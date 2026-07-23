@@ -31,11 +31,23 @@ Input values:
 
 Output:
 
-```
+```text
 Resistor impedance is 100.00+0.00j ohm
 Inductor impedance is 0.00+15.71j ohm
 Capacitor impedance is 0.00-31.83j ohm
 Total impedance is 100.00-16.12j ohm
 Magnitude is 101.29 ohm
 Phase is -9.16 degrees
+```
+
+## Run
+
+```bash
+python applications/circuit-analyzer/impedance.py
+```
+
+## Test
+
+```bash
+python applications/circuit-analyzer/test_impedance.py
 ```

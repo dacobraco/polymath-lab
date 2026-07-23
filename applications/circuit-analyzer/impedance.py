@@ -43,9 +43,10 @@ def print_all(resistance, inductance, capacitance, frequency):
     print(f"Magnitude is {impedance_magnitude(Z):.2f} ohm")
     print(f"Phase is {impedance_phase(Z):.2f} degrees")
 
-resistance = 100
-inductance = 0.05
-capacitance = 100e-6
-frequency = 50
+if __name__ == "__main__":
+    resistance = 100
+    inductance = 0.05
+    capacitance = 100e-6
+    frequency = 50
 
-print_all(resistance, inductance, capacitance, frequency)
+    print_all(resistance, inductance, capacitance, frequency)
