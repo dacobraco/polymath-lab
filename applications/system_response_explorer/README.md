@@ -18,6 +18,7 @@ A simple Python application that demonstrates how basic systems transform numeri
 ## Project Structure
 
 - `basic_systems.py` — contains the system functions
+- `linearity.py` — checks systems for linearity
 - `main.py` — runs the interactive application
 - `tests.py` — verifies the system functions
 
@@ -38,3 +39,20 @@ Expected output:
 ```text
 All tests passed!
 ```
+
+## Linearity Checker
+
+The application can test whether a selected system satisfies:
+
+T(a*x1 + b*x2) = a*T(x1) + b*T(x2)
+
+Current results:
+
+- Amplify is linear
+- Attenuate is linear
+- Shift is not linear
+
+Run the checker:
+
+```bash
+python linearity.py

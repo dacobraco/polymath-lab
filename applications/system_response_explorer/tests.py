@@ -1,4 +1,5 @@
 from basic_systems import amplify, attenuate, shift
+from linearity import is_linear
 
 def test_amplify():
     assert amplify(4) == 8
@@ -14,8 +15,16 @@ def test_shift():
     assert shift(4) == 7
     assert shift([1, 2, 3]) == [4, 5, 6]
 
+
+def test_linearity():
+    assert is_linear(amplify, 2, 4, 3, 2) is True
+    assert is_linear(attenuate, 2, 4, 3, 2) is True
+    assert is_linear(shift, 2, 4, 3, 2) is False
+
 if __name__ == "__main__":
     test_amplify()
     test_attenuate()
     test_shift()
-    print("All tests passed!")
+    test_linearity()
+
+    print("\nAll tests passed!")
