@@ -56,3 +56,4 @@ Run the checker:
 
 ```bash
 python linearity.py
+```

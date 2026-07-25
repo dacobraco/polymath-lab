@@ -10,15 +10,14 @@ def is_linear(system, x1, x2, a, b):
     print(f"{system.__name__.capitalize()} is linear: {result}")
     return result
 
-
-option = input(
-    "1. Amplify\n"
-    "2. Attenuate\n"
-    "3. Shift\n\n"
-    "Choose your option (1, 2 or 3): "
-)
-
 if __name__ == "__main__":
+    option = input(
+        "1. Amplify\n"
+        "2. Attenuate\n"
+        "3. Shift\n\n"
+        "Choose your option (1, 2 or 3): "
+    )
+
     if option == "1":
         system = amplify
     elif option == "2":
