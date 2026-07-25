@@ -41,7 +41,6 @@ if __name__ == "__main__":
     test_shift()
     test_linearity()
     test_signal_shifts()
-    test_signal_shifts()
     test_time_invariance()
 
     print("\nAll tests passed!")
