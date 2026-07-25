@@ -14,6 +14,8 @@ A simple Python application that demonstrates how basic systems transform numeri
 - Accepts a comma-separated list
 - Applies the selected system
 - Displays the input and output
+- Delays and advances discrete signals by one sample
+- Checks systems for time invariance
 
 ## Project Structure
 
@@ -21,6 +23,8 @@ A simple Python application that demonstrates how basic systems transform numeri
 - `linearity.py` — checks systems for linearity
 - `main.py` — runs the interactive application
 - `tests.py` — verifies the system functions
+- `signal_shifts.py` — delays and advances discrete signals
+- `time_invariance.py` — checks systems for time invariance
 
 ## Run
 
@@ -56,4 +60,38 @@ Run the checker:
 
 ```bash
 python linearity.py
+```
+
+## Signal Shifts
+
+The application supports one-sample signal shifts with zero padding:
+
+- Delay: `y[n] = x[n - 1]`
+- Advance: `y[n] = x[n + 1]`
+
+Example:
+
+```text
+Input:    [1, 2, 3, 4]
+Delayed: [0, 1, 2, 3]
+Advanced:[2, 3, 4, 0]
+```
+
+## Time-Invariance Checker
+
+A system is time invariant when delaying the input before applying the
+system gives the same result as applying the system before delaying the
+output.
+
+Current results:
+
+- Amplify — time invariant
+- Attenuate — time invariant
+- Shift — time invariant
+- Multiply by index — time varying
+
+Run the checker:
+
+```bash
+python time_invariance.py
 ```

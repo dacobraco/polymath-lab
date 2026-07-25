@@ -12,3 +12,9 @@ def shift(x):
     if isinstance(x, list):
         return [value + 3 for value in x]
     return x + 3
+
+def multiply_by_index(signal):
+    return [
+        index * value
+        for index, value in enumerate(signal)
+    ]
