@@ -95,3 +95,18 @@ Run the checker:
 ```bash
 python time_invariance.py
 ```
+
+## Previous Sample Addition
+
+The system is defined by:
+
+`y[n] = x[n] + x[n - 1]`
+
+This system has memory because its output depends on both the current and the previous input sample.
+
+Example:
+
+```text
+Input:  [1, 2, 3, 4]
+Output: [1, 3, 5, 7]
+```
