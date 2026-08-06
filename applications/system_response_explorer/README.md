@@ -16,15 +16,17 @@ A simple Python application that demonstrates how basic systems transform numeri
 - Displays the input and output
 - Delays and advances discrete signals by one sample
 - Checks systems for time invariance
+- Creates and visualizes unit impulses and impulse responses
 
 ## Project Structure
 
-- `basic_systems.py` — contains the system functions
-- `linearity.py` — checks systems for linearity
-- `main.py` — runs the interactive application
-- `tests.py` — verifies the system functions
-- `signal_shifts.py` — delays and advances discrete signals
-- `time_invariance.py` — checks systems for time invariance
+- `basic_systems.py` - contains the system functions
+- `linearity.py` - checks systems for linearity
+- `main.py` - runs the interactive application
+- `tests.py` - verifies the system functions
+- `signal_shifts.py` - delays and advances discrete signals
+- `time_invariance.py` - checks systems for time invariance
+- `impulse_response.py` - creates and visualizes unit impulses and impulse responses
 
 ## Run
 
@@ -85,10 +87,10 @@ output.
 
 Current results:
 
-- Amplify — time invariant
-- Attenuate — time invariant
-- Shift — time invariant
-- Multiply by index — time varying
+- Amplify - time invariant
+- Attenuate - time invariant
+- Shift - time invariant
+- Multiply by index - time varying
 
 Run the checker:
 
@@ -109,4 +111,22 @@ Example:
 ```text
 Input:  [1, 2, 3, 4]
 Output: [1, 3, 5, 7]
+```
+
+## Impulse Response
+
+The impulse response describes how a system responds to a unit impulse `δ[n]`.
+
+The explorer visualizes the following systems:
+
+- `h1[n] = 2δ[n]` - amplification
+- `h2[n] = δ[n - 1]` - one-sample delay
+- `h3[n] = δ[n] + 0.5δ[n - 1]` - current and delayed response
+
+The signals are displayed using discrete stem plots.
+
+Run the explorer:
+
+```bash
+python impulse_response.py
 ```
