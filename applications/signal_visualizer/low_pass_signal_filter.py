@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-cutoff_frequency = 10  # Hz
+cutoff_frequency = 2  # Hz
 low_frequency = 1  # Hz
 high_frequency = 20  # Hz
 
