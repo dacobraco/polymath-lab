@@ -13,6 +13,7 @@ The project connects mathematical models with numerical calculations and visuali
 - Impulse response of an LTI system
 - Discrete-time convolution
 - Input-side convolution as a sum of shifted and scaled impulse responses
+- Output-side convolution
 - Commutativity of convolution
 - Magnitude and phase of a frequency response
 - Wrapped and unwrapped phase
@@ -43,11 +44,13 @@ The project connects mathematical models with numerical calculations and visuali
 - Applies magnitude attenuation and phase shift to individual sinusoidal components
 - Reconstructs and compares composite input and filtered output signals
 - Implements discrete-time convolution manually using nested loops
+- Accepts interactive comma-separated input sequences
 - Verifies manual convolution against `np.convolve`
 - Verifies the commutative property of convolution
 - Visualizes the input, impulse response, and convolution output
 - Decomposes the output into shifted and scaled impulse-response contributions
 - Reconstructs the output by summing all individual contributions
+- Includes pytest tests for a known result, commutativity, and output length
 
 ## Mathematical Models
 
@@ -176,18 +179,20 @@ Complementary magnitude-response identity:
 - `high_pass_bode_explorer.py` - displays the high-pass Bode response, compares it with the low-pass response, and verifies their complementary magnitudes
 - `low_pass_signal_filter.py` - filters a composite signal by processing its sinusoidal components separately
 - `impulse_response.py` - creates and visualizes shifted and scaled discrete-time impulse responses
-- `convolution.py` - implements manual discrete-time convolution and visualizes every shifted and scaled contribution
+- `convolution.py` - provides an interactive manual convolution laboratory and visualizes every shifted and scaled contribution
+- `test_convolution.py` - tests a known convolution result, commutativity, and output length
 
 ## Requirements
 
 - Python 3
 - NumPy
 - Matplotlib
+- pytest
 
 Install the required libraries:
 
 ```bash
-pip install numpy matplotlib
+pip install numpy matplotlib pytest
 ```
 
 ## Run
@@ -248,10 +253,48 @@ Impulse-response visualization:
 python impulse_response.py
 ```
 
-Manual discrete-time convolution:
+Interactive discrete-time convolution:
 
 ```bash
 python convolution.py
+```
+
+The program asks for the input signal and impulse response as comma-separated values:
+
+```text
+Enter x[n] as comma-separated values: 1, 2, 4, 7
+Enter h[n] as comma-separated values: 1, -1
+```
+
+The manual convolution, NumPy result, commutativity check, contribution matrix, and graphical visualizations are then displayed.
+
+## Tests
+
+Run the convolution tests from `applications/signal_visualizer`:
+
+```bash
+python -m pytest -v test_convolution.py
+```
+
+The test suite verifies:
+
+- a manually calculated convolution result
+- the commutative property of convolution
+- the output-length formula
+
+The expected result is:
+
+```text
+collected 3 items
+test_convolution.py::test_manual_known_example PASSED
+test_convolution.py::test_convolution_is_commutative PASSED
+test_convolution.py::test_output_length PASSED
+```
+
+The final summary should report:
+
+```text
+3 passed
 ```
 
 ## Expected Results
@@ -317,11 +360,11 @@ h2[n] = δ[n - 1]
 h3[n] = δ[n] + 0.5δ[n - 1]
 ```
 
-For the convolution experiment with `x = [1, 2, 4, 7]` and `h = [1, -1]`:
+For the interactive convolution example with `x = [1, 2, 4, 7]` and `h = [1, -1]`:
 
 ```text
 Manual convolution: [ 1.  1.  2.  3. -7.]
-NumPy convolution: [ 1  1  2  3 -7]
+NumPy convolution: [ 1.  1.  2.  3. -7.]
 Matching: True
 Convolution is commutative: True
 Contribution sum: [ 1.  1.  2.  3. -7.]
@@ -351,8 +394,17 @@ y[n] = x[n] - x[n - 1]
 
 Samples outside the finite input sequence are treated as zero.
 
+The third manually calculated example is:
+
+```text
+x = [2, -1, 3]
+h = [1, 2, -1]
+y = [2, 3, -1, 7, -3]
+```
+
 ## Learning Progress
 
+This project contains practical work from lessons 14 through 24 and related practical explorations from the PolyMath curriculum:
 
 - Complex exponentials
 - Delay and phase shift
@@ -365,6 +417,10 @@ Samples outside the finite input sequence are treated as zero.
 - First-order high-pass response
 - Complementary low-pass and high-pass magnitude responses
 - Unit impulses and impulse response
-- Discrete-time convolution
+- Convolution intuition
+- Manual discrete-time convolution
 - Input-side construction using shifted and scaled impulse responses
+- Output-side calculation of individual output samples
 - Convolution commutativity and numerical verification
+- Interactive Convolution Lab v1
+- Automated convolution testing with pytest
