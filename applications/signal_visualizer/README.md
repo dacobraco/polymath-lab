@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python experiments for building intuition about signals, LTI systems, frequency response, Bode plots, and first-order filtering.
+A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, and first-order filtering.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -9,6 +9,11 @@ The project connects mathematical models with numerical calculations and visuali
 - Complex exponentials and their real and imaginary components
 - Time delay and phase shift
 - Complex exponentials as eigenfunctions of LTI systems
+- Unit impulses and shifted impulses
+- Impulse response of an LTI system
+- Discrete-time convolution
+- Input-side convolution as a sum of shifted and scaled impulse responses
+- Commutativity of convolution
 - Magnitude and phase of a frequency response
 - Wrapped and unwrapped phase
 - First-order low-pass filters
@@ -26,6 +31,8 @@ The project connects mathematical models with numerical calculations and visuali
 - Compares an original sinusoid with its delayed version
 - Verifies the eigenfunction property of complex exponentials for an LTI delay system
 - Displays magnitude, wrapped phase, and unwrapped phase
+- Creates shifted and scaled unit impulses
+- Visualizes several discrete-time impulse responses
 - Calculates the response of a first-order low-pass filter
 - Calculates the response of a first-order high-pass filter
 - Identifies the frequency sample closest to the cutoff frequency
@@ -35,6 +42,12 @@ The project connects mathematical models with numerical calculations and visuali
 - Numerically verifies complementary magnitude responses using `np.allclose`
 - Applies magnitude attenuation and phase shift to individual sinusoidal components
 - Reconstructs and compares composite input and filtered output signals
+- Implements discrete-time convolution manually using nested loops
+- Verifies manual convolution against `np.convolve`
+- Verifies the commutative property of convolution
+- Visualizes the input, impulse response, and convolution output
+- Decomposes the output into shifted and scaled impulse-response contributions
+- Reconstructs the output by summing all individual contributions
 
 ## Mathematical Models
 
@@ -49,6 +62,47 @@ Pure time delay:
 ```text
 y(t) = x(t - τ)
 H(f) = exp(-j2πfτ)
+```
+
+Shifted unit impulse:
+
+```text
+δ[n - n0] = 1,  n = n0
+δ[n - n0] = 0,  n ≠ n0
+```
+
+Example impulse responses:
+
+```text
+h1[n] = 2δ[n]
+h2[n] = δ[n - 1]
+h3[n] = δ[n] + 0.5δ[n - 1]
+```
+
+Discrete-time convolution:
+
+```text
+y[n] = x[n] * h[n]
+y[n] = sum_k x[k]h[n - k]
+```
+
+Input-side contribution produced by one input sample:
+
+```text
+c_k[n] = x[k]h[n - k]
+y[n] = sum_k c_k[n]
+```
+
+Output length for finite signals:
+
+```text
+N_y = N_x + N_h - 1
+```
+
+Commutativity of convolution:
+
+```text
+x[n] * h[n] = h[n] * x[n]
 ```
 
 Normalized frequency ratio:
@@ -121,6 +175,8 @@ Complementary magnitude-response identity:
 - `low_pass_bode_explorer.py` - displays the low-pass Bode response and measures the high-frequency slope
 - `high_pass_bode_explorer.py` - displays the high-pass Bode response, compares it with the low-pass response, and verifies their complementary magnitudes
 - `low_pass_signal_filter.py` - filters a composite signal by processing its sinusoidal components separately
+- `impulse_response.py` - creates and visualizes shifted and scaled discrete-time impulse responses
+- `convolution.py` - implements manual discrete-time convolution and visualizes every shifted and scaled contribution
 
 ## Requirements
 
@@ -186,6 +242,18 @@ Composite-signal filtering:
 python low_pass_signal_filter.py
 ```
 
+Impulse-response visualization:
+
+```bash
+python impulse_response.py
+```
+
+Manual discrete-time convolution:
+
+```bash
+python convolution.py
+```
+
 ## Expected Results
 
 For a first-order low-pass filter at the cutoff frequency:
@@ -241,9 +309,50 @@ For the composite filtering experiment with `fc = 2 Hz`:
 - the 20 Hz component is strongly attenuated and shifted close to -90°
 - the output keeps both original frequencies because an LTI system changes their amplitudes and phases, not their frequencies
 
+The impulse-response experiment visualizes:
+
+```text
+h1[n] = 2δ[n]
+h2[n] = δ[n - 1]
+h3[n] = δ[n] + 0.5δ[n - 1]
+```
+
+For the convolution experiment with `x = [1, 2, 4, 7]` and `h = [1, -1]`:
+
+```text
+Manual convolution: [ 1.  1.  2.  3. -7.]
+NumPy convolution: [ 1  1  2  3 -7]
+Matching: True
+Convolution is commutative: True
+Contribution sum: [ 1.  1.  2.  3. -7.]
+Matching: True
+```
+
+The contribution matrix is:
+
+```text
+[[ 1. -1.  0.  0.  0.]
+ [ 0.  2. -2.  0.  0.]
+ [ 0.  0.  4. -4.  0.]
+ [ 0.  0.  0.  7. -7.]]
+```
+
+Each row is one shifted and scaled copy of the impulse response. Summing the rows reconstructs the complete output:
+
+```text
+y[n] = [1, 1, 2, 3, -7]
+```
+
+For `h = [1, -1]`, the system calculates the difference between consecutive input samples:
+
+```text
+y[n] = x[n] - x[n - 1]
+```
+
+Samples outside the finite input sequence are treated as zero.
+
 ## Learning Progress
 
-This project contains the practical work from lessons 14 through 20 of the PolyMath curriculum:
 
 - Complex exponentials
 - Delay and phase shift
@@ -255,3 +364,7 @@ This project contains the practical work from lessons 14 through 20 of the PolyM
 - Filtering a composite signal
 - First-order high-pass response
 - Complementary low-pass and high-pass magnitude responses
+- Unit impulses and impulse response
+- Discrete-time convolution
+- Input-side construction using shifted and scaled impulse responses
+- Convolution commutativity and numerical verification
