@@ -34,6 +34,11 @@ The project connects mathematical models with numerical calculations and visuali
 * Orthogonal and orthonormal bases
 * Signal projection onto sine and cosine basis functions
 * Signal reconstruction from projection coefficients
+* Trigonometric Fourier coefficients
+* DC, cosine, and sine coefficients
+* Signal symmetry and vanishing Fourier coefficients
+* Symbolic and numerical integration
+* Numerical approximation error
 
 ## Features
 
@@ -70,6 +75,12 @@ The project connects mathematical models with numerical calculations and visuali
 * Projects a composite signal onto sine and cosine basis functions
 * Recovers the coefficients of the original signal components
 * Reconstructs the signal and verifies the result using `np.allclose`
+* Calculates the Fourier coefficients of a square wave symbolically with SymPy
+* Approximates the same Fourier coefficients using numerical integration
+* Compares symbolic and numerical coefficients in a formatted table
+* Calculates the absolute error between both methods
+* Verifies the expected symmetry and odd-harmonic coefficient pattern
+* Visualizes symbolic and numerical sine coefficients on the same stem plot
 
 ## Mathematical Models
 
@@ -182,6 +193,40 @@ Signal reconstruction from basis functions:
 x_reconstructed(t) = sum_k c_k b_k(t)
 ```
 
+Trigonometric Fourier series:
+
+```text
+x(t) = a0/2 + sum_n [a_n cos(nω0t) + b_n sin(nω0t)]
+```
+
+Fourier coefficients over one period:
+
+```text
+a0 = (2/T) integral_T x(t) dt
+a_n = (2/T) integral_T x(t)cos(nω0t) dt
+b_n = (2/T) integral_T x(t)sin(nω0t) dt
+```
+
+Symmetry properties:
+
+```text
+Even signal: b_n = 0
+Odd signal: a0 = 0 and a_n = 0
+```
+
+Sine coefficients of the odd square wave:
+
+```text
+b_n = 4/(nπ),  n odd
+b_n = 0,       n even
+```
+
+Absolute coefficient error:
+
+```text
+absolute_error = |symbolic_b_n - numerical_b_n|
+```
+
 Normalized frequency ratio:
 
 ```text
@@ -257,18 +302,20 @@ Complementary magnitude-response identity:
 * `test_convolution.py` - tests a known convolution result, commutativity, and output length
 * `fourier_series_explorer.py` - reconstructs a square wave using increasing numbers of odd Fourier harmonics
 * `orthogonality_explorer.py` - verifies orthogonality, extracts projection coefficients, and reconstructs a composite signal
+* `fourier_coefficients_explorer.py` - compares symbolic and numerical Fourier coefficients of an odd square wave
 
 ## Requirements
 
 * Python 3
 * NumPy
+* SymPy
 * Matplotlib
 * pytest
 
 Install the required libraries:
 
 ```bash
-pip install numpy matplotlib pytest
+pip install numpy sympy matplotlib pytest
 ```
 
 ## Run
@@ -363,6 +410,14 @@ python orthogonality_explorer.py
 ```
 
 The program calculates inner products between sinusoidal basis functions, extracts the coefficients of a composite signal, and reconstructs the signal from its projections.
+
+Symbolic and numerical Fourier coefficients:
+
+```bash
+python fourier_coefficients_explorer.py
+```
+
+The program calculates the first ten Fourier coefficients of an odd square wave, compares symbolic and numerical results, verifies the expected coefficient pattern, and displays both methods on the same stem plot.
 
 ## Tests
 
@@ -532,9 +587,40 @@ cos2 coefficient: 0.5
 Reconstruction matches: True
 ```
 
+For the Fourier-coefficient experiment:
+
+```text
+a0 ≈ 0
+a_n ≈ 0
+b_n ≈ 4/(nπ),  n odd
+b_n ≈ 0,       n even
+```
+
+The first coefficients are:
+
+```text
+b1 ≈ 1.2732395
+b2 ≈ 0
+b3 ≈ 0.4244131
+b4 ≈ 0
+b5 ≈ 0.2546477
+```
+
+All automatic checks should return:
+
+```text
+True
+```
+
+The symbolic and numerical sine coefficients should agree within an absolute tolerance of:
+
+```text
+1e-6
+```
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 25 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 27 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -558,10 +644,14 @@ This project contains practical work from lessons 14 through 25 and related prac
 * Fundamental frequency and harmonics
 * Square-wave reconstruction using odd harmonics
 * Gibbs phenomenon near discontinuities
-
-Lesson 26 adds:
-
 * Inner products of signals
 * Orthogonal and orthonormal basis functions
 * Projection coefficients
 * Signal reconstruction from orthogonal components
+* Trigonometric Fourier coefficients
+* DC, cosine, and sine coefficients
+* Symmetry-based elimination of Fourier coefficients
+* Symbolic integration with SymPy
+* Numerical integration with NumPy
+* Absolute-error comparison between both methods
+* Automatic coefficient validation
