@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, and harmonic reconstruction.
+A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, harmonic reconstruction, and quantitative reconstruction error.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -39,6 +39,12 @@ The project connects mathematical models with numerical calculations and visuali
 * Signal symmetry and vanishing Fourier coefficients
 * Symbolic and numerical integration
 * Numerical approximation error
+* Periodic extension and normalized-time wrapping
+* Fourier-series reconstruction of a sawtooth signal
+* Alternating Fourier sine coefficients
+* Partial sums using consecutive harmonics
+* Root mean square reconstruction error
+* Convergence at periodic discontinuities
 
 ## Features
 
@@ -81,6 +87,13 @@ The project connects mathematical models with numerical calculations and visuali
 * Calculates the absolute error between both methods
 * Verifies the expected symmetry and odd-harmonic coefficient pattern
 * Visualizes symbolic and numerical sine coefficients on the same stem plot
+* Constructs an ideal periodically repeated sawtooth signal using normalized-time wrapping
+* Reconstructs the sawtooth using all harmonics from 1 through `N`
+* Compares partial sums for `N = 1, 3, 5, and 20`
+* Calculates RMSE between the ideal signal and every reconstruction
+* Verifies that reconstruction error decreases as more harmonics are included
+* Displays the ideal sawtooth and four Fourier reconstructions in a 2-by-2 subplot layout
+* Visualizes narrowing Gibbs oscillations near the periodic discontinuities
 
 ## Mathematical Models
 
@@ -227,6 +240,45 @@ Absolute coefficient error:
 absolute_error = |symbolic_b_n - numerical_b_n|
 ```
 
+Normalized periodic wrapping into the interval `[-π, π)`:
+
+```text
+t_wrapped = (t + π) mod (2π) - π
+```
+
+Normalized sawtooth signal over one period:
+
+```text
+x(t) = t / π,  -π < t < π
+```
+
+Fourier sine coefficients of the normalized sawtooth:
+
+```text
+a0 = 0
+a_n = 0
+b_n = 2(-1)^(n + 1) / (πn)
+```
+
+Sawtooth reconstruction using the first `N` consecutive harmonics:
+
+```text
+x_N(t) = (2/π) sum from n=1 to N of [(-1)^(n + 1) / n] sin(nt)
+```
+
+Root mean square reconstruction error:
+
+```text
+RMSE = sqrt(mean((x_ideal - x_N)²))
+```
+
+Fourier-series value at a jump discontinuity:
+
+```text
+x_N(t_jump) approaches (x_left + x_right) / 2
+For a jump from 1 to -1, the limiting value is 0.
+```
+
 Normalized frequency ratio:
 
 ```text
@@ -303,6 +355,7 @@ Complementary magnitude-response identity:
 * `fourier_series_explorer.py` - reconstructs a square wave using increasing numbers of odd Fourier harmonics
 * `orthogonality_explorer.py` - verifies orthogonality, extracts projection coefficients, and reconstructs a composite signal
 * `fourier_coefficients_explorer.py` - compares symbolic and numerical Fourier coefficients of an odd square wave
+* `periodic_signal_reconstruction.py` - reconstructs a periodic sawtooth using consecutive harmonics and measures RMSE
 
 ## Requirements
 
@@ -418,6 +471,14 @@ python fourier_coefficients_explorer.py
 ```
 
 The program calculates the first ten Fourier coefficients of an odd square wave, compares symbolic and numerical results, verifies the expected coefficient pattern, and displays both methods on the same stem plot.
+
+Periodic sawtooth reconstruction:
+
+```bash
+python periodic_signal_reconstruction.py
+```
+
+The program periodically wraps normalized time into `[-π, π)`, reconstructs the sawtooth using all harmonics from 1 through `N` for `N = 1, 3, 5, and 20`, calculates RMSE, and compares all four reconstructions in a 2-by-2 subplot layout.
 
 ## Tests
 
@@ -618,9 +679,27 @@ The symbolic and numerical sine coefficients should agree within an absolute tol
 1e-6
 ```
 
+For the periodic sawtooth reconstruction, the measured RMSE values with 5000 normalized-time samples are:
+
+```text
+N = 1,  RMSE = 0.361476
+N = 3,  RMSE = 0.239798
+N = 5,  RMSE = 0.191667
+N = 20, RMSE = 0.099401
+```
+
+The sawtooth experiment demonstrates that:
+
+* every reconstruction uses all harmonics from `1` through `N`
+* the coefficient sign alternates between consecutive harmonics
+* larger `N` produces a more accurate linear slope and a smaller RMSE
+* Gibbs oscillations become narrower near the discontinuities as `N` increases
+* the relative Gibbs overshoot does not disappear completely
+* exactly at a jump from `1` to `-1`, the Fourier series converges to `0`
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 27 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 28 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -655,3 +734,10 @@ This project contains practical work from lessons 14 through 27 and related prac
 * Numerical integration with NumPy
 * Absolute-error comparison between both methods
 * Automatic coefficient validation
+* Periodic extension using normalized-time wrapping
+* Sawtooth reconstruction using consecutive Fourier harmonics
+* Alternating sine-coefficient signs
+* Partial-sum comparison for 1, 3, 5, and 20 harmonics
+* RMSE measurement of reconstruction quality
+* Numerical verification that RMSE decreases with additional harmonics
+* Fourier-series convergence to the midpoint at discontinuities
