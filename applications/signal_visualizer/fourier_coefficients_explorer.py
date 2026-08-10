@@ -45,7 +45,7 @@ for n, (symbolic_value, numerical_value) in enumerate(zip(symbolic_bn, numerical
     print(
         f"{n} | {symbolic_value} | "
         f"{numerical_value:.8f} | {error:.3e}"
-)
+        )
 
 print("a0 is approximately zero:", np.isclose(numerical_a0, 0, atol=10**-6, rtol=0))
 print("an is approximately zero:", np.allclose(numerical_an, 0, atol=10**-6, rtol=0))
