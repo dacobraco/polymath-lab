@@ -1,56 +1,75 @@
 # Signal Visualizer
 
-A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, and first-order filtering.
+A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, and harmonic reconstruction.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
 ## Concepts
 
-- Complex exponentials and their real and imaginary components
-- Time delay and phase shift
-- Complex exponentials as eigenfunctions of LTI systems
-- Unit impulses and shifted impulses
-- Impulse response of an LTI system
-- Discrete-time convolution
-- Input-side convolution as a sum of shifted and scaled impulse responses
-- Output-side convolution
-- Commutativity of convolution
-- Magnitude and phase of a frequency response
-- Wrapped and unwrapped phase
-- First-order low-pass filters
-- First-order high-pass filters
-- Cutoff frequency and the -3 dB point
-- Decibels and Bode plots
-- Logarithmic frequency axes
-- Frequency-response slope in decibels per decade
-- Complementary low-pass and high-pass magnitude responses
-- Filtering a signal composed of multiple sinusoidal components
+* Complex exponentials and their real and imaginary components
+* Time delay and phase shift
+* Complex exponentials as eigenfunctions of LTI systems
+* Unit impulses and shifted impulses
+* Impulse response of an LTI system
+* Discrete-time convolution
+* Input-side convolution as a sum of shifted and scaled impulse responses
+* Output-side convolution
+* Commutativity of convolution
+* Magnitude and phase of a frequency response
+* Wrapped and unwrapped phase
+* First-order low-pass filters
+* First-order high-pass filters
+* Cutoff frequency and the -3 dB point
+* Decibels and Bode plots
+* Logarithmic frequency axes
+* Frequency-response slope in decibels per decade
+* Complementary low-pass and high-pass magnitude responses
+* Filtering a signal composed of multiple sinusoidal components
+* Fourier series representation of periodic signals
+* Fundamental frequency and harmonics
+* Harmonic reconstruction of a square wave
+* Odd harmonics and the Gibbs phenomenon
+* Inner products of real signals over one period
+* Orthogonal sinusoidal basis functions
+* Orthogonal and orthonormal bases
+* Signal projection onto sine and cosine basis functions
+* Signal reconstruction from projection coefficients
 
 ## Features
 
-- Visualizes the real and imaginary parts of a complex exponential
-- Compares an original sinusoid with its delayed version
-- Verifies the eigenfunction property of complex exponentials for an LTI delay system
-- Displays magnitude, wrapped phase, and unwrapped phase
-- Creates shifted and scaled unit impulses
-- Visualizes several discrete-time impulse responses
-- Calculates the response of a first-order low-pass filter
-- Calculates the response of a first-order high-pass filter
-- Identifies the frequency sample closest to the cutoff frequency
-- Displays magnitude in decibels on a logarithmic frequency axis
-- Measures the low-pass slope between two frequencies
-- Compares low-pass and high-pass magnitude responses on the same Bode plot
-- Numerically verifies complementary magnitude responses using `np.allclose`
-- Applies magnitude attenuation and phase shift to individual sinusoidal components
-- Reconstructs and compares composite input and filtered output signals
-- Implements discrete-time convolution manually using nested loops
-- Accepts interactive comma-separated input sequences
-- Verifies manual convolution against `np.convolve`
-- Verifies the commutative property of convolution
-- Visualizes the input, impulse response, and convolution output
-- Decomposes the output into shifted and scaled impulse-response contributions
-- Reconstructs the output by summing all individual contributions
-- Includes pytest tests for a known result, commutativity, and output length
+* Visualizes the real and imaginary parts of a complex exponential
+* Compares an original sinusoid with its delayed version
+* Verifies the eigenfunction property of complex exponentials for an LTI delay system
+* Displays magnitude, wrapped phase, and unwrapped phase
+* Creates shifted and scaled unit impulses
+* Visualizes several discrete-time impulse responses
+* Calculates the response of a first-order low-pass filter
+* Calculates the response of a first-order high-pass filter
+* Identifies the frequency sample closest to the cutoff frequency
+* Displays magnitude in decibels on a logarithmic frequency axis
+* Measures the low-pass slope between two frequencies
+* Compares low-pass and high-pass magnitude responses on the same Bode plot
+* Numerically verifies complementary magnitude responses using `np.allclose`
+* Applies magnitude attenuation and phase shift to individual sinusoidal components
+* Reconstructs and compares composite input and filtered output signals
+* Implements discrete-time convolution manually using nested loops
+* Accepts interactive comma-separated input sequences
+* Verifies manual convolution against `np.convolve`
+* Verifies the commutative property of convolution
+* Visualizes the input, impulse response, and convolution output
+* Decomposes the output into shifted and scaled impulse-response contributions
+* Reconstructs the output by summing all individual contributions
+* Includes pytest tests for a known result, commutativity, and output length
+* Reconstructs a square wave using odd Fourier harmonics
+* Generates partial sums for maximum harmonics `K = 1, 3, 5, and 9`
+* Stores harmonic reconstructions generated by nested loops
+* Compares Fourier approximations with an ideal square wave
+* Visualizes Gibbs oscillations near signal discontinuities
+* Calculates numerical inner products over one period
+* Verifies the orthogonality of different sinusoidal basis functions
+* Projects a composite signal onto sine and cosine basis functions
+* Recovers the coefficients of the original signal components
+* Reconstructs the signal and verifies the result using `np.allclose`
 
 ## Mathematical Models
 
@@ -106,6 +125,61 @@ Commutativity of convolution:
 
 ```text
 x[n] * h[n] = h[n] * x[n]
+```
+
+Square-wave Fourier series:
+
+```text
+x(t) = (4/π) sum_{k=1,3,5,...} sin(kω0t) / k
+```
+
+Partial reconstruction up to the highest odd harmonic `K`:
+
+```text
+x_K(t) = (4/π) sum_{k=1,3,5,...,K} sin(kω0t) / k
+```
+
+Fundamental frequency and angular frequency:
+
+```text
+f0 = 1 / T
+ω0 = 2πf0
+```
+
+Amplitude of the odd harmonic `k`:
+
+```text
+A_k = 4 / (πk)
+```
+
+Continuous-time inner product over one period:
+
+```text
+<x, y> = integral from 0 to T of x(t)y(t) dt
+```
+
+Numerical approximation of the inner product:
+
+```text
+<x, y> ≈ dt sum_n x[n]y[n]
+```
+
+Orthogonality condition:
+
+```text
+<x, y> = 0
+```
+
+Projection coefficient onto a basis function:
+
+```text
+c = <x, b> / <b, b>
+```
+
+Signal reconstruction from basis functions:
+
+```text
+x_reconstructed(t) = sum_k c_k b_k(t)
 ```
 
 Normalized frequency ratio:
@@ -170,24 +244,26 @@ Complementary magnitude-response identity:
 
 ## Project Structure
 
-- `frequency_explorer.py` - visualizes the real and imaginary parts of a complex exponential
-- `delay_phase_explorer.py` - compares an original signal with a delayed signal
-- `lti_eigenfunction_explorer.py` - verifies that a complex exponential keeps its form through an LTI delay system
-- `frequency_response_explorer.py` - visualizes the magnitude and wrapped and unwrapped phase of a pure delay
-- `low_pass_frequency_response.py` - analyzes the magnitude and phase of a first-order low-pass filter
-- `low_pass_bode_explorer.py` - displays the low-pass Bode response and measures the high-frequency slope
-- `high_pass_bode_explorer.py` - displays the high-pass Bode response, compares it with the low-pass response, and verifies their complementary magnitudes
-- `low_pass_signal_filter.py` - filters a composite signal by processing its sinusoidal components separately
-- `impulse_response.py` - creates and visualizes shifted and scaled discrete-time impulse responses
-- `convolution.py` - provides an interactive manual convolution laboratory and visualizes every shifted and scaled contribution
-- `test_convolution.py` - tests a known convolution result, commutativity, and output length
+* `frequency_explorer.py` - visualizes the real and imaginary parts of a complex exponential
+* `delay_phase_explorer.py` - compares an original signal with its delayed signal
+* `lti_eigenfunction_explorer.py` - verifies that a complex exponential keeps its form through an LTI delay system
+* `frequency_response_explorer.py` - visualizes the magnitude and wrapped and unwrapped phase of a pure delay
+* `low_pass_frequency_response.py` - analyzes the magnitude and phase of a first-order low-pass filter
+* `low_pass_bode_explorer.py` - displays the low-pass Bode response and measures the high-frequency slope
+* `high_pass_bode_explorer.py` - displays the high-pass Bode response, compares it with the low-pass response, and verifies their complementary magnitudes
+* `low_pass_signal_filter.py` - filters a composite signal by processing its sinusoidal components separately
+* `impulse_response.py` - creates and visualizes shifted and scaled discrete-time impulse responses
+* `convolution.py` - provides an interactive manual convolution laboratory and visualizes every shifted and scaled contribution
+* `test_convolution.py` - tests a known convolution result, commutativity, and output length
+* `fourier_series_explorer.py` - reconstructs a square wave using increasing numbers of odd Fourier harmonics
+* `orthogonality_explorer.py` - verifies orthogonality, extracts projection coefficients, and reconstructs a composite signal
 
 ## Requirements
 
-- Python 3
-- NumPy
-- Matplotlib
-- pytest
+* Python 3
+* NumPy
+* Matplotlib
+* pytest
 
 Install the required libraries:
 
@@ -268,6 +344,26 @@ Enter h[n] as comma-separated values: 1, -1
 
 The manual convolution, NumPy result, commutativity check, contribution matrix, and graphical visualizations are then displayed.
 
+Fourier-series square-wave reconstruction:
+
+```bash
+python fourier_series_explorer.py
+```
+
+The program compares an ideal square wave with Fourier partial sums whose highest included odd harmonics are:
+
+```text
+K = 1, 3, 5, 9
+```
+
+Orthogonality and signal projection:
+
+```bash
+python orthogonality_explorer.py
+```
+
+The program calculates inner products between sinusoidal basis functions, extracts the coefficients of a composite signal, and reconstructs the signal from its projections.
+
 ## Tests
 
 Run the convolution tests from `applications/signal_visualizer`:
@@ -278,9 +374,9 @@ python -m pytest -v test_convolution.py
 
 The test suite verifies:
 
-- a manually calculated convolution result
-- the commutative property of convolution
-- the output-length formula
+* a manually calculated convolution result
+* the commutative property of convolution
+* the output-length formula
 
 The expected result is:
 
@@ -348,9 +444,9 @@ f >> fc: |H_HP| approaches 1 and phase approaches 0°
 
 For the composite filtering experiment with `fc = 2 Hz`:
 
-- the 1 Hz component is only moderately attenuated and phase shifted
-- the 20 Hz component is strongly attenuated and shifted close to -90°
-- the output keeps both original frequencies because an LTI system changes their amplitudes and phases, not their frequencies
+* the 1 Hz component is only moderately attenuated and phase shifted
+* the 20 Hz component is strongly attenuated and shifted close to -90°
+* the output keeps both original frequencies because an LTI system changes their amplitudes and phases, not their frequencies
 
 The impulse-response experiment visualizes:
 
@@ -402,25 +498,63 @@ h = [1, 2, -1]
 y = [2, 3, -1, 7, -3]
 ```
 
+For the Fourier-series experiment:
+
+* `K = 1` produces a single sinusoidal approximation
+* `K = 3` adds the third harmonic and improves the square-wave shape
+* `K = 5` produces flatter regions and sharper transitions
+* `K = 9` gives the closest displayed approximation to the ideal square wave
+* every reconstruction keeps the fundamental period of `1 s`
+* only odd harmonics are included
+* oscillations near the discontinuities demonstrate the Gibbs phenomenon
+
+For the orthogonality experiment:
+
+```text
+<sin(ω0t), cos(ω0t)> ≈ 0
+<sin(ω0t), sin(2ω0t)> ≈ 0
+<sin(ω0t), sin(ω0t)> ≈ 0.5
+```
+
+For the composite signal:
+
+```text
+x(t) = 3sin(ω0t) + 0.5cos(2ω0t)
+```
+
+The recovered coefficients are approximately:
+
+```text
+sin1 coefficient: 3.0
+cos1 coefficient: 0.0
+sin2 coefficient: 0.0
+cos2 coefficient: 0.5
+Reconstruction matches: True
+```
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 24 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 25 and related practical explorations from the PolyMath curriculum:
 
-- Complex exponentials
-- Delay and phase shift
-- LTI eigenfunctions
-- Frequency response
-- First-order low-pass response
-- Decibels and Bode plots
-- Low-pass slope measurement
-- Filtering a composite signal
-- First-order high-pass response
-- Complementary low-pass and high-pass magnitude responses
-- Unit impulses and impulse response
-- Convolution intuition
-- Manual discrete-time convolution
-- Input-side construction using shifted and scaled impulse responses
-- Output-side calculation of individual output samples
-- Convolution commutativity and numerical verification
-- Interactive Convolution Lab v1
-- Automated convolution testing with pytest
+* Complex exponentials
+* Delay and phase shift
+* LTI eigenfunctions
+* Frequency response
+* First-order low-pass response
+* Decibels and Bode plots
+* Low-pass slope measurement
+* Filtering a composite signal
+* First-order high-pass response
+* Complementary low-pass and high-pass magnitude responses
+* Unit impulses and impulse response
+* Convolution intuition
+* Manual discrete-time convolution
+* Input-side construction using shifted and scaled impulse responses
+* Output-side calculation of individual output samples
+* Convolution commutativity and numerical verification
+* Interactive Convolution Lab v1
+* Automated convolution testing with pytest
+* Fourier series intuition
+* Fundamental frequency and harmonics
+* Square-wave reconstruction using odd harmonics
+* Gibbs phenomenon near discontinuities
