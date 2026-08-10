@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, harmonic reconstruction, and quantitative reconstruction error.
+A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, harmonic reconstruction, quantitative reconstruction error, signal symmetry, and harmonic line spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -37,6 +37,7 @@ The project connects mathematical models with numerical calculations and visuali
 * Trigonometric Fourier coefficients
 * DC, cosine, and sine coefficients
 * Signal symmetry and vanishing Fourier coefficients
+* Even, odd, and half-wave symmetry
 * Symbolic and numerical integration
 * Numerical approximation error
 * Periodic extension and normalized-time wrapping
@@ -45,6 +46,9 @@ The project connects mathematical models with numerical calculations and visuali
 * Partial sums using consecutive harmonics
 * Root mean square reconstruction error
 * Convergence at periodic discontinuities
+* Discrete line spectra of periodic signals
+* Harmonic amplitude and phase spectra
+* Conversion from trigonometric coefficients to amplitude-phase form
 
 ## Features
 
@@ -94,6 +98,11 @@ The project connects mathematical models with numerical calculations and visuali
 * Verifies that reconstruction error decreases as more harmonics are included
 * Displays the ideal sawtooth and four Fourier reconstructions in a 2-by-2 subplot layout
 * Visualizes narrowing Gibbs oscillations near the periodic discontinuities
+* Calculates the first ten Fourier coefficients of an odd sawtooth signal
+* Converts cosine and sine coefficients into harmonic amplitudes and phases
+* Displays the sawtooth amplitude and phase spectra using stem plots
+* Demonstrates the presence of both even and odd sawtooth harmonics
+* Visualizes alternating harmonic phases of -90 and 90 degrees
 
 ## Mathematical Models
 
@@ -170,7 +179,14 @@ f0 = 1 / T
 ω0 = 2πf0
 ```
 
-Amplitude of the odd harmonic `k`:
+Harmonic frequencies of a periodic signal:
+
+```text
+f_n = nf0
+ω_n = nω0
+```
+
+Amplitude of the odd square-wave harmonic `k`:
 
 ```text
 A_k = 4 / (πk)
@@ -223,8 +239,18 @@ b_n = (2/T) integral_T x(t)sin(nω0t) dt
 Symmetry properties:
 
 ```text
-Even signal: b_n = 0
-Odd signal: a0 = 0 and a_n = 0
+Even signal:
+x(-t) = x(t)
+b_n = 0
+
+Odd signal:
+x(-t) = -x(t)
+a0 = 0
+a_n = 0
+
+Half-wave symmetry:
+x(t + T/2) = -x(t)
+DC and even harmonics vanish
 ```
 
 Sine coefficients of the odd square wave:
@@ -277,6 +303,34 @@ Fourier-series value at a jump discontinuity:
 ```text
 x_N(t_jump) approaches (x_left + x_right) / 2
 For a jump from 1 to -1, the limiting value is 0.
+```
+
+Amplitude-phase form of one harmonic:
+
+```text
+a_n cos(nω0t) + b_n sin(nω0t)
+= A_n cos(nω0t + phase_n)
+```
+
+Harmonic amplitude:
+
+```text
+A_n = sqrt(a_n² + b_n²)
+```
+
+Harmonic phase:
+
+```text
+phase_n = atan2(-b_n, a_n)
+```
+
+Amplitude and phase of the normalized sawtooth harmonics:
+
+```text
+A_n = 2 / (πn)
+
+phase_n = -90°,  n odd
+phase_n = 90°,   n even
 ```
 
 Normalized frequency ratio:
@@ -356,6 +410,7 @@ Complementary magnitude-response identity:
 * `orthogonality_explorer.py` - verifies orthogonality, extracts projection coefficients, and reconstructs a composite signal
 * `fourier_coefficients_explorer.py` - compares symbolic and numerical Fourier coefficients of an odd square wave
 * `periodic_signal_reconstruction.py` - reconstructs a periodic sawtooth using consecutive harmonics and measures RMSE
+* `line_spectrum_explorer.py` - calculates and visualizes the amplitude and phase spectra of the first ten sawtooth harmonics
 
 ## Requirements
 
@@ -479,6 +534,14 @@ python periodic_signal_reconstruction.py
 ```
 
 The program periodically wraps normalized time into `[-π, π)`, reconstructs the sawtooth using all harmonics from 1 through `N` for `N = 1, 3, 5, and 20`, calculates RMSE, and compares all four reconstructions in a 2-by-2 subplot layout.
+
+Sawtooth line spectrum:
+
+```bash
+python line_spectrum_explorer.py
+```
+
+The program calculates the first ten sawtooth Fourier coefficients, converts them into harmonic amplitudes and phases, and displays the amplitude and phase line spectra using two stem plots.
 
 ## Tests
 
@@ -697,9 +760,26 @@ The sawtooth experiment demonstrates that:
 * the relative Gibbs overshoot does not disappear completely
 * exactly at a jump from `1` to `-1`, the Fourier series converges to `0`
 
+For the sawtooth line-spectrum experiment, the first coefficients and amplitudes are:
+
+```text
+n = 1: b_n ≈ 0.636620,  A_n ≈ 0.636620, phase ≈ -90°
+n = 2: b_n ≈ -0.318310, A_n ≈ 0.318310, phase ≈ 90°
+n = 3: b_n ≈ 0.212207,  A_n ≈ 0.212207, phase ≈ -90°
+n = 4: b_n ≈ -0.159155, A_n ≈ 0.159155, phase ≈ 90°
+```
+
+The line-spectrum experiment demonstrates that:
+
+* odd symmetry eliminates all cosine coefficients
+* both even and odd harmonics remain because the sawtooth does not have half-wave symmetry
+* harmonic amplitudes decrease as `1/n`
+* harmonic phases alternate between `-90°` and `90°`
+* a periodic signal has discrete spectral lines at integer multiples of its fundamental frequency
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 28 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 29 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -741,3 +821,8 @@ This project contains practical work from lessons 14 through 28 and related prac
 * RMSE measurement of reconstruction quality
 * Numerical verification that RMSE decreases with additional harmonics
 * Fourier-series convergence to the midpoint at discontinuities
+* Even, odd, and half-wave symmetry
+* Discrete harmonic line spectra
+* Harmonic amplitude and phase calculation
+* Alternating sawtooth phase pattern
+* Amplitude and phase spectrum visualization
