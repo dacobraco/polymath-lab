@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from fourier_utils import calculate_fourier_coefficients, calculate_rmse, calculate_spectrum, reconstruct_signal, generate_ideal_signal, calculate_fourier_coefficients
+from fourier_utils import calculate_fourier_coefficients, calculate_rmse, calculate_spectrum, reconstruct_signal, generate_ideal_signal
 
 
 class TestFourierSeriesVisualizer(unittest.TestCase):
