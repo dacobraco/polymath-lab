@@ -103,6 +103,14 @@ The project connects mathematical models with numerical calculations and visuali
 * Displays the sawtooth amplitude and phase spectra using stem plots
 * Demonstrates the presence of both even and odd sawtooth harmonics
 * Visualizes alternating harmonic phases of -90 and 90 degrees
+* Integrates square-wave and sawtooth Fourier analysis into one interactive application
+* Allows the user to select the signal type and number of harmonics
+* Separates reusable mathematical functions from input and visualization logic
+* Generates the ideal signal and its Fourier reconstruction
+* Calculates Fourier coefficients, RMSE, harmonic amplitudes, and phases
+* Displays the reconstruction, amplitude spectrum, and phase spectrum together
+* Validates unsupported signal types, nonpositive harmonic counts, and incompatible array shapes
+* Includes 15 automated unit tests for numerical results and input validation
 
 ## Mathematical Models
 
@@ -122,8 +130,8 @@ H(f) = exp(-j2πfτ)
 Shifted unit impulse:
 
 ```text
-δ[n - n0] = 1,  n = n0
-δ[n - n0] = 0,  n ≠ n0
+δ[n - n0] = 1, n = n0
+δ[n - n0] = 0, n ≠ n0
 ```
 
 Example impulse responses:
@@ -256,7 +264,7 @@ DC and even harmonics vanish
 Sine coefficients of the odd square wave:
 
 ```text
-b_n = 4/(nπ),  n odd
+b_n = 4/(nπ), n odd
 b_n = 0,       n even
 ```
 
@@ -275,7 +283,7 @@ t_wrapped = (t + π) mod (2π) - π
 Normalized sawtooth signal over one period:
 
 ```text
-x(t) = t / π,  -π < t < π
+x(t) = t / π, -π < t < π
 ```
 
 Fourier sine coefficients of the normalized sawtooth:
@@ -329,8 +337,8 @@ Amplitude and phase of the normalized sawtooth harmonics:
 ```text
 A_n = 2 / (πn)
 
-phase_n = -90°,  n odd
-phase_n = 90°,   n even
+phase_n = -90°, n odd
+phase_n = 90°,  n even
 ```
 
 Normalized frequency ratio:
@@ -411,6 +419,9 @@ Complementary magnitude-response identity:
 * `fourier_coefficients_explorer.py` - compares symbolic and numerical Fourier coefficients of an odd square wave
 * `periodic_signal_reconstruction.py` - reconstructs a periodic sawtooth using consecutive harmonics and measures RMSE
 * `line_spectrum_explorer.py` - calculates and visualizes the amplitude and phase spectra of the first ten sawtooth harmonics
+* `fourier_utils.py` - provides reusable functions for signal generation, Fourier coefficients, reconstruction, RMSE, and spectrum calculation
+* `fourier_series_visualizer.py` - integrates the Fourier-series workflow into one interactive application
+* `test_fourier_series_visualizer.py` - contains 15 unit tests for Fourier calculations and validation behavior
 
 ## Requirements
 
@@ -543,6 +554,28 @@ python line_spectrum_explorer.py
 
 The program calculates the first ten sawtooth Fourier coefficients, converts them into harmonic amplitudes and phases, and displays the amplitude and phase line spectra using two stem plots.
 
+Fourier Series Visualizer v1:
+
+```bash
+python fourier_series_visualizer.py
+```
+
+The application asks the user to select a supported signal and the number of harmonics:
+
+```text
+Square or sawtooth signal? square
+How many harmonics? 5
+```
+
+It then:
+
+* generates the ideal periodic signal
+* calculates its Fourier coefficients
+* reconstructs the signal using the selected number of harmonics
+* calculates RMSE
+* calculates harmonic amplitudes and phases
+* displays the reconstruction, amplitude spectrum, and phase spectrum
+
 ## Tests
 
 Run the convolution tests from `applications/signal_visualizer`:
@@ -570,6 +603,32 @@ The final summary should report:
 
 ```text
 3 passed
+```
+
+Run the Fourier Series Visualizer tests from `applications/signal_visualizer`:
+
+```bash
+python -m unittest -v test_fourier_series_visualizer.py
+```
+
+The test suite verifies:
+
+* square-wave and sawtooth signal generation
+* periodic wrapping of the sawtooth signal
+* square-wave and sawtooth Fourier coefficients
+* reconstruction of a known single-sine signal
+* zero and nonzero RMSE cases
+* known harmonic amplitude and phase
+* unsupported signal types
+* nonpositive harmonic counts
+* incompatible signal and coefficient-array shapes
+
+The final summary should report:
+
+```text
+Ran 15 tests
+
+OK
 ```
 
 ## Expected Results
@@ -716,8 +775,8 @@ For the Fourier-coefficient experiment:
 ```text
 a0 ≈ 0
 a_n ≈ 0
-b_n ≈ 4/(nπ),  n odd
-b_n ≈ 0,       n even
+b_n ≈ 4/(nπ), n odd
+b_n ≈ 0,      n even
 ```
 
 The first coefficients are:
@@ -777,9 +836,29 @@ The line-spectrum experiment demonstrates that:
 * harmonic phases alternate between `-90°` and `90°`
 * a periodic signal has discrete spectral lines at integer multiples of its fundamental frequency
 
+For Fourier Series Visualizer v1 with five harmonics, the square-wave analysis should produce approximately:
+
+```text
+RMSE: 0.2578
+Amplitudes: [1.2732, 0.0000, 0.4244, 0.0000, 0.2546]
+Phases: [-90°, 0°, -90°, 0°, -90°]
+```
+
+Only odd square-wave harmonics are present. The reconstruction displays Gibbs oscillations near every discontinuity.
+
+With five harmonics, the sawtooth analysis should produce approximately:
+
+```text
+RMSE: 0.1917
+Amplitudes: [0.6366, 0.3183, 0.2122, 0.1592, 0.1273]
+Phases: [-90°, 90°, -90°, 90°, -90°]
+```
+
+Both even and odd sawtooth harmonics are present, their amplitudes decrease as `1/n`, and their phases alternate between `-90°` and `90°`.
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 29 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 30 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -826,3 +905,9 @@ This project contains practical work from lessons 14 through 29 and related prac
 * Harmonic amplitude and phase calculation
 * Alternating sawtooth phase pattern
 * Amplitude and phase spectrum visualization
+* Separation of mathematical logic, visualization, and application control flow
+* Reusable Fourier-analysis utility functions
+* Integrated Fourier Series Visualizer v1
+* Interactive signal-type and harmonic-count selection
+* Automated testing with Python unittest
+* Validation of numerical results and invalid inputs
