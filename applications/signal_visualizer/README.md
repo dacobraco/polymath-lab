@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, harmonic reconstruction, quantitative reconstruction error, signal symmetry, and harmonic line spectra.
+A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -49,6 +49,14 @@ The project connects mathematical models with numerical calculations and visuali
 * Discrete line spectra of periodic signals
 * Harmonic amplitude and phase spectra
 * Conversion from trigonometric coefficients to amplitude-phase form
+* Fourier transform representation of nonperiodic signals
+* Continuous frequency spectra
+* Relationship between the Fourier series and Fourier transform
+* Spectral-line spacing and its dependence on the period
+* Rectangular pulses and sinc-shaped spectra
+* Time-width and frequency-width relationship
+* Transition from a discrete line spectrum to a continuous spectrum
+* Fourier-transform integrals as limits of Fourier-series sums
 
 ## Features
 
@@ -111,6 +119,14 @@ The project connects mathematical models with numerical calculations and visuali
 * Displays the reconstruction, amplitude spectrum, and phase spectrum together
 * Validates unsupported signal types, nonpositive harmonic counts, and incompatible array shapes
 * Includes 15 automated unit tests for numerical results and input validation
+* Calculates the continuous sinc spectrum of a rectangular pulse
+* Calculates Fourier-series coefficients for periodically repeated pulses
+* Scales the coefficients using `T C_k` for direct comparison with the Fourier transform
+* Compares the continuous spectrum with discrete samples at harmonic frequencies
+* Displays the comparison for `T = 2, 4, 8, and 16 s`
+* Demonstrates that the line spacing `Δf = 1/T` decreases as the period increases
+* Visualizes the transition from a discrete line spectrum to a continuous spectrum
+* Displays all four transition stages in a 2-by-2 subplot layout
 
 ## Mathematical Models
 
@@ -341,6 +357,69 @@ phase_n = -90°, n odd
 phase_n = 90°,  n even
 ```
 
+Fourier transform:
+
+```text
+X(f) = integral from -∞ to ∞ of x(t)exp(-j2πft) dt
+```
+
+Inverse Fourier transform:
+
+```text
+x(t) = integral from -∞ to ∞ of X(f)exp(j2πft) df
+```
+
+Rectangular pulse of width `τ`:
+
+```text
+x(t) = 1, |t| < τ/2
+x(t) = 0, otherwise
+```
+
+Fourier transform of the rectangular pulse:
+
+```text
+X(f) = τ sinc(fτ)
+```
+
+NumPy uses the normalized sinc definition:
+
+```text
+np.sinc(u) = sin(πu) / (πu)
+```
+
+Harmonic frequencies and line spacing for a periodic signal:
+
+```text
+f_k = k / T
+Δf = 1 / T
+```
+
+Fourier-series coefficients of a periodically repeated rectangular pulse:
+
+```text
+C_k = (τ/T) sinc(kτ/T)
+```
+
+Relationship between Fourier-series coefficients and Fourier-transform samples:
+
+```text
+C_k = (1/T)X(f_k)
+C_k = Δf X(f_k)
+T C_k = X(f_k)
+```
+
+Transition from the Fourier-series sum to the Fourier-transform integral:
+
+```text
+x(t) = sum_k X(f_k)exp(j2πf_k t)Δf
+
+As T approaches ∞:
+Δf approaches 0
+
+x(t) = integral from -∞ to ∞ of X(f)exp(j2πft) df
+```
+
 Normalized frequency ratio:
 
 ```text
@@ -422,6 +501,7 @@ Complementary magnitude-response identity:
 * `fourier_utils.py` - provides reusable functions for signal generation, Fourier coefficients, reconstruction, RMSE, and spectrum calculation
 * `fourier_series_visualizer.py` - integrates the Fourier-series workflow into one interactive application
 * `test_fourier_series_visualizer.py` - contains 15 unit tests for Fourier calculations and validation behavior
+* `fourier_transform_transition.py` - visualizes the transition from Fourier-series line spectra to a continuous Fourier-transform spectrum
 
 ## Requirements
 
@@ -575,6 +655,22 @@ It then:
 * calculates RMSE
 * calculates harmonic amplitudes and phases
 * displays the reconstruction, amplitude spectrum, and phase spectrum
+
+Fourier series to Fourier transform transition:
+
+```bash
+python fourier_transform_transition.py
+```
+
+The experiment:
+
+* calculates the continuous sinc spectrum of a rectangular pulse
+* generates harmonic frequencies for `T = 2, 4, 8, and 16 s`
+* calculates the corresponding Fourier-series coefficients
+* scales each coefficient using `T C_k`
+* compares the scaled discrete lines with the continuous Fourier-transform curve
+* displays the four periods in a 2-by-2 subplot layout
+* demonstrates how the spectral-line spacing decreases as the period increases
 
 ## Tests
 
@@ -856,9 +952,41 @@ Phases: [-90°, 90°, -90°, 90°, -90°]
 
 Both even and odd sawtooth harmonics are present, their amplitudes decrease as `1/n`, and their phases alternate between `-90°` and `90°`.
 
+For the Fourier-series to Fourier-transform transition with `τ = 1 s`:
+
+```text
+X(f) = sinc(f)
+X(0) = 1
+```
+
+The first zeros of the continuous spectrum occur at:
+
+```text
+f = ±1 Hz
+```
+
+The four visualized periods and their spectral-line spacings are:
+
+```text
+T = 2 s:  Δf = 0.5000 Hz
+T = 4 s:  Δf = 0.2500 Hz
+T = 8 s:  Δf = 0.1250 Hz
+T = 16 s: Δf = 0.0625 Hz
+```
+
+The transition experiment demonstrates that:
+
+* the harmonic frequencies are located at `f_k = k/T`
+* increasing `T` reduces the line spacing `Δf`
+* the unscaled Fourier-series coefficients decrease because they contain the factor `1/T`
+* the scaled coefficients `T C_k` lie on the continuous Fourier-transform curve
+* discrete spectral lines become increasingly dense as `T` grows
+* in the limit `T → ∞`, the Fourier-series sum becomes the Fourier-transform integral
+* the negative sinc lobes are valid because the signed spectrum `X(f)` is displayed rather than its magnitude `|X(f)|`
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 30 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 31 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -911,3 +1039,11 @@ This project contains practical work from lessons 14 through 30 and related prac
 * Interactive signal-type and harmonic-count selection
 * Automated testing with Python unittest
 * Validation of numerical results and invalid inputs
+* Fourier-transform intuition
+* Continuous spectra of nonperiodic signals
+* Rectangular-pulse sinc spectrum
+* Relationship between pulse width and spectrum width
+* Spectral-line spacing `Δf = 1/T`
+* Relationship between `C_k`, `X(f_k)`, and `T C_k`
+* Transition from discrete Fourier-series lines to a continuous Fourier-transform spectrum
+* Interpretation of the Fourier-transform integral as the limit of Fourier-series sums
