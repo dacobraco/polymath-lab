@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
+A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -62,6 +62,14 @@ The project connects mathematical models with numerical calculations and visuali
 * Matrix and element-wise operations in MATLAB
 * Signal generation and visualization in MATLAB
 * Equivalent signal workflows in MATLAB and NumPy
+* Definition of the continuous-time Fourier transform
+* Inverse Fourier transform
+* Linearity of the Fourier transform
+* Duality of the Fourier transform
+* Double Fourier transformation and time reversal
+* Numerical Fourier-transform approximation from the defining integral
+* Gaussian signals as test functions for Fourier-transform properties
+* Numerical verification of transform properties in Python and MATLAB
 
 ## Features
 
@@ -136,6 +144,12 @@ The project connects mathematical models with numerical calculations and visuali
 * Demonstrates MATLAB vector creation, indexing, and element-wise operations
 * Reproduces the same sinusoidal signal using NumPy and Matplotlib
 * Compares basic MATLAB signal-processing syntax with its NumPy equivalent
+* Implements the continuous-time Fourier-transform integral numerically in Python
+* Implements the same numerical Fourier-transform calculation in MATLAB
+* Verifies Fourier-transform linearity using two Gaussian signals
+* Verifies Fourier-transform duality using a shifted Gaussian signal
+* Demonstrates that applying the Fourier transform twice produces a reflected signal
+* Measures the maximum numerical error of the MATLAB linearity and duality checks
 
 ## Mathematical Models
 
@@ -378,6 +392,47 @@ Inverse Fourier transform:
 x(t) = integral from -∞ to ∞ of X(f)exp(j2πft) df
 ```
 
+Fourier-transform linearity:
+
+```text
+If:
+x1(t) <-> X1(f)
+x2(t) <-> X2(f)
+
+Then:
+a x1(t) + b x2(t) <-> a X1(f) + b X2(f)
+```
+
+Fourier-transform duality:
+
+```text
+If:
+x(t) <-> X(f)
+
+Then:
+X(t) <-> x(-f)
+```
+
+Applying the Fourier transform twice:
+
+```text
+F{F{x(t)}} = x(-t)
+```
+
+Shifted Gaussian used for the numerical duality test:
+
+```text
+x(t) = exp(-π(t - 1)²)
+x(-t) = exp(-π(t + 1)²)
+```
+
+Numerical Fourier-transform approximation over a finite interval:
+
+```text
+X(f) ≈ integral over the sampled time interval of
+       x(t)exp(-j2πft) dt
+```
+
 Rectangular pulse of width `τ`:
 
 ```text
@@ -532,6 +587,9 @@ T = 0.5 s
 * `fourier_transform_transition.py` - visualizes the transition from Fourier-series line spectra to a continuous Fourier-transform spectrum
 * `matlab_signal_intro.m` - introduces MATLAB through the generation and visualization of a sinusoidal signal
 * `matlab_numpy_intro.py` - reproduces the introductory MATLAB signal example using NumPy and Matplotlib
+* `fourier_properties.py` - numerically verifies Fourier-transform linearity and duality in Python
+* `numerical_fourier_transform.m` - implements the defining Fourier-transform integral numerically in MATLAB
+* `fourier_properties_matlab.m` - verifies Fourier-transform linearity and duality in MATLAB
 
 ## Requirements
 
@@ -726,6 +784,38 @@ python matlab_numpy_intro.py
 ```
 
 The Python experiment reproduces the same `2 Hz` sinusoidal signal using NumPy and Matplotlib so that the syntax and workflows of both environments can be compared directly.
+
+Fourier-transform property verification in Python:
+
+```bash
+python fourier_properties.py
+```
+
+The experiment:
+
+* approximates the continuous Fourier-transform integral numerically
+* transforms two Gaussian signals
+* verifies Fourier-transform linearity
+* applies the transform twice to a shifted Gaussian
+* verifies that the second transform produces the reflected signal `x(-t)`
+* checks both properties using numerical tolerances
+
+Fourier-transform property verification in MATLAB:
+
+```text
+fourier_properties_matlab.m
+```
+
+Run the script from MATLAB with `applications/signal_visualizer` set as the Current Folder.
+
+The MATLAB experiment:
+
+* uses `numerical_fourier_transform.m` to approximate the transform integral with `trapz`
+* verifies linearity using two Gaussian signals
+* verifies duality using a Gaussian shifted to `t = 1`
+* applies the transform twice
+* compares the result with the reflected Gaussian centered at `t = -1`
+* measures the maximum absolute numerical error
 
 ## Tests
 
@@ -1058,9 +1148,43 @@ Both implementations produce the same sinusoidal signal with:
 
 The MATLAB implementation uses one-based indexing, while the NumPy implementation uses zero-based indexing.
 
+For the Python Fourier-transform property experiment:
+
+```text
+Linearity: True
+Duality: True
+```
+
+The linearity test verifies:
+
+```text
+F{2x1(t) - 3x2(t)} ≈ 2X1(f) - 3X2(f)
+```
+
+The duality test uses:
+
+```text
+x(t) = exp(-π(t - 1)²)
+```
+
+and verifies that applying the Fourier transform twice produces:
+
+```text
+x(-t) = exp(-π(t + 1)²)
+```
+
+For the MATLAB Fourier-transform property experiment, the measured maximum errors are:
+
+```text
+linearity_error = 3.7470e-15
+duality_error = 6.6615e-16
+```
+
+These values are effectively zero at numerical precision and confirm the theoretical linearity and duality properties.
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 32 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 33 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -1128,3 +1252,16 @@ This project contains practical work from lessons 14 through 32 and related prac
 * Matrix and element-wise MATLAB operators
 * MATLAB signal generation and plotting
 * Comparison of MATLAB and NumPy syntax for the same sinusoidal signal
+* Continuous-time Fourier-transform definition
+* Inverse Fourier transform
+* Frequency analysis as projection onto complex exponentials
+* Fourier-transform linearity
+* Fourier-transform duality
+* Double Fourier transformation and signal reflection
+* Numerical approximation of the Fourier-transform integral
+* Gaussian test signals for transform-property verification
+* Python verification of Fourier-transform linearity and duality
+* MATLAB implementation of numerical Fourier transformation
+* MATLAB `trapz` integration
+* MATLAB verification of Fourier-transform linearity and duality
+* Floating-point error interpretation in numerical transform verification
