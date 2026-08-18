@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
+A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -57,6 +57,11 @@ The project connects mathematical models with numerical calculations and visuali
 * Time-width and frequency-width relationship
 * Transition from a discrete line spectrum to a continuous spectrum
 * Fourier-transform integrals as limits of Fourier-series sums
+* MATLAB vectors and one-based indexing
+* Row and column vectors in MATLAB
+* Matrix and element-wise operations in MATLAB
+* Signal generation and visualization in MATLAB
+* Equivalent signal workflows in MATLAB and NumPy
 
 ## Features
 
@@ -127,6 +132,10 @@ The project connects mathematical models with numerical calculations and visuali
 * Demonstrates that the line spacing `Δf = 1/T` decreases as the period increases
 * Visualizes the transition from a discrete line spectrum to a continuous spectrum
 * Displays all four transition stages in a 2-by-2 subplot layout
+* Generates and plots a sinusoidal signal in MATLAB
+* Demonstrates MATLAB vector creation, indexing, and element-wise operations
+* Reproduces the same sinusoidal signal using NumPy and Matplotlib
+* Compares basic MATLAB signal-processing syntax with its NumPy equivalent
 
 ## Mathematical Models
 
@@ -480,6 +489,25 @@ Complementary magnitude-response identity:
 |H_LP(f)|² + |H_HP(f)|² = 1
 ```
 
+Sinusoidal signal:
+
+```text
+x(t) = sin(2πft)
+```
+
+Signal period:
+
+```text
+T = 1 / f
+```
+
+For the introductory MATLAB example:
+
+```text
+f = 2 Hz
+T = 0.5 s
+```
+
 ## Project Structure
 
 * `frequency_explorer.py` - visualizes the real and imaginary parts of a complex exponential
@@ -502,6 +530,8 @@ Complementary magnitude-response identity:
 * `fourier_series_visualizer.py` - integrates the Fourier-series workflow into one interactive application
 * `test_fourier_series_visualizer.py` - contains 15 unit tests for Fourier calculations and validation behavior
 * `fourier_transform_transition.py` - visualizes the transition from Fourier-series line spectra to a continuous Fourier-transform spectrum
+* `matlab_signal_intro.m` - introduces MATLAB through the generation and visualization of a sinusoidal signal
+* `matlab_numpy_intro.py` - reproduces the introductory MATLAB signal example using NumPy and Matplotlib
 
 ## Requirements
 
@@ -510,8 +540,9 @@ Complementary magnitude-response identity:
 * SymPy
 * Matplotlib
 * pytest
+* MATLAB
 
-Install the required libraries:
+Install the required Python libraries:
 
 ```bash
 pip install numpy sympy matplotlib pytest
@@ -671,6 +702,30 @@ The experiment:
 * compares the scaled discrete lines with the continuous Fourier-transform curve
 * displays the four periods in a 2-by-2 subplot layout
 * demonstrates how the spectral-line spacing decreases as the period increases
+
+MATLAB signal introduction:
+
+```text
+matlab_signal_intro.m
+```
+
+Run the script from MATLAB with `applications/signal_visualizer` set as the Current Folder.
+
+The script:
+
+* creates a time vector from `0` to `1 s`
+* generates a `2 Hz` sinusoidal signal
+* plots the signal
+* labels the time and amplitude axes
+* demonstrates the basic MATLAB workflow for signal visualization
+
+NumPy comparison of the MATLAB example:
+
+```bash
+python matlab_numpy_intro.py
+```
+
+The Python experiment reproduces the same `2 Hz` sinusoidal signal using NumPy and Matplotlib so that the syntax and workflows of both environments can be compared directly.
 
 ## Tests
 
@@ -984,9 +1039,28 @@ The transition experiment demonstrates that:
 * in the limit `T → ∞`, the Fourier-series sum becomes the Fourier-transform integral
 * the negative sinc lobes are valid because the signed spectrum `X(f)` is displayed rather than its magnitude `|X(f)|`
 
+For the MATLAB and NumPy introductory signal example:
+
+```text
+f = 2 Hz
+T = 0.5 s
+time interval = 0 to 1 s
+number of samples = 101
+```
+
+Both implementations produce the same sinusoidal signal with:
+
+* amplitude `1`
+* two complete periods over the displayed one-second interval
+* maxima near `1`
+* minima near `-1`
+* identical physical interpretation despite different syntax
+
+The MATLAB implementation uses one-based indexing, while the NumPy implementation uses zero-based indexing.
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 31 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 32 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -1047,3 +1121,10 @@ This project contains practical work from lessons 14 through 31 and related prac
 * Relationship between `C_k`, `X(f_k)`, and `T C_k`
 * Transition from discrete Fourier-series lines to a continuous Fourier-transform spectrum
 * Interpretation of the Fourier-transform integral as the limit of Fourier-series sums
+* MATLAB Command Window and script workflow
+* MATLAB vectors and one-based indexing
+* MATLAB row and column vectors
+* MATLAB transpose operation
+* Matrix and element-wise MATLAB operators
+* MATLAB signal generation and plotting
+* Comparison of MATLAB and NumPy syntax for the same sinusoidal signal
