@@ -588,8 +588,7 @@ T = 0.5 s
 * `matlab_signal_intro.m` - introduces MATLAB through the generation and visualization of a sinusoidal signal
 * `matlab_numpy_intro.py` - reproduces the introductory MATLAB signal example using NumPy and Matplotlib
 * `fourier_properties.py` - numerically verifies Fourier-transform linearity and duality in Python
-* `numerical_fourier_transform.m` - implements the defining Fourier-transform integral numerically in MATLAB
-* `fourier_properties_matlab.m` - verifies Fourier-transform linearity and duality in MATLAB
+* `fourier_properties_matlab.m` - implements the numerical Fourier-transform integral and verifies Fourier-transform linearity and duality in MATLAB
 
 ## Requirements
 
@@ -810,7 +809,7 @@ Run the script from MATLAB with `applications/signal_visualizer` set as the Curr
 
 The MATLAB experiment:
 
-* uses `numerical_fourier_transform.m` to approximate the transform integral with `trapz`
+* uses a local `numerical_fourier_transform` function to approximate the transform integral with `trapz`
 * verifies linearity using two Gaussian signals
 * verifies duality using a Gaussian shifted to `t = 1`
 * applies the transform twice
