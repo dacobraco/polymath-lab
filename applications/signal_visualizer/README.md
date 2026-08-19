@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
+A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -78,6 +78,13 @@ The project connects mathematical models with numerical calculations and visuali
 * Cosine modulation
 * Positive- and negative-frequency spectral copies
 * Relationship between real modulation and complex exponentials
+* Signal energy
+* Squared signal magnitude and energy integrals
+* Relationship between signal energy and the inner product
+* Parseval's theorem
+* Conservation of energy between time and frequency representations
+* Numerical integration using SciPy
+* Floating-point error in numerical energy verification
 
 ## Features
 
@@ -165,6 +172,12 @@ The project connects mathematical models with numerical calculations and visuali
 * Verifies cosine modulation as the creation of two shifted spectral copies
 * Measures numerical errors for all Fourier shifting, scaling, and modulation properties
 * Displays four time-domain and frequency-domain signal-spectrum pairs in a 4-by-2 layout
+* Calculates the energy of a Gaussian signal in the time domain
+* Calculates the same energy from the Fourier-transform magnitude
+* Uses SciPy Simpson integration for numerical energy calculations
+* Numerically verifies Parseval's theorem
+* Compares numerical energy with the analytical Gaussian result
+* Measures Parseval error near machine precision
 
 ## Mathematical Models
 
@@ -511,6 +524,74 @@ f = -2 Hz
 f = 2 Hz
 ```
 
+Signal energy:
+
+```text
+E_x = integral from -∞ to ∞ of |x(t)|² dt
+```
+
+Energy as an inner product:
+
+```text
+E_x = <x, x>
+```
+
+Scaling of signal energy:
+
+```text
+If:
+y(t) = a x(t)
+
+Then:
+E_y = |a|² E_x
+```
+
+Parseval's theorem for the Fourier-transform convention used in this project:
+
+```text
+X(f) = integral from -∞ to ∞ of x(t)exp(-j2πft) dt
+```
+
+is:
+
+```text
+integral from -∞ to ∞ of |x(t)|² dt
+=
+integral from -∞ to ∞ of |X(f)|² df
+```
+
+Therefore:
+
+```text
+E_time = E_frequency
+```
+
+Gaussian used for the Parseval experiment:
+
+```text
+x(t) = exp(-πt²)
+```
+
+Its squared magnitude is:
+
+```text
+|x(t)|² = exp(-2πt²)
+```
+
+Analytical Gaussian energy:
+
+```text
+E = integral from -∞ to ∞ of exp(-2πt²) dt
+E = 1 / sqrt(2)
+E ≈ 0.7071067811865476
+```
+
+Numerical Parseval error:
+
+```text
+parseval_error = |E_time - E_frequency|
+```
+
 Rectangular pulse of width `τ`:
 
 ```text
@@ -668,11 +749,13 @@ T = 0.5 s
 * `fourier_properties.py` - numerically verifies Fourier-transform linearity and duality in Python
 * `fourier_properties_matlab.m` - implements the numerical Fourier-transform integral and verifies Fourier-transform linearity and duality in MATLAB
 * `fourier_shift_scale_modulation.py` - verifies time shifting, time scaling, complex modulation, and cosine modulation while visualizing four signal-spectrum pairs
+* `signal_energy_parseval.py` - calculates Gaussian signal energy in the time and frequency domains and numerically verifies Parseval's theorem
 
 ## Requirements
 
 * Python 3
 * NumPy
+* SciPy
 * SymPy
 * Matplotlib
 * pytest
@@ -681,7 +764,13 @@ T = 0.5 s
 Install the required Python libraries:
 
 ```bash
-pip install numpy sympy matplotlib pytest
+python -m pip install numpy scipy sympy matplotlib pytest
+```
+
+On Windows with the Python launcher:
+
+```bash
+py -m pip install numpy scipy sympy matplotlib pytest
 ```
 
 ## Run
@@ -914,6 +1003,28 @@ The experiment:
 * verifies the appearance of spectral copies centered at `-2 Hz` and `+2 Hz`
 * calculates maximum numerical errors for all four properties
 * displays four time-domain and frequency-domain signal-spectrum pairs
+
+Signal energy and Parseval verification:
+
+```bash
+python signal_energy_parseval.py
+```
+
+On Windows with the Python launcher:
+
+```bash
+py signal_energy_parseval.py
+```
+
+The experiment:
+
+* generates the Gaussian signal `x(t) = exp(-πt²)`
+* calculates its time-domain energy using SciPy Simpson integration
+* calculates its numerical Fourier transform
+* integrates `|X(f)|²` over frequency
+* compares time-domain and frequency-domain energies
+* calculates the Parseval error
+* verifies that both energy values agree to numerical precision
 
 ## Tests
 
@@ -1318,9 +1429,33 @@ The cosine-modulation experiment demonstrates that:
 * each separated copy has half the amplitude of the original spectrum
 * the two copies arise from the positive- and negative-frequency complex exponentials in Euler's cosine identity
 
+For the signal-energy and Parseval experiment:
+
+```text
+Time-domain energy: 0.7071067811865476
+Frequency-domain energy: 0.7071067811865475
+Parseval error: 1.1102230246251565e-16
+```
+
+The analytical Gaussian energy is:
+
+```text
+1 / sqrt(2) ≈ 0.7071067811865476
+```
+
+The experiment demonstrates that:
+
+* squaring the signal magnitude prevents positive and negative signal values from canceling
+* signal energy is the inner product of a signal with itself
+* scaling a signal by a factor of `2` scales its energy by a factor of `4`
+* the Gaussian has finite energy because it decays rapidly toward zero
+* the energy calculated in the time domain matches the energy calculated from the Fourier-transform magnitude
+* the measured Parseval error is at floating-point precision
+* the Fourier transform changes the signal representation without changing its total energy
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 34 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 35 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -1412,3 +1547,13 @@ This project contains practical work from lessons 14 through 34 and related prac
 * Positive- and negative-frequency spectral copies
 * Numerical verification of shifting, scaling, and modulation properties
 * Four signal-spectrum visual comparisons
+* Signal-energy definition
+* Energy as the squared norm of a signal
+* Relationship between energy and inner products
+* Energy scaling by the squared amplitude factor
+* Parseval's theorem
+* Time-domain and frequency-domain energy equivalence
+* Numerical integration with SciPy `simpson`
+* Analytical energy of a Gaussian signal
+* Numerical Parseval verification
+* Floating-point error interpretation in energy calculations
