@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
+A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, rectangular pulses, sinc spectra, time-bandwidth relationships, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -85,6 +85,16 @@ The project connects mathematical models with numerical calculations and visuali
 * Conservation of energy between time and frequency representations
 * Numerical integration using SciPy
 * Floating-point error in numerical energy verification
+* Pulse width
+* Frequency bandwidth
+* First-null bandwidth
+* Main lobes and side lobes
+* First spectral nulls
+* Band-limited and non-band-limited signals
+* Inverse time-bandwidth relationship
+* Time-bandwidth product
+* DC value of a rectangular-pulse spectrum
+* Relationship between pulse area and `X(0)`
 
 ## Features
 
@@ -178,6 +188,17 @@ The project connects mathematical models with numerical calculations and visuali
 * Numerically verifies Parseval's theorem
 * Compares numerical energy with the analytical Gaussian result
 * Measures Parseval error near machine precision
+* Generates rectangular pulses with several pulse widths
+* Calculates their analytical sinc spectra
+* Calculates first-null bandwidth using `B = 1/τ`
+* Marks positive and negative first spectral nulls
+* Compares pulse width and spectral width in a 4-by-2 Python explorer
+* Reproduces the time-bandwidth explorer in MATLAB
+* Demonstrates that shorter pulses require larger bandwidth
+* Demonstrates that longer pulses produce narrower main lobes
+* Verifies that the spectrum peak satisfies `X(0) = τ`
+* Demonstrates the constant first-null time-bandwidth product `τB = 1`
+* Shows that rectangular pulses are not strictly band-limited because sinc side lobes extend indefinitely
 
 ## Mathematical Models
 
@@ -595,7 +616,7 @@ parseval_error = |E_time - E_frequency|
 Rectangular pulse of width `τ`:
 
 ```text
-x(t) = 1, |t| < τ/2
+x(t) = 1, |t| <= τ/2
 x(t) = 0, otherwise
 ```
 
@@ -603,6 +624,66 @@ Fourier transform of the rectangular pulse:
 
 ```text
 X(f) = τ sinc(fτ)
+```
+
+Normalized sinc definition used by NumPy and MATLAB:
+
+```text
+sinc(u) = sin(πu) / (πu)
+sinc(0) = 1
+```
+
+DC value of the rectangular-pulse spectrum:
+
+```text
+X(0) = τ sinc(0)
+X(0) = τ
+```
+
+The same result follows from pulse area:
+
+```text
+X(0) = integral from -∞ to ∞ of x(t) dt
+X(0) = pulse height × pulse width
+X(0) = 1 × τ
+X(0) = τ
+```
+
+First spectral nulls:
+
+```text
+f_null = ±1/τ
+```
+
+First-null bandwidth:
+
+```text
+B = 1/τ
+```
+
+Total main-lobe width:
+
+```text
+main_lobe_width = 2/τ
+```
+
+First-null time-bandwidth product:
+
+```text
+τB = 1
+```
+
+Inverse time-bandwidth relationship:
+
+```text
+τ decreases -> B increases
+τ increases -> B decreases
+```
+
+The rectangular pulse is not strictly band-limited:
+
+```text
+X(f) != 0 for infinitely many frequencies beyond the first null.
 ```
 
 NumPy uses the normalized sinc definition:
@@ -750,6 +831,8 @@ T = 0.5 s
 * `fourier_properties_matlab.m` - implements the numerical Fourier-transform integral and verifies Fourier-transform linearity and duality in MATLAB
 * `fourier_shift_scale_modulation.py` - verifies time shifting, time scaling, complex modulation, and cosine modulation while visualizing four signal-spectrum pairs
 * `signal_energy_parseval.py` - calculates Gaussian signal energy in the time and frequency domains and numerically verifies Parseval's theorem
+* `time_bandwidth_explorer.py` - compares rectangular pulses and sinc spectra for several pulse widths and first-null bandwidths
+* `time_bandwidth_explorer_matlab.m` - reproduces the rectangular-pulse time-bandwidth explorer in MATLAB
 
 ## Requirements
 
@@ -1025,6 +1108,45 @@ The experiment:
 * compares time-domain and frequency-domain energies
 * calculates the Parseval error
 * verifies that both energy values agree to numerical precision
+
+Python time-bandwidth explorer:
+
+```bash
+python time_bandwidth_explorer.py
+```
+
+On Windows with the Python launcher:
+
+```bash
+py time_bandwidth_explorer.py
+```
+
+The experiment:
+
+* generates rectangular pulses with widths `τ = 0.25, 0.5, 1, and 2 s`
+* calculates `X(f) = τ sinc(fτ)` for every pulse
+* calculates the first-null bandwidth `B = 1/τ`
+* displays each pulse next to its sinc spectrum
+* marks the first spectral nulls at `±B`
+* demonstrates the inverse relationship between pulse width and bandwidth
+* shows that the sinc peak equals `τ`
+
+MATLAB time-bandwidth explorer:
+
+```text
+time_bandwidth_explorer_matlab.m
+```
+
+Run the script from MATLAB with `applications/signal_visualizer` set as the Current Folder.
+
+The MATLAB experiment:
+
+* reproduces the four pulse-width cases from the Python explorer
+* uses `linspace`, logical indexing, `sinc`, `for`, `subplot`, `xline`, and `sprintf`
+* displays the rectangular pulse in the time domain
+* displays its sinc spectrum in the frequency domain
+* marks the positive and negative first spectral nulls
+* demonstrates the same time-bandwidth relationship as the Python implementation
 
 ## Tests
 
@@ -1453,9 +1575,48 @@ The experiment demonstrates that:
 * the measured Parseval error is at floating-point precision
 * the Fourier transform changes the signal representation without changing its total energy
 
+For the rectangular-pulse time-bandwidth explorers:
+
+```text
+τ = 0.25 s -> B = 4.0 Hz
+τ = 0.50 s -> B = 2.0 Hz
+τ = 1.00 s -> B = 1.0 Hz
+τ = 2.00 s -> B = 0.5 Hz
+```
+
+For every case:
+
+```text
+B = 1/τ
+τB = 1
+main-lobe width = 2/τ
+X(0) = τ
+```
+
+The first spectral nulls are:
+
+```text
+τ = 0.25 s -> f = ±4 Hz
+τ = 0.50 s -> f = ±2 Hz
+τ = 1.00 s -> f = ±1 Hz
+τ = 2.00 s -> f = ±0.5 Hz
+```
+
+The time-bandwidth experiments demonstrate that:
+
+* decreasing pulse width increases first-null bandwidth
+* increasing pulse width decreases first-null bandwidth
+* a pulse that is ten times shorter has ten times larger first-null bandwidth
+* the central sinc peak equals the pulse width because `sinc(0) = 1`
+* `X(0)` also equals the area of the rectangular pulse
+* the total main-lobe width is twice the first-null bandwidth
+* sinc side lobes continue beyond the first nulls
+* a rectangular pulse therefore does not have a finite strict bandwidth
+* the same physical relationship is reproduced independently in Python and MATLAB
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 35 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 36 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -1557,3 +1718,23 @@ This project contains practical work from lessons 14 through 35 and related prac
 * Analytical energy of a Gaussian signal
 * Numerical Parseval verification
 * Floating-point error interpretation in energy calculations
+* Rectangular-pulse duration
+* Sinc-shaped Fourier-transform spectra
+* First spectral nulls
+* First-null bandwidth
+* Main-lobe and side-lobe interpretation
+* Strictly band-limited versus non-band-limited signals
+* Inverse pulse-width and bandwidth relationship
+* First-null time-bandwidth product
+* DC spectral value and pulse area
+* Python parameter sweep over pulse width
+* Python 4-by-2 time-bandwidth explorer
+* MATLAB `linspace`
+* MATLAB logical vectors
+* MATLAB one-based indexing in a parameter sweep
+* MATLAB `for` loops
+* MATLAB `subplot`
+* MATLAB `xline`
+* MATLAB `sprintf`
+* MATLAB `if` conditions
+* MATLAB implementation of the time-bandwidth explorer
