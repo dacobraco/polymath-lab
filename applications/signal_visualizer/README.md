@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
+A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -70,6 +70,14 @@ The project connects mathematical models with numerical calculations and visuali
 * Numerical Fourier-transform approximation from the defining integral
 * Gaussian signals as test functions for Fourier-transform properties
 * Numerical verification of transform properties in Python and MATLAB
+* Time shifting and linear phase
+* Time scaling and reciprocal frequency scaling
+* Compression in time and expansion in frequency
+* Complex exponential modulation
+* Frequency translation of a spectrum
+* Cosine modulation
+* Positive- and negative-frequency spectral copies
+* Relationship between real modulation and complex exponentials
 
 ## Features
 
@@ -150,6 +158,13 @@ The project connects mathematical models with numerical calculations and visuali
 * Verifies Fourier-transform duality using a shifted Gaussian signal
 * Demonstrates that applying the Fourier transform twice produces a reflected signal
 * Measures the maximum numerical error of the MATLAB linearity and duality checks
+* Verifies that time shifting changes spectral phase while preserving spectral magnitude
+* Verifies reciprocal time and frequency scaling using a Gaussian signal
+* Demonstrates that compressing a signal in time expands its spectrum
+* Verifies complex modulation as a frequency-domain translation
+* Verifies cosine modulation as the creation of two shifted spectral copies
+* Measures numerical errors for all Fourier shifting, scaling, and modulation properties
+* Displays four time-domain and frequency-domain signal-spectrum pairs in a 4-by-2 layout
 
 ## Mathematical Models
 
@@ -433,6 +448,69 @@ X(f) ≈ integral over the sampled time interval of
        x(t)exp(-j2πft) dt
 ```
 
+Fourier-transform time-shift property:
+
+```text
+x(t - t0) <-> X(f)exp(-j2πft0)
+```
+
+For a delay of `t0 = 2 s`:
+
+```text
+x(t - 2) <-> X(f)exp(-j4πf)
+```
+
+Time shifting preserves the magnitude spectrum:
+
+```text
+|X_shifted(f)| = |X(f)|
+```
+
+Fourier-transform time-scaling property:
+
+```text
+x(at) <-> (1/|a|)X(f/a)
+```
+
+For `a = 2`:
+
+```text
+x(2t) <-> (1/2)X(f/2)
+```
+
+Complex exponential modulation:
+
+```text
+x(t)exp(j2πf0t) <-> X(f - f0)
+```
+
+For `f0 = 2 Hz`:
+
+```text
+x(t)exp(j4πt) <-> X(f - 2)
+```
+
+Euler representation of a cosine:
+
+```text
+cos(2πf0t)
+= (1/2)exp(j2πf0t) + (1/2)exp(-j2πf0t)
+```
+
+Cosine modulation:
+
+```text
+x(t)cos(2πf0t)
+<-> (1/2)X(f - f0) + (1/2)X(f + f0)
+```
+
+For `f0 = 2 Hz`, the two spectral copies are centered at:
+
+```text
+f = -2 Hz
+f = 2 Hz
+```
+
 Rectangular pulse of width `τ`:
 
 ```text
@@ -589,6 +667,7 @@ T = 0.5 s
 * `matlab_numpy_intro.py` - reproduces the introductory MATLAB signal example using NumPy and Matplotlib
 * `fourier_properties.py` - numerically verifies Fourier-transform linearity and duality in Python
 * `fourier_properties_matlab.m` - implements the numerical Fourier-transform integral and verifies Fourier-transform linearity and duality in MATLAB
+* `fourier_shift_scale_modulation.py` - verifies time shifting, time scaling, complex modulation, and cosine modulation while visualizing four signal-spectrum pairs
 
 ## Requirements
 
@@ -815,6 +894,26 @@ The MATLAB experiment:
 * applies the transform twice
 * compares the result with the reflected Gaussian centered at `t = -1`
 * measures the maximum absolute numerical error
+
+Fourier shift, scaling, and modulation experiment:
+
+```bash
+python fourier_shift_scale_modulation.py
+```
+
+The experiment:
+
+* uses a Gaussian signal as the reference signal
+* shifts the Gaussian by `2 s`
+* verifies that time shifting preserves the magnitude spectrum and adds the predicted phase factor
+* compresses the Gaussian in time using `x(2t)`
+* verifies reciprocal expansion of the spectrum and the `1/2` amplitude factor
+* modulates the signal with a complex exponential at `2 Hz`
+* verifies translation of the spectrum to `+2 Hz`
+* modulates the signal with a real cosine at `2 Hz`
+* verifies the appearance of spectral copies centered at `-2 Hz` and `+2 Hz`
+* calculates maximum numerical errors for all four properties
+* displays four time-domain and frequency-domain signal-spectrum pairs
 
 ## Tests
 
@@ -1181,9 +1280,47 @@ duality_error = 6.6615e-16
 
 These values are effectively zero at numerical precision and confirm the theoretical linearity and duality properties.
 
+For the Fourier shift, scaling, and modulation experiment, the measured numerical errors are:
+
+```text
+Magnitude error: 2.731148640577885e-14
+Shift property error: 2.7531964119108606e-14
+Scale error: 1.1443916996305594e-16
+Modulation error: 4.47545209131181e-16
+Cosine modulation error: 2.227212004505268e-16
+```
+
+These values are effectively zero at numerical precision.
+
+The time-shift experiment demonstrates that:
+
+* shifting the Gaussian from `t = 0` to `t = 2 s` does not change the magnitude spectrum
+* the complete complex spectrum changes because the shift introduces a frequency-dependent phase factor
+* the predicted phase factor is `exp(-j4πf)`
+
+The time-scaling experiment demonstrates that:
+
+* `x(2t)` is narrower than `x(t)` in the time domain
+* its frequency spectrum is wider than the original spectrum
+* the spectral amplitude is multiplied by `1/2`
+* compression in one domain produces expansion in the other
+
+The complex modulation experiment demonstrates that:
+
+* multiplying by `exp(j2πf0t)` translates the spectrum
+* for `f0 = 2 Hz`, the Gaussian spectrum moves from `0 Hz` to `2 Hz`
+* the spectral shape is preserved
+
+The cosine-modulation experiment demonstrates that:
+
+* multiplication by a real cosine creates two shifted spectral copies
+* for `f0 = 2 Hz`, the copies are centered at `-2 Hz` and `2 Hz`
+* each separated copy has half the amplitude of the original spectrum
+* the two copies arise from the positive- and negative-frequency complex exponentials in Euler's cosine identity
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 33 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 34 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -1264,3 +1401,14 @@ This project contains practical work from lessons 14 through 33 and related prac
 * MATLAB `trapz` integration
 * MATLAB verification of Fourier-transform linearity and duality
 * Floating-point error interpretation in numerical transform verification
+* Fourier-transform time-shift property
+* Linear phase produced by a time delay
+* Preservation of spectral magnitude under time shifting
+* Reciprocal time and frequency scaling
+* Time compression and spectral expansion
+* Complex exponential modulation
+* Frequency translation
+* Real cosine modulation
+* Positive- and negative-frequency spectral copies
+* Numerical verification of shifting, scaling, and modulation properties
+* Four signal-spectrum visual comparisons
