@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, the convolution theorem, FFT-based filtering, uniform sampling, continuous- and discrete-time signal representations, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, rectangular pulses, sinc spectra, time-bandwidth relationships, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
+A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, the convolution theorem, FFT-based filtering, uniform sampling, the Nyquist-Shannon sampling theorem, boundary sampling cases, continuous- and discrete-time signal representations, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, rectangular pulses, sinc spectra, time-bandwidth relationships, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -110,6 +110,13 @@ The project connects mathematical models with numerical calculations and visuali
 * Physical sample time versus integer sample index
 * Number of samples per signal period
 * Dense numerical reference grids for continuous-time visualization
+
+* Band-limited signals and maximum signal frequency
+* Nyquist rate `2B`
+* Nyquist frequency `f_s / 2`
+* Safe, boundary, and unsafe sampling rates
+* Practical sampling condition `f_s > 2B`
+* Phase sensitivity at the exact Nyquist boundary
 
 ## Features
 
@@ -228,6 +235,12 @@ The project connects mathematical models with numerical calculations and visuali
 * Overlays sampled values on the continuous-time reference curve
 * Displays the discrete sequence `x[n]` using integer sample indices
 * Distinguishes the visualization reference rate from the physical sampling rate
+
+* Compares a 5 Hz sinusoid sampled at 40, 12, 10, and 8 Hz
+* Classifies sampling rates as safe, boundary, or unsafe
+* Displays only measured sample points without implying values between them
+* Demonstrates phase sensitivity when `f_s = 2f`
+* Compares phase-zero and 90-degree boundary samples
 
 ## Mathematical Models
 
@@ -895,6 +908,27 @@ T_s = 0.025 s
 samples_per_period = 8
 ```
 
+Nyquist rate for a signal band-limited to `B`:
+```text
+f_N = 2B
+```
+Practical no-alias sampling condition:
+```text
+f_s > 2B
+```
+Nyquist frequency of a sampler:
+```text
+f_Nyquist = f_s / 2
+```
+At the exact boundary for a 5 Hz sine sampled at 10 Hz:
+```text
+x[n] = sin(2π * 5 * n / 10) = sin(πn) = 0
+```
+A 90-degree phase shift at the same sampling rate produces alternating samples:
+```text
+x[n] = 1, -1, 1, -1, ...
+```
+
 ## Project Structure
 
 * `frequency_explorer.py` - visualizes the real and imaginary parts of a complex exponential
@@ -927,6 +961,8 @@ samples_per_period = 8
 * `time_bandwidth_explorer_matlab.m` - reproduces the rectangular-pulse time-bandwidth explorer in MATLAB
 * `convolution_theorem_explorer.py` - compares time-domain convolution with FFT-based frequency-domain filtering using correct zero-padding
 * `sampling_explorer.py` - visualizes uniform sampling of a continuous-time sinusoid and distinguishes physical sample times from discrete sample indices
+
+* `nyquist_sampling_explorer.py` - compares safe, boundary, and unsafe sampling rates and demonstrates phase sensitivity at the Nyquist boundary
 
 ## Requirements
 
@@ -1287,6 +1323,23 @@ The experiment:
 * overlays the sampled values on the reference curve
 * displays `x[n]` against integer sample indices
 * distinguishes the visualization reference rate from the physical sampling rate
+
+Nyquist sampling explorer:
+```bash
+python nyquist_sampling_explorer.py
+```
+On Windows with the Python launcher:
+```bash
+py nyquist_sampling_explorer.py
+```
+The experiment:
+* generates a 5 Hz reference sinusoid
+* compares sampling rates of 40, 12, 10, and 8 Hz
+* classifies each case as safe, boundary, or unsafe
+* reports samples per period and total sample count
+* displays measured samples without connecting them
+* demonstrates that phase-zero samples vanish at the exact 10 Hz boundary
+* demonstrates alternating samples after a 90-degree phase shift
 
 ## Tests
 
@@ -1819,9 +1872,28 @@ The experiment demonstrates that:
 * the physical sampling rate determines the actual sample times and values
 * `x(t)` is displayed against time, while `x[n]` is displayed against an integer index
 
+For the Nyquist sampling experiment:
+```text
+Signal frequency: 5 Hz
+Nyquist rate: 10 Hz
+Sampling frequencies: [40, 12, 10, 8]
+40 Hz: Safe, 8.0 samples per period, 40 total samples
+12 Hz: Safe, 2.4 samples per period, 12 total samples
+10 Hz: Boundary, 2.0 samples per period, 10 total samples
+8 Hz: Unsafe, 1.6 samples per period, 8 total samples
+Boundary samples with phase 0: approximately zero
+Boundary samples with phase pi/2: [1, -1, 1, -1, ...]
+```
+The experiment demonstrates that:
+* sampling above twice the maximum signal frequency is safe for an ideal band-limited signal
+* the exact Nyquist boundary is phase-sensitive and fragile
+* a phase-zero 5 Hz sine sampled at 10 Hz can produce only zero-valued samples
+* changing only the phase by 90 degrees produces alternating positive and negative samples
+* sampling below the Nyquist rate is unsafe and can create frequency ambiguity
+
 ## Learning Progress
 
-This project contains practical work from lessons 14 through 37 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 39 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -1964,3 +2036,8 @@ This project contains practical work from lessons 14 through 37 and related prac
 * Samples per signal period
 * Dense reference visualization versus physical sampling
 * Stem-plot representation of a discrete-time sequence
+* Nyquist-Shannon sampling theorem
+* Nyquist rate and Nyquist frequency
+* Safe, boundary, and unsafe sampling cases
+* Phase sensitivity at the Nyquist boundary
+* Boundary sampling verification with phase 0 and phase pi/2
