@@ -954,7 +954,9 @@ cos(2π * 7n / 10)
 = cos(-2π * 3n / 10)
 = cos(2π * 3n / 10)
 ```
-The equality follows because adding or subtracting complete `2π` rotations does not change a cosine and because cosine is an even function.## Project Structure
+The equality follows because adding or subtracting complete `2π` rotations does not change a cosine and because cosine is an even function.
+
+## Project Structure
 
 * `frequency_explorer.py` - visualizes the real and imaginary parts of a complex exponential
 * `delay_phase_explorer.py` - compares an original signal with its delayed signal
@@ -1383,7 +1385,9 @@ The experiment:
 * calculates the apparent 3 Hz alias for the fixed `k = 1` example
 * verifies the equality of both sampled sequences using `np.allclose`
 * displays the true and apparent continuous-time signals in separate panels
-* overlays the same measured samples on both continuous-time curves## Tests
+* overlays the same measured samples on both continuous-time curves
+
+## Tests
 
 Run the convolution tests from `applications/signal_visualizer`:
 
@@ -1950,7 +1954,9 @@ The experiment demonstrates that:
 * both curves have identical values at every measured sampling instant
 * `np.allclose` confirms the equality of the two sampled sequences
 * the samples alone cannot distinguish the true 7 Hz signal from its 3 Hz alias
-* avoiding this ambiguity requires a valid band limit and a sufficiently high sampling frequency## Learning Progress
+* avoiding this ambiguity requires a valid band limit and a sufficiently high sampling frequency
+
+## Learning Progress
 
 This project contains practical work from lessons 14 through 40 and related practical explorations from the PolyMath curriculum:
 
