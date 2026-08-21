@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, the convolution theorem, FFT-based filtering, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, rectangular pulses, sinc spectra, time-bandwidth relationships, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
+A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, the convolution theorem, FFT-based filtering, uniform sampling, continuous- and discrete-time signal representations, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, rectangular pulses, sinc spectra, time-bandwidth relationships, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -103,6 +103,14 @@ The project connects mathematical models with numerical calculations and visuali
 * DC value of a rectangular-pulse spectrum
 * Relationship between pulse area and `X(0)`
 
+* Uniform sampling of a continuous-time signal
+* Sampling frequency and sampling interval
+* Sampling instants `t_n = nT_s`
+* Relationship between `x(t)` and `x[n]`
+* Physical sample time versus integer sample index
+* Number of samples per signal period
+* Dense numerical reference grids for continuous-time visualization
+
 ## Features
 
 * Visualizes the real and imaginary parts of a complex exponential
@@ -176,7 +184,7 @@ The project connects mathematical models with numerical calculations and visuali
 * Scales the coefficients using `T C_k` for direct comparison with the Fourier transform
 * Compares the continuous spectrum with discrete samples at harmonic frequencies
 * Displays the comparison for `T = 2, 4, 8, and 16 s`
-* Demonstrates that the line spacing `Δf = 1/T` decreases as the period increases
+* Demonstrates that the line spacing `О”f = 1/T` decreases as the period increases
 * Visualizes the transition from a discrete line spectrum to a continuous spectrum
 * Displays all four transition stages in a 2-by-2 subplot layout
 * Generates and plots a sinusoidal signal in MATLAB
@@ -204,44 +212,51 @@ The project connects mathematical models with numerical calculations and visuali
 * Measures Parseval error near machine precision
 * Generates rectangular pulses with several pulse widths
 * Calculates their analytical sinc spectra
-* Calculates first-null bandwidth using `B = 1/τ`
+* Calculates first-null bandwidth using `B = 1/П„`
 * Marks positive and negative first spectral nulls
 * Compares pulse width and spectral width in a 4-by-2 Python explorer
 * Reproduces the time-bandwidth explorer in MATLAB
 * Demonstrates that shorter pulses require larger bandwidth
 * Demonstrates that longer pulses produce narrower main lobes
-* Verifies that the spectrum peak satisfies `X(0) = τ`
-* Demonstrates the constant first-null time-bandwidth product `τB = 1`
+* Verifies that the spectrum peak satisfies `X(0) = П„`
+* Demonstrates the constant first-null time-bandwidth product `П„B = 1`
 * Shows that rectangular pulses are not strictly band-limited because sinc side lobes extend indefinitely
+
+* Generates a dense numerical reference representation of a continuous-time sinusoid
+* Uniformly samples a 5 Hz signal at 40 Hz
+* Calculates the sampling interval and number of samples per period
+* Overlays sampled values on the continuous-time reference curve
+* Displays the discrete sequence `x[n]` using integer sample indices
+* Distinguishes the visualization reference rate from the physical sampling rate
 
 ## Mathematical Models
 
 Complex exponential:
 
 ```text
-x(t) = exp(j2πft)
+x(t) = exp(j2ПЂft)
 ```
 
 Pure time delay:
 
 ```text
-y(t) = x(t - τ)
-H(f) = exp(-j2πfτ)
+y(t) = x(t - П„)
+H(f) = exp(-j2ПЂfП„)
 ```
 
 Shifted unit impulse:
 
 ```text
-δ[n - n0] = 1, n = n0
-δ[n - n0] = 0, n ≠ n0
+Оґ[n - n0] = 1, n = n0
+Оґ[n - n0] = 0, n в‰  n0
 ```
 
 Example impulse responses:
 
 ```text
-h1[n] = 2δ[n]
-h2[n] = δ[n - 1]
-h3[n] = δ[n] + 0.5δ[n - 1]
+h1[n] = 2Оґ[n]
+h2[n] = Оґ[n - 1]
+h3[n] = Оґ[n] + 0.5Оґ[n - 1]
 ```
 
 Discrete-time convolution:
@@ -303,33 +318,33 @@ Averaging one complete period strongly suppresses the 20 Hz component while pres
 Square-wave Fourier series:
 
 ```text
-x(t) = (4/π) sum_{k=1,3,5,...} sin(kω0t) / k
+x(t) = (4/ПЂ) sum_{k=1,3,5,...} sin(kП‰0t) / k
 ```
 
 Partial reconstruction up to the highest odd harmonic `K`:
 
 ```text
-x_K(t) = (4/π) sum_{k=1,3,5,...,K} sin(kω0t) / k
+x_K(t) = (4/ПЂ) sum_{k=1,3,5,...,K} sin(kП‰0t) / k
 ```
 
 Fundamental frequency and angular frequency:
 
 ```text
 f0 = 1 / T
-ω0 = 2πf0
+П‰0 = 2ПЂf0
 ```
 
 Harmonic frequencies of a periodic signal:
 
 ```text
 f_n = nf0
-ω_n = nω0
+П‰_n = nП‰0
 ```
 
 Amplitude of the odd square-wave harmonic `k`:
 
 ```text
-A_k = 4 / (πk)
+A_k = 4 / (ПЂk)
 ```
 
 Continuous-time inner product over one period:
@@ -341,7 +356,7 @@ Continuous-time inner product over one period:
 Numerical approximation of the inner product:
 
 ```text
-<x, y> ≈ dt sum_n x[n]y[n]
+<x, y> в‰€ dt sum_n x[n]y[n]
 ```
 
 Orthogonality condition:
@@ -365,15 +380,15 @@ x_reconstructed(t) = sum_k c_k b_k(t)
 Trigonometric Fourier series:
 
 ```text
-x(t) = a0/2 + sum_n [a_n cos(nω0t) + b_n sin(nω0t)]
+x(t) = a0/2 + sum_n [a_n cos(nП‰0t) + b_n sin(nП‰0t)]
 ```
 
 Fourier coefficients over one period:
 
 ```text
 a0 = (2/T) integral_T x(t) dt
-a_n = (2/T) integral_T x(t)cos(nω0t) dt
-b_n = (2/T) integral_T x(t)sin(nω0t) dt
+a_n = (2/T) integral_T x(t)cos(nП‰0t) dt
+b_n = (2/T) integral_T x(t)sin(nП‰0t) dt
 ```
 
 Symmetry properties:
@@ -396,7 +411,7 @@ DC and even harmonics vanish
 Sine coefficients of the odd square wave:
 
 ```text
-b_n = 4/(nπ), n odd
+b_n = 4/(nПЂ), n odd
 b_n = 0,       n even
 ```
 
@@ -406,16 +421,16 @@ Absolute coefficient error:
 absolute_error = |symbolic_b_n - numerical_b_n|
 ```
 
-Normalized periodic wrapping into the interval `[-π, π)`:
+Normalized periodic wrapping into the interval `[-ПЂ, ПЂ)`:
 
 ```text
-t_wrapped = (t + π) mod (2π) - π
+t_wrapped = (t + ПЂ) mod (2ПЂ) - ПЂ
 ```
 
 Normalized sawtooth signal over one period:
 
 ```text
-x(t) = t / π, -π < t < π
+x(t) = t / ПЂ, -ПЂ < t < ПЂ
 ```
 
 Fourier sine coefficients of the normalized sawtooth:
@@ -423,19 +438,19 @@ Fourier sine coefficients of the normalized sawtooth:
 ```text
 a0 = 0
 a_n = 0
-b_n = 2(-1)^(n + 1) / (πn)
+b_n = 2(-1)^(n + 1) / (ПЂn)
 ```
 
 Sawtooth reconstruction using the first `N` consecutive harmonics:
 
 ```text
-x_N(t) = (2/π) sum from n=1 to N of [(-1)^(n + 1) / n] sin(nt)
+x_N(t) = (2/ПЂ) sum from n=1 to N of [(-1)^(n + 1) / n] sin(nt)
 ```
 
 Root mean square reconstruction error:
 
 ```text
-RMSE = sqrt(mean((x_ideal - x_N)²))
+RMSE = sqrt(mean((x_ideal - x_N)ВІ))
 ```
 
 Fourier-series value at a jump discontinuity:
@@ -448,14 +463,14 @@ For a jump from 1 to -1, the limiting value is 0.
 Amplitude-phase form of one harmonic:
 
 ```text
-a_n cos(nω0t) + b_n sin(nω0t)
-= A_n cos(nω0t + phase_n)
+a_n cos(nП‰0t) + b_n sin(nП‰0t)
+= A_n cos(nП‰0t + phase_n)
 ```
 
 Harmonic amplitude:
 
 ```text
-A_n = sqrt(a_n² + b_n²)
+A_n = sqrt(a_nВІ + b_nВІ)
 ```
 
 Harmonic phase:
@@ -467,22 +482,22 @@ phase_n = atan2(-b_n, a_n)
 Amplitude and phase of the normalized sawtooth harmonics:
 
 ```text
-A_n = 2 / (πn)
+A_n = 2 / (ПЂn)
 
-phase_n = -90°, n odd
-phase_n = 90°,  n even
+phase_n = -90В°, n odd
+phase_n = 90В°,  n even
 ```
 
 Fourier transform:
 
 ```text
-X(f) = integral from -∞ to ∞ of x(t)exp(-j2πft) dt
+X(f) = integral from -в€ћ to в€ћ of x(t)exp(-j2ПЂft) dt
 ```
 
 Inverse Fourier transform:
 
 ```text
-x(t) = integral from -∞ to ∞ of X(f)exp(j2πft) df
+x(t) = integral from -в€ћ to в€ћ of X(f)exp(j2ПЂft) df
 ```
 
 Fourier-transform linearity:
@@ -515,27 +530,27 @@ F{F{x(t)}} = x(-t)
 Shifted Gaussian used for the numerical duality test:
 
 ```text
-x(t) = exp(-π(t - 1)²)
-x(-t) = exp(-π(t + 1)²)
+x(t) = exp(-ПЂ(t - 1)ВІ)
+x(-t) = exp(-ПЂ(t + 1)ВІ)
 ```
 
 Numerical Fourier-transform approximation over a finite interval:
 
 ```text
-X(f) ≈ integral over the sampled time interval of
-       x(t)exp(-j2πft) dt
+X(f) в‰€ integral over the sampled time interval of
+       x(t)exp(-j2ПЂft) dt
 ```
 
 Fourier-transform time-shift property:
 
 ```text
-x(t - t0) <-> X(f)exp(-j2πft0)
+x(t - t0) <-> X(f)exp(-j2ПЂft0)
 ```
 
 For a delay of `t0 = 2 s`:
 
 ```text
-x(t - 2) <-> X(f)exp(-j4πf)
+x(t - 2) <-> X(f)exp(-j4ПЂf)
 ```
 
 Time shifting preserves the magnitude spectrum:
@@ -559,26 +574,26 @@ x(2t) <-> (1/2)X(f/2)
 Complex exponential modulation:
 
 ```text
-x(t)exp(j2πf0t) <-> X(f - f0)
+x(t)exp(j2ПЂf0t) <-> X(f - f0)
 ```
 
 For `f0 = 2 Hz`:
 
 ```text
-x(t)exp(j4πt) <-> X(f - 2)
+x(t)exp(j4ПЂt) <-> X(f - 2)
 ```
 
 Euler representation of a cosine:
 
 ```text
-cos(2πf0t)
-= (1/2)exp(j2πf0t) + (1/2)exp(-j2πf0t)
+cos(2ПЂf0t)
+= (1/2)exp(j2ПЂf0t) + (1/2)exp(-j2ПЂf0t)
 ```
 
 Cosine modulation:
 
 ```text
-x(t)cos(2πf0t)
+x(t)cos(2ПЂf0t)
 <-> (1/2)X(f - f0) + (1/2)X(f + f0)
 ```
 
@@ -592,7 +607,7 @@ f = 2 Hz
 Signal energy:
 
 ```text
-E_x = integral from -∞ to ∞ of |x(t)|² dt
+E_x = integral from -в€ћ to в€ћ of |x(t)|ВІ dt
 ```
 
 Energy as an inner product:
@@ -608,21 +623,21 @@ If:
 y(t) = a x(t)
 
 Then:
-E_y = |a|² E_x
+E_y = |a|ВІ E_x
 ```
 
 Parseval's theorem for the Fourier-transform convention used in this project:
 
 ```text
-X(f) = integral from -∞ to ∞ of x(t)exp(-j2πft) dt
+X(f) = integral from -в€ћ to в€ћ of x(t)exp(-j2ПЂft) dt
 ```
 
 is:
 
 ```text
-integral from -∞ to ∞ of |x(t)|² dt
+integral from -в€ћ to в€ћ of |x(t)|ВІ dt
 =
-integral from -∞ to ∞ of |X(f)|² df
+integral from -в€ћ to в€ћ of |X(f)|ВІ df
 ```
 
 Therefore:
@@ -634,21 +649,21 @@ E_time = E_frequency
 Gaussian used for the Parseval experiment:
 
 ```text
-x(t) = exp(-πt²)
+x(t) = exp(-ПЂtВІ)
 ```
 
 Its squared magnitude is:
 
 ```text
-|x(t)|² = exp(-2πt²)
+|x(t)|ВІ = exp(-2ПЂtВІ)
 ```
 
 Analytical Gaussian energy:
 
 ```text
-E = integral from -∞ to ∞ of exp(-2πt²) dt
+E = integral from -в€ћ to в€ћ of exp(-2ПЂtВІ) dt
 E = 1 / sqrt(2)
-E ≈ 0.7071067811865476
+E в‰€ 0.7071067811865476
 ```
 
 Numerical Parseval error:
@@ -657,71 +672,71 @@ Numerical Parseval error:
 parseval_error = |E_time - E_frequency|
 ```
 
-Rectangular pulse of width `τ`:
+Rectangular pulse of width `П„`:
 
 ```text
-x(t) = 1, |t| <= τ/2
+x(t) = 1, |t| <= П„/2
 x(t) = 0, otherwise
 ```
 
 Fourier transform of the rectangular pulse:
 
 ```text
-X(f) = τ sinc(fτ)
+X(f) = П„ sinc(fП„)
 ```
 
 Normalized sinc definition used by NumPy and MATLAB:
 
 ```text
-sinc(u) = sin(πu) / (πu)
+sinc(u) = sin(ПЂu) / (ПЂu)
 sinc(0) = 1
 ```
 
 DC value of the rectangular-pulse spectrum:
 
 ```text
-X(0) = τ sinc(0)
-X(0) = τ
+X(0) = П„ sinc(0)
+X(0) = П„
 ```
 
 The same result follows from pulse area:
 
 ```text
-X(0) = integral from -∞ to ∞ of x(t) dt
-X(0) = pulse height × pulse width
-X(0) = 1 × τ
-X(0) = τ
+X(0) = integral from -в€ћ to в€ћ of x(t) dt
+X(0) = pulse height Г— pulse width
+X(0) = 1 Г— П„
+X(0) = П„
 ```
 
 First spectral nulls:
 
 ```text
-f_null = ±1/τ
+f_null = В±1/П„
 ```
 
 First-null bandwidth:
 
 ```text
-B = 1/τ
+B = 1/П„
 ```
 
 Total main-lobe width:
 
 ```text
-main_lobe_width = 2/τ
+main_lobe_width = 2/П„
 ```
 
 First-null time-bandwidth product:
 
 ```text
-τB = 1
+П„B = 1
 ```
 
 Inverse time-bandwidth relationship:
 
 ```text
-τ decreases -> B increases
-τ increases -> B decreases
+П„ decreases -> B increases
+П„ increases -> B decreases
 ```
 
 The rectangular pulse is not strictly band-limited:
@@ -733,39 +748,39 @@ X(f) != 0 for infinitely many frequencies beyond the first null.
 NumPy uses the normalized sinc definition:
 
 ```text
-np.sinc(u) = sin(πu) / (πu)
+np.sinc(u) = sin(ПЂu) / (ПЂu)
 ```
 
 Harmonic frequencies and line spacing for a periodic signal:
 
 ```text
 f_k = k / T
-Δf = 1 / T
+О”f = 1 / T
 ```
 
 Fourier-series coefficients of a periodically repeated rectangular pulse:
 
 ```text
-C_k = (τ/T) sinc(kτ/T)
+C_k = (П„/T) sinc(kП„/T)
 ```
 
 Relationship between Fourier-series coefficients and Fourier-transform samples:
 
 ```text
 C_k = (1/T)X(f_k)
-C_k = Δf X(f_k)
+C_k = О”f X(f_k)
 T C_k = X(f_k)
 ```
 
 Transition from the Fourier-series sum to the Fourier-transform integral:
 
 ```text
-x(t) = sum_k X(f_k)exp(j2πf_k t)Δf
+x(t) = sum_k X(f_k)exp(j2ПЂf_k t)О”f
 
-As T approaches ∞:
-Δf approaches 0
+As T approaches в€ћ:
+О”f approaches 0
 
-x(t) = integral from -∞ to ∞ of X(f)exp(j2πft) df
+x(t) = integral from -в€ћ to в€ћ of X(f)exp(j2ПЂft) df
 ```
 
 Normalized frequency ratio:
@@ -789,13 +804,13 @@ H_HP(f) = jr / (1 + jr)
 Low-pass magnitude:
 
 ```text
-|H_LP(f)| = 1 / sqrt(1 + r²)
+|H_LP(f)| = 1 / sqrt(1 + rВІ)
 ```
 
 High-pass magnitude:
 
 ```text
-|H_HP(f)| = r / sqrt(1 + r²)
+|H_HP(f)| = r / sqrt(1 + rВІ)
 ```
 
 Magnitude in decibels:
@@ -813,7 +828,7 @@ phase_LP(f) = -arctan(r)
 High-pass phase:
 
 ```text
-phase_HP(f) = 90° - arctan(r)
+phase_HP(f) = 90В° - arctan(r)
 ```
 
 Slope between two frequencies:
@@ -825,13 +840,13 @@ s = (M2 - M1) / log10(f2/f1)
 Complementary magnitude-response identity:
 
 ```text
-|H_LP(f)|² + |H_HP(f)|² = 1
+|H_LP(f)|ВІ + |H_HP(f)|ВІ = 1
 ```
 
 Sinusoidal signal:
 
 ```text
-x(t) = sin(2πft)
+x(t) = sin(2ПЂft)
 ```
 
 Signal period:
@@ -845,6 +860,39 @@ For the introductory MATLAB example:
 ```text
 f = 2 Hz
 T = 0.5 s
+```
+
+Uniform sampling interval:
+
+```text
+T_s = 1 / f_s
+```
+
+Sampling instants:
+
+```text
+t_n = nT_s
+```
+
+Discrete-time sequence obtained from a continuous-time signal:
+
+```text
+x[n] = x(t_n) = x(nT_s)
+```
+
+Number of samples per signal period:
+
+```text
+samples_per_period = f_s / f
+```
+
+For the sampling experiment:
+
+```text
+f = 5 Hz
+f_s = 40 Hz
+T_s = 0.025 s
+samples_per_period = 8
 ```
 
 ## Project Structure
@@ -878,6 +926,7 @@ T = 0.5 s
 * `time_bandwidth_explorer.py` - compares rectangular pulses and sinc spectra for several pulse widths and first-null bandwidths
 * `time_bandwidth_explorer_matlab.m` - reproduces the rectangular-pulse time-bandwidth explorer in MATLAB
 * `convolution_theorem_explorer.py` - compares time-domain convolution with FFT-based frequency-domain filtering using correct zero-padding
+* `sampling_explorer.py` - visualizes uniform sampling of a continuous-time sinusoid and distinguishes physical sample times from discrete sample indices
 
 ## Requirements
 
@@ -1008,7 +1057,7 @@ Periodic sawtooth reconstruction:
 python periodic_signal_reconstruction.py
 ```
 
-The program periodically wraps normalized time into `[-π, π)`, reconstructs the sawtooth using all harmonics from 1 through `N` for `N = 1, 3, 5, and 20`, calculates RMSE, and compares all four reconstructions in a 2-by-2 subplot layout.
+The program periodically wraps normalized time into `[-ПЂ, ПЂ)`, reconstructs the sawtooth using all harmonics from 1 through `N` for `N = 1, 3, 5, and 20`, calculates RMSE, and compares all four reconstructions in a 2-by-2 subplot layout.
 
 Sawtooth line spectrum:
 
@@ -1146,10 +1195,10 @@ py signal_energy_parseval.py
 
 The experiment:
 
-* generates the Gaussian signal `x(t) = exp(-πt²)`
+* generates the Gaussian signal `x(t) = exp(-ПЂtВІ)`
 * calculates its time-domain energy using SciPy Simpson integration
 * calculates its numerical Fourier transform
-* integrates `|X(f)|²` over frequency
+* integrates `|X(f)|ВІ` over frequency
 * compares time-domain and frequency-domain energies
 * calculates the Parseval error
 * verifies that both energy values agree to numerical precision
@@ -1168,13 +1217,13 @@ py time_bandwidth_explorer.py
 
 The experiment:
 
-* generates rectangular pulses with widths `τ = 0.25, 0.5, 1, and 2 s`
-* calculates `X(f) = τ sinc(fτ)` for every pulse
-* calculates the first-null bandwidth `B = 1/τ`
+* generates rectangular pulses with widths `П„ = 0.25, 0.5, 1, and 2 s`
+* calculates `X(f) = П„ sinc(fП„)` for every pulse
+* calculates the first-null bandwidth `B = 1/П„`
 * displays each pulse next to its sinc spectrum
-* marks the first spectral nulls at `±B`
+* marks the first spectral nulls at `В±B`
 * demonstrates the inverse relationship between pulse width and bandwidth
-* shows that the sinc peak equals `τ`
+* shows that the sinc peak equals `П„`
 
 MATLAB time-bandwidth explorer:
 
@@ -1217,6 +1266,27 @@ The experiment:
 * compares direct convolution with FFT-based filtering
 * measures their maximum absolute difference
 * visualizes the input signal, both filtered outputs, and their numerical error
+
+Sampling explorer:
+
+```bash
+python sampling_explorer.py
+```
+
+On Windows with the Python launcher:
+
+```bash
+py sampling_explorer.py
+```
+
+The experiment:
+
+* generates a dense reference representation of a 5 Hz sinusoid
+* samples the signal uniformly at 40 Hz
+* calculates the sampling interval and number of samples per period
+* overlays the sampled values on the reference curve
+* displays `x[n]` against integer sample indices
+* distinguishes the visualization reference rate from the physical sampling rate
 
 ## Tests
 
@@ -1278,17 +1348,17 @@ OK
 For a first-order low-pass filter at the cutoff frequency:
 
 ```text
-|H_LP(fc)| ≈ 0.707
-M_LP(fc) ≈ -3.01 dB
-phase_LP(fc) ≈ -45°
+|H_LP(fc)| в‰€ 0.707
+M_LP(fc) в‰€ -3.01 dB
+phase_LP(fc) в‰€ -45В°
 ```
 
 For a first-order high-pass filter at the cutoff frequency:
 
 ```text
-|H_HP(fc)| ≈ 0.707
-M_HP(fc) ≈ -3.01 dB
-phase_HP(fc) ≈ 45°
+|H_HP(fc)| в‰€ 0.707
+M_HP(fc) в‰€ -3.01 dB
+phase_HP(fc) в‰€ 45В°
 ```
 
 For the high-pass Bode experiment, the numerical verification should return:
@@ -1300,7 +1370,7 @@ Complementary magnitude responses: True
 The low-pass and high-pass magnitude responses satisfy:
 
 ```text
-|H_LP(f)|² + |H_HP(f)|² = 1
+|H_LP(f)|ВІ + |H_HP(f)|ВІ = 1
 ```
 
 Far above the cutoff frequency, the low-pass magnitude approaches a slope of:
@@ -1318,22 +1388,22 @@ Far below the cutoff frequency, the high-pass magnitude approaches a slope of:
 The limiting behavior of the high-pass filter is:
 
 ```text
-f << fc: |H_HP| approaches 0 and phase approaches 90°
-f >> fc: |H_HP| approaches 1 and phase approaches 0°
+f << fc: |H_HP| approaches 0 and phase approaches 90В°
+f >> fc: |H_HP| approaches 1 and phase approaches 0В°
 ```
 
 For the composite filtering experiment with `fc = 2 Hz`:
 
 * the 1 Hz component is only moderately attenuated and phase shifted
-* the 20 Hz component is strongly attenuated and shifted close to -90°
+* the 20 Hz component is strongly attenuated and shifted close to -90В°
 * the output keeps both original frequencies because an LTI system changes their amplitudes and phases, not their frequencies
 
 The impulse-response experiment visualizes:
 
 ```text
-h1[n] = 2δ[n]
-h2[n] = δ[n - 1]
-h3[n] = δ[n] + 0.5δ[n - 1]
+h1[n] = 2Оґ[n]
+h2[n] = Оґ[n - 1]
+h3[n] = Оґ[n] + 0.5Оґ[n - 1]
 ```
 
 For the interactive convolution example with `x = [1, 2, 4, 7]` and `h = [1, -1]`:
@@ -1391,15 +1461,15 @@ For the Fourier-series experiment:
 For the orthogonality experiment:
 
 ```text
-<sin(ω0t), cos(ω0t)> ≈ 0
-<sin(ω0t), sin(2ω0t)> ≈ 0
-<sin(ω0t), sin(ω0t)> ≈ 0.5
+<sin(П‰0t), cos(П‰0t)> в‰€ 0
+<sin(П‰0t), sin(2П‰0t)> в‰€ 0
+<sin(П‰0t), sin(П‰0t)> в‰€ 0.5
 ```
 
 For the composite signal:
 
 ```text
-x(t) = 3sin(ω0t) + 0.5cos(2ω0t)
+x(t) = 3sin(П‰0t) + 0.5cos(2П‰0t)
 ```
 
 The recovered coefficients are approximately:
@@ -1415,20 +1485,20 @@ Reconstruction matches: True
 For the Fourier-coefficient experiment:
 
 ```text
-a0 ≈ 0
-a_n ≈ 0
-b_n ≈ 4/(nπ), n odd
-b_n ≈ 0,      n even
+a0 в‰€ 0
+a_n в‰€ 0
+b_n в‰€ 4/(nПЂ), n odd
+b_n в‰€ 0,      n even
 ```
 
 The first coefficients are:
 
 ```text
-b1 ≈ 1.2732395
-b2 ≈ 0
-b3 ≈ 0.4244131
-b4 ≈ 0
-b5 ≈ 0.2546477
+b1 в‰€ 1.2732395
+b2 в‰€ 0
+b3 в‰€ 0.4244131
+b4 в‰€ 0
+b5 в‰€ 0.2546477
 ```
 
 All automatic checks should return:
@@ -1464,10 +1534,10 @@ The sawtooth experiment demonstrates that:
 For the sawtooth line-spectrum experiment, the first coefficients and amplitudes are:
 
 ```text
-n = 1: b_n ≈ 0.636620,  A_n ≈ 0.636620, phase ≈ -90°
-n = 2: b_n ≈ -0.318310, A_n ≈ 0.318310, phase ≈ 90°
-n = 3: b_n ≈ 0.212207,  A_n ≈ 0.212207, phase ≈ -90°
-n = 4: b_n ≈ -0.159155, A_n ≈ 0.159155, phase ≈ 90°
+n = 1: b_n в‰€ 0.636620,  A_n в‰€ 0.636620, phase в‰€ -90В°
+n = 2: b_n в‰€ -0.318310, A_n в‰€ 0.318310, phase в‰€ 90В°
+n = 3: b_n в‰€ 0.212207,  A_n в‰€ 0.212207, phase в‰€ -90В°
+n = 4: b_n в‰€ -0.159155, A_n в‰€ 0.159155, phase в‰€ 90В°
 ```
 
 The line-spectrum experiment demonstrates that:
@@ -1475,7 +1545,7 @@ The line-spectrum experiment demonstrates that:
 * odd symmetry eliminates all cosine coefficients
 * both even and odd harmonics remain because the sawtooth does not have half-wave symmetry
 * harmonic amplitudes decrease as `1/n`
-* harmonic phases alternate between `-90°` and `90°`
+* harmonic phases alternate between `-90В°` and `90В°`
 * a periodic signal has discrete spectral lines at integer multiples of its fundamental frequency
 
 For Fourier Series Visualizer v1 with five harmonics, the square-wave analysis should produce approximately:
@@ -1483,7 +1553,7 @@ For Fourier Series Visualizer v1 with five harmonics, the square-wave analysis s
 ```text
 RMSE: 0.2578
 Amplitudes: [1.2732, 0.0000, 0.4244, 0.0000, 0.2546]
-Phases: [-90°, 0°, -90°, 0°, -90°]
+Phases: [-90В°, 0В°, -90В°, 0В°, -90В°]
 ```
 
 Only odd square-wave harmonics are present. The reconstruction displays Gibbs oscillations near every discontinuity.
@@ -1493,12 +1563,12 @@ With five harmonics, the sawtooth analysis should produce approximately:
 ```text
 RMSE: 0.1917
 Amplitudes: [0.6366, 0.3183, 0.2122, 0.1592, 0.1273]
-Phases: [-90°, 90°, -90°, 90°, -90°]
+Phases: [-90В°, 90В°, -90В°, 90В°, -90В°]
 ```
 
-Both even and odd sawtooth harmonics are present, their amplitudes decrease as `1/n`, and their phases alternate between `-90°` and `90°`.
+Both even and odd sawtooth harmonics are present, their amplitudes decrease as `1/n`, and their phases alternate between `-90В°` and `90В°`.
 
-For the Fourier-series to Fourier-transform transition with `τ = 1 s`:
+For the Fourier-series to Fourier-transform transition with `П„ = 1 s`:
 
 ```text
 X(f) = sinc(f)
@@ -1508,26 +1578,26 @@ X(0) = 1
 The first zeros of the continuous spectrum occur at:
 
 ```text
-f = ±1 Hz
+f = В±1 Hz
 ```
 
 The four visualized periods and their spectral-line spacings are:
 
 ```text
-T = 2 s:  Δf = 0.5000 Hz
-T = 4 s:  Δf = 0.2500 Hz
-T = 8 s:  Δf = 0.1250 Hz
-T = 16 s: Δf = 0.0625 Hz
+T = 2 s:  О”f = 0.5000 Hz
+T = 4 s:  О”f = 0.2500 Hz
+T = 8 s:  О”f = 0.1250 Hz
+T = 16 s: О”f = 0.0625 Hz
 ```
 
 The transition experiment demonstrates that:
 
 * the harmonic frequencies are located at `f_k = k/T`
-* increasing `T` reduces the line spacing `Δf`
+* increasing `T` reduces the line spacing `О”f`
 * the unscaled Fourier-series coefficients decrease because they contain the factor `1/T`
 * the scaled coefficients `T C_k` lie on the continuous Fourier-transform curve
 * discrete spectral lines become increasingly dense as `T` grows
-* in the limit `T → ∞`, the Fourier-series sum becomes the Fourier-transform integral
+* in the limit `T в†’ в€ћ`, the Fourier-series sum becomes the Fourier-transform integral
 * the negative sinc lobes are valid because the signed spectrum `X(f)` is displayed rather than its magnitude `|X(f)|`
 
 For the MATLAB and NumPy introductory signal example:
@@ -1559,19 +1629,19 @@ Duality: True
 The linearity test verifies:
 
 ```text
-F{2x1(t) - 3x2(t)} ≈ 2X1(f) - 3X2(f)
+F{2x1(t) - 3x2(t)} в‰€ 2X1(f) - 3X2(f)
 ```
 
 The duality test uses:
 
 ```text
-x(t) = exp(-π(t - 1)²)
+x(t) = exp(-ПЂ(t - 1)ВІ)
 ```
 
 and verifies that applying the Fourier transform twice produces:
 
 ```text
-x(-t) = exp(-π(t + 1)²)
+x(-t) = exp(-ПЂ(t + 1)ВІ)
 ```
 
 For the MATLAB Fourier-transform property experiment, the measured maximum errors are:
@@ -1599,7 +1669,7 @@ The time-shift experiment demonstrates that:
 
 * shifting the Gaussian from `t = 0` to `t = 2 s` does not change the magnitude spectrum
 * the complete complex spectrum changes because the shift introduces a frequency-dependent phase factor
-* the predicted phase factor is `exp(-j4πf)`
+* the predicted phase factor is `exp(-j4ПЂf)`
 
 The time-scaling experiment demonstrates that:
 
@@ -1610,7 +1680,7 @@ The time-scaling experiment demonstrates that:
 
 The complex modulation experiment demonstrates that:
 
-* multiplying by `exp(j2πf0t)` translates the spectrum
+* multiplying by `exp(j2ПЂf0t)` translates the spectrum
 * for `f0 = 2 Hz`, the Gaussian spectrum moves from `0 Hz` to `2 Hz`
 * the spectral shape is preserved
 
@@ -1632,7 +1702,7 @@ Parseval error: 1.1102230246251565e-16
 The analytical Gaussian energy is:
 
 ```text
-1 / sqrt(2) ≈ 0.7071067811865476
+1 / sqrt(2) в‰€ 0.7071067811865476
 ```
 
 The experiment demonstrates that:
@@ -1648,28 +1718,28 @@ The experiment demonstrates that:
 For the rectangular-pulse time-bandwidth explorers:
 
 ```text
-τ = 0.25 s -> B = 4.0 Hz
-τ = 0.50 s -> B = 2.0 Hz
-τ = 1.00 s -> B = 1.0 Hz
-τ = 2.00 s -> B = 0.5 Hz
+П„ = 0.25 s -> B = 4.0 Hz
+П„ = 0.50 s -> B = 2.0 Hz
+П„ = 1.00 s -> B = 1.0 Hz
+П„ = 2.00 s -> B = 0.5 Hz
 ```
 
 For every case:
 
 ```text
-B = 1/τ
-τB = 1
-main-lobe width = 2/τ
-X(0) = τ
+B = 1/П„
+П„B = 1
+main-lobe width = 2/П„
+X(0) = П„
 ```
 
 The first spectral nulls are:
 
 ```text
-τ = 0.25 s -> f = ±4 Hz
-τ = 0.50 s -> f = ±2 Hz
-τ = 1.00 s -> f = ±1 Hz
-τ = 2.00 s -> f = ±0.5 Hz
+П„ = 0.25 s -> f = В±4 Hz
+П„ = 0.50 s -> f = В±2 Hz
+П„ = 1.00 s -> f = В±1 Hz
+П„ = 2.00 s -> f = В±0.5 Hz
 ```
 
 The time-bandwidth experiments demonstrate that:
@@ -1726,6 +1796,28 @@ The experiment demonstrates that:
 * a five-sample moving average strongly suppresses a 20 Hz component sampled at 100 Hz
 * direct convolution and FFT-based filtering are numerically equivalent
 * the remaining difference is caused only by floating-point rounding
+
+For the sampling experiment:
+
+```text
+Signal frequency: 5 Hz
+Sampling frequency: 40 Hz
+Sampling interval: 0.025 s
+Reference points: 2000
+Number of samples: 40
+First sample index: 0
+Last sample index: 39
+Samples per period: 8.0
+```
+
+The experiment demonstrates that:
+
+* a sampling frequency of 40 Hz produces 40 samples over the interval `[0, 1)`
+* the last sample occurs at `0.975 s` because indexing starts at `n = 0`
+* a 5 Hz sinusoid sampled at 40 Hz has eight samples per period
+* increasing the reference rate changes only the visual smoothness of the reference curve
+* the physical sampling rate determines the actual sample times and values
+* `x(t)` is displayed against time, while `x[n]` is displayed against an integer index
 
 ## Learning Progress
 
@@ -1786,7 +1878,7 @@ This project contains practical work from lessons 14 through 37 and related prac
 * Continuous spectra of nonperiodic signals
 * Rectangular-pulse sinc spectrum
 * Relationship between pulse width and spectrum width
-* Spectral-line spacing `Δf = 1/T`
+* Spectral-line spacing `О”f = 1/T`
 * Relationship between `C_k`, `X(f_k)`, and `T C_k`
 * Transition from discrete Fourier-series lines to a continuous Fourier-transform spectrum
 * Interpretation of the Fourier-transform integral as the limit of Fourier-series sums
@@ -1864,3 +1956,11 @@ This project contains practical work from lessons 14 through 37 and related prac
 * Time-domain and frequency-domain filtering comparison
 * Floating-point error in FFT-based convolution
 * Three-panel convolution-theorem visualization
+
+* Uniform sampling of continuous-time signals
+* Sampling frequency and sampling interval
+* Sampling instants and integer sample indices
+* Relationship between `x(t)` and `x[n]`
+* Samples per signal period
+* Dense reference visualization versus physical sampling
+* Stem-plot representation of a discrete-time sequence
