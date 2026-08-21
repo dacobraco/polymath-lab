@@ -1,6 +1,6 @@
 # Signal Visualizer
 
-A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, the convolution theorem, FFT-based filtering, uniform sampling, the Nyquist-Shannon sampling theorem, boundary sampling cases, continuous- and discrete-time signal representations, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, rectangular pulses, sinc spectra, time-bandwidth relationships, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
+A collection of Python and MATLAB experiments for building intuition about signals, LTI systems, impulse response, convolution, the convolution theorem, FFT-based filtering, uniform sampling, the Nyquist-Shannon sampling theorem, boundary sampling cases, aliasing, apparent frequency, frequency ambiguity, continuous- and discrete-time signal representations, frequency response, Bode plots, first-order filtering, Fourier series, Fourier transforms, Fourier-transform properties, time shifting, time scaling, modulation, signal energy, Parseval's theorem, rectangular pulses, sinc spectra, time-bandwidth relationships, harmonic reconstruction, quantitative reconstruction error, signal symmetry, line spectra, and the transition from discrete to continuous spectra.
 
 The project connects mathematical models with numerical calculations and visualizations in both the time and frequency domains.
 
@@ -117,6 +117,10 @@ The project connects mathematical models with numerical calculations and visuali
 * Safe, boundary, and unsafe sampling rates
 * Practical sampling condition `f_s > 2B`
 * Phase sensitivity at the exact Nyquist boundary
+* Aliasing caused by undersampling
+* Apparent alias frequency
+* Frequency ambiguity between continuous-time signals
+* Identical sample sequences produced by different cosine frequencies
 
 ## Features
 
@@ -241,6 +245,11 @@ The project connects mathematical models with numerical calculations and visuali
 * Displays only measured sample points without implying values between them
 * Demonstrates phase sensitivity when `f_s = 2f`
 * Compares phase-zero and 90-degree boundary samples
+* Compares dense reference cosines at 7 Hz and 3 Hz
+* Samples both signals at 10 Hz
+* Calculates the 5 Hz Nyquist frequency and the apparent 3 Hz alias
+* Numerically verifies that both sampled sequences are equal
+* Displays two different continuous-time signals with the same measured sample values
 
 ## Mathematical Models
 
@@ -929,7 +938,23 @@ A 90-degree phase shift at the same sampling rate produces alternating samples:
 x[n] = 1, -1, 1, -1, ...
 ```
 
-## Project Structure
+For the fixed aliasing example:
+```text
+f_true = 7 Hz
+f_s = 10 Hz
+f_Nyquist = f_s / 2 = 5 Hz
+f_alias = |f_true - 1 * f_s| = 3 Hz
+```
+The alias-frequency calculation above is specific to the current `k = 1` example. At the sampling instants `t_n = n/f_s`:
+```text
+x_7[n] = cos(2π * 7n / 10)
+x_3[n] = cos(2π * 3n / 10)
+cos(2π * 7n / 10)
+= cos(2πn - 2π * 3n / 10)
+= cos(-2π * 3n / 10)
+= cos(2π * 3n / 10)
+```
+The equality follows because adding or subtracting complete `2π` rotations does not change a cosine and because cosine is an even function.## Project Structure
 
 * `frequency_explorer.py` - visualizes the real and imaginary parts of a complex exponential
 * `delay_phase_explorer.py` - compares an original signal with its delayed signal
@@ -963,6 +988,7 @@ x[n] = 1, -1, 1, -1, ...
 * `sampling_explorer.py` - visualizes uniform sampling of a continuous-time sinusoid and distinguishes physical sample times from discrete sample indices
 
 * `nyquist_sampling_explorer.py` - compares safe, boundary, and unsafe sampling rates and demonstrates phase sensitivity at the Nyquist boundary
+* `aliasing_lab.py` - demonstrates how 7 Hz and 3 Hz cosines produce identical samples when sampled at 10 Hz
 
 ## Requirements
 
@@ -1341,7 +1367,23 @@ The experiment:
 * demonstrates that phase-zero samples vanish at the exact 10 Hz boundary
 * demonstrates alternating samples after a 90-degree phase shift
 
-## Tests
+Aliasing lab:
+```bash
+python aliasing_lab.py
+```
+On Windows with the Python launcher:
+```bash
+py aliasing_lab.py
+```
+The experiment:
+* generates dense reference cosines at 7 Hz and 3 Hz
+* samples both signals at 10 Hz over the interval `[0, 1)`
+* calculates a sampling interval of `0.1 s`
+* calculates the 5 Hz Nyquist frequency
+* calculates the apparent 3 Hz alias for the fixed `k = 1` example
+* verifies the equality of both sampled sequences using `np.allclose`
+* displays the true and apparent continuous-time signals in separate panels
+* overlays the same measured samples on both continuous-time curves## Tests
 
 Run the convolution tests from `applications/signal_visualizer`:
 
@@ -1891,9 +1933,26 @@ The experiment demonstrates that:
 * changing only the phase by 90 degrees produces alternating positive and negative samples
 * sampling below the Nyquist rate is unsafe and can create frequency ambiguity
 
-## Learning Progress
+For the aliasing experiment:
+```text
+True frequency: 7 Hz
+Sampling frequency: 10 Hz
+Nyquist frequency: 5.0 Hz
+Alias frequency: 3 Hz
+Number of samples: 10
+Sample times: [0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]
+Matching: True
+```
+The experiment demonstrates that:
+* the 7 Hz signal exceeds the 5 Hz Nyquist frequency of the sampler
+* sampling the 7 Hz cosine at 10 Hz produces an apparent frequency of 3 Hz
+* the 7 Hz and 3 Hz continuous-time curves are visibly different between sampling instants
+* both curves have identical values at every measured sampling instant
+* `np.allclose` confirms the equality of the two sampled sequences
+* the samples alone cannot distinguish the true 7 Hz signal from its 3 Hz alias
+* avoiding this ambiguity requires a valid band limit and a sufficiently high sampling frequency## Learning Progress
 
-This project contains practical work from lessons 14 through 39 and related practical explorations from the PolyMath curriculum:
+This project contains practical work from lessons 14 through 40 and related practical explorations from the PolyMath curriculum:
 
 * Complex exponentials
 * Delay and phase shift
@@ -2041,3 +2100,8 @@ This project contains practical work from lessons 14 through 39 and related prac
 * Safe, boundary, and unsafe sampling cases
 * Phase sensitivity at the Nyquist boundary
 * Boundary sampling verification with phase 0 and phase pi/2
+* Aliasing and apparent frequency
+* Frequency ambiguity caused by undersampling
+* Equality of discrete samples from different continuous-time cosine frequencies
+* Numerical alias verification using `np.allclose`
+* Two-panel visualization of a true signal and its apparent alias
