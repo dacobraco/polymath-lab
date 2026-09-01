@@ -956,6 +956,51 @@ cos(2π * 7n / 10)
 ```
 The equality follows because adding or subtracting complete `2π` rotations does not change a cosine and because cosine is an even function.
 
+
+Reconstruction of a uniformly sampled signal:
+```text
+T_s = 1 / f_s
+t_n = nT_s
+x[n] = x(t_n)
+```
+Zero-order hold keeps the previous sample value until the next sample arrives:
+```text
+x_hat_ZOH(t) = x[n], for nT_s <= t < (n + 1)T_s
+```
+Linear interpolation uses two adjacent samples and connects them with a straight line:
+```text
+alpha = (t - nT_s) / T_s
+x_hat_linear(t) = (1 - alpha)x[n] + alpha x[n + 1]
+```
+Normalized sinc definition:
+```text
+sinc(u) = sin(pi u) / (pi u)
+sinc(0) = 1
+```
+Ideal sinc reconstruction:
+```text
+x_hat_sinc(t) = sum_n x[n] sinc((t - nT_s) / T_s)
+```
+At the sampling instants, the centered sinc kernel equals one while the other shifted kernels equal zero. Ideal reconstruction assumes a band-limited signal, sampling above the Nyquist rate, and an infinite sequence of samples. A finite observation interval produces truncation and edge errors.
+For the reconstruction experiment:
+```text
+signal frequency = 3 Hz
+sampling frequency = 12 Hz
+Nyquist rate = 6 Hz
+sampling interval = 1/12 s
+samples per period = 4
+```
+The measured reconstruction errors are:
+```text
+ZOH RMSE = 0.6019806900817339
+Linear RMSE = 0.19878220567458754
+Sinc RMSE = 0.06778145507145349
+```
+Therefore:
+```text
+Sinc RMSE < Linear RMSE < ZOH RMSE
+```
+
 ## Project Structure
 
 * `frequency_explorer.py` - visualizes the real and imaginary parts of a complex exponential
@@ -991,6 +1036,7 @@ The equality follows because adding or subtracting complete `2π` rotations does
 
 * `nyquist_sampling_explorer.py` - compares safe, boundary, and unsafe sampling rates and demonstrates phase sensitivity at the Nyquist boundary
 * `aliasing_lab.py` - demonstrates how 7 Hz and 3 Hz cosines produce identical samples when sampled at 10 Hz
+* `reconstruction_interpolation_lab.py` - compares zero-order hold, linear interpolation, and sinc reconstruction and reports their RMSE values
 
 ## Requirements
 
@@ -1386,6 +1432,27 @@ The experiment:
 * verifies the equality of both sampled sequences using `np.allclose`
 * displays the true and apparent continuous-time signals in separate panels
 * overlays the same measured samples on both continuous-time curves
+
+
+Reconstruction and interpolation lab:
+```bash
+python reconstruction_interpolation_lab.py
+```
+On Windows with the Python launcher:
+```bash
+py reconstruction_interpolation_lab.py
+```
+The experiment:
+* generates a dense reference representation of a 3 Hz sinusoid
+* samples the signal at 12 Hz, giving four samples per period
+* reconstructs the signal using zero-order hold
+* reconstructs the signal using linear interpolation
+* reconstructs the signal using a finite sinc sum
+* verifies that sinc reconstruction passes through the known samples
+* calculates RMSE for all three reconstruction methods
+* demonstrates finite-window edge effects
+* displays the original signal, samples, and all three reconstructions
+* verifies that sinc reconstruction has the smallest RMSE
 
 ## Tests
 
