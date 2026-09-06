@@ -1041,6 +1041,7 @@ Sinc RMSE < Linear RMSE < ZOH RMSE
 * `test_fourier_sampling_lab.py` - tests classification, aliasing, FFT detection, sinc interpolation, and reconstruction error
 * `fourier_sampling_validation.m` - independently validates the safe sampling experiment in MATLAB
 * `rc_rl_system_models.py` - models first-order RC and RL circuits with symbolic ODE solutions, numerical verification, and response plots
+* `first_order_numerical_solver.py` - solves a first-order RC initial-value problem with SciPy `solve_ivp`, compares numerical and analytical responses, measures solver error, and demonstrates the accuracy-cost tradeoff
 
 ## Requirements
 
@@ -2447,4 +2448,139 @@ The program creates:
 From the repository root:
 ```powershell
 py applications/signal_visualizer/rc_rl_system_models.py
+```
+
+## Numerical Solution of a First-Order System
+`first_order_numerical_solver.py` solves the transient response of a first-order RC system numerically with SciPy `solve_ivp` and compares the result with the known analytical solution.
+The laboratory demonstrates how a differential equation can be used directly by a numerical solver without providing the closed-form solution.
+### First-order RC model
+The system is described by:
+```text
+dv(t) / dt = (V_in - v(t)) / tau
+```
+The laboratory uses:
+```text
+V_in = 5 V
+tau = 1 s
+v(0) = 0 V
+```
+The derivative function supplied to `solve_ivp` is therefore:
+```text
+dv / dt = (5 - v) / 1
+```
+At the beginning:
+```text
+v = 0 V
+dv / dt = 5 V/s
+```
+When the capacitor voltage reaches 4 V:
+```text
+v = 4 V
+dv / dt = 1 V/s
+```
+The rate of change decreases as the capacitor voltage approaches the final value of 5 V.
+### Numerical solution
+SciPy `solve_ivp` solves the initial-value problem from 0 to 5 seconds.
+Selected numerical results with the default solver settings are:
+```text
+t = 0 s: 0.000000 V
+t = 1 s: 3.161055 V
+t = 2 s: 4.323786 V
+t = 5 s: 4.965707 V
+```
+The analytical step response is:
+```text
+v(t) = V_in (1 - exp(-t / tau))
+```
+For the same times:
+```text
+t = 0 s: 0.000000 V
+t = 1 s: 3.160603 V
+t = 2 s: 4.323324 V
+t = 5 s: 4.966310 V
+```
+The maximum absolute error with the default solver settings is approximately:
+```text
+6.03e-4 V
+```
+### Solver tolerances
+The experiment is repeated with stricter numerical tolerances:
+```text
+rtol = 1e-9
+atol = 1e-12
+```
+The maximum absolute error decreases to approximately:
+```text
+8.82e-10 V
+```
+This higher accuracy requires more evaluations of the differential-equation function:
+```text
+Default solver evaluations: 56
+Strict solver evaluations: 386
+```
+This demonstrates an important numerical-computation tradeoff:
+```text
+higher accuracy -> more computation
+```
+### Evaluation times and internal solver steps
+`t_eval` specifies the times at which results should be returned.
+For example:
+```text
+t_eval = [0, 1, 2, 5]
+```
+does not mean that the numerical solver takes only four integration steps.
+`solve_ivp` internally chooses its own adaptive step sizes while integrating the differential equation. The requested evaluation times only specify where the final solution should be reported.
+### Dense-grid verification
+The strict numerical solution is also evaluated at 501 points between 0 and 5 seconds.
+The numerical and analytical curves are compared over the complete interval.
+The maximum dense-grid error is approximately:
+```text
+9.44e-10 V
+```
+The program automatically verifies:
+```text
+solver success
+maximum error < 1e-8 V
+```
+Successful execution prints:
+```text
+Dense-grid checks passed.
+```
+### Main numerical workflow
+The laboratory follows this workflow:
+```text
+differential equation
+        |
+        v
+derivative function
+        |
+        v
+solve_ivp
+        |
+        v
+numerical transient response
+        |
+        v
+analytical reference
+        |
+        v
+error calculation and automatic verification
+```
+The important idea is that the numerical solver does not need the analytical expression for the solution.
+It only needs:
+```text
+1. the differential equation
+2. the initial condition
+3. the integration interval
+```
+This makes numerical ODE solvers useful for systems whose analytical solutions are difficult or impossible to obtain in closed form.
+### Visualizations
+The program creates two plots:
+1. analytical and numerical capacitor-voltage responses
+2. absolute numerical error over time
+With strict tolerances, the analytical and numerical response curves visually overlap.
+### Run
+From the repository root:
+```powershell
+py applications/signal_visualizer/first_order_numerical_solver.py
 ```
