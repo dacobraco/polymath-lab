@@ -1040,6 +1040,7 @@ Sinc RMSE < Linear RMSE < ZOH RMSE
 * `fourier_sampling_lab.py` - integrates sampling, aliasing, normalized FFT analysis, reconstruction, RMSE verification, and a 3-by-3 dashboard
 * `test_fourier_sampling_lab.py` - tests classification, aliasing, FFT detection, sinc interpolation, and reconstruction error
 * `fourier_sampling_validation.m` - independently validates the safe sampling experiment in MATLAB
+* `rc_rl_system_models.py` - models first-order RC and RL circuits with symbolic ODE solutions, numerical verification, and response plots
 
 ## Requirements
 
@@ -2333,3 +2334,117 @@ fourier_sampling_validation.m
 ```
 
 The MATLAB script independently verifies the safe 3 Hz signal sampled at 12 Hz, its normalized spectrum, dominant frequency, three reconstructions, and RMSE values.
+
+## Differential Equations as System Models
+`rc_rl_system_models.py` models first-order RC and RL circuits using symbolic differential equations, analytical solutions, numerical parameter substitution, automatic verification, and response plots.
+The laboratory demonstrates that physically different systems can have the same normalized first-order dynamics.
+### RC system
+The RC differential equation is:
+```text
+R C dv_C(t) / dt + v_C(t) = V_in
+```
+For an initially uncharged capacitor and a constant input voltage:
+```text
+v_C(t) = V_in (1 - exp(-t / tau_RC))
+tau_RC = R C
+```
+The laboratory uses:
+```text
+R = 10000 ohm
+C = 100 microfarad
+V_in = 5 V
+tau_RC = 1 s
+```
+Selected results are:
+```text
+v_C(0 s) = 0 V
+v_C(1 s) = 3.160603 V
+v_C(2 s) = 4.323324 V
+v_C(5 s) = 4.966310 V
+```
+The capacitor voltage is the RC state variable. It represents stored electrical energy and contains information about the previous behavior of the circuit.
+### RL system
+The RL differential equation is:
+```text
+L di(t) / dt + R i(t) = V_in
+```
+For zero initial current and a constant input voltage:
+```text
+i(t) = (V_in / R) (1 - exp(-t / tau_RL))
+tau_RL = L / R
+```
+The laboratory uses:
+```text
+R = 10 ohm
+L = 0.5 H
+V_in = 10 V
+tau_RL = 0.05 s
+I_final = 1 A
+```
+Selected results are:
+```text
+i(0 s) = 0 A
+i(0.05 s) = 0.632121 A
+i(0.10 s) = 0.864665 A
+i(0.25 s) = 0.993262 A
+```
+The inductor current is the RL state variable. It represents stored magnetic energy and cannot change instantaneously in the ideal model.
+### State and memory
+A state variable is the minimum internal information required, together with the future input, to determine the future behavior of a system.
+```text
+RC state: capacitor voltage v_C(t)
+RL state: inductor current i(t)
+```
+Initial conditions represent system memory. Identical circuits receiving the same future input can respond differently if they begin with different capacitor voltages or inductor currents.
+An ideal resistor stores no energy and therefore does not independently introduce a state variable.
+### Symbolic workflow
+SymPy is used to:
+- create symbolic parameters with `symbols`
+- represent time-dependent unknowns with `Function`
+- calculate symbolic derivatives with `diff`
+- construct equations with `Eq`
+- solve differential equations with `dsolve`
+- apply initial conditions with `ics`
+- substitute numerical values with `subs`
+- verify solutions with `simplify`
+- create NumPy-compatible functions with `lambdify`
+The analytical solutions are substituted back into their original differential equations.
+```text
+RC equation residual: 0
+RL equation residual: 0
+```
+A zero symbolic residual confirms that the analytical expression satisfies the corresponding equation exactly.
+### Normalized first-order response
+The responses are normalized using:
+```text
+normalized time = t / tau
+normalized output = output / final output
+```
+Both RC and RL systems then follow:
+```text
+normalized output = 1 - exp(-normalized time)
+```
+Their normalized curves overlap even though their physical quantities, final values, and time constants differ.
+This demonstrates that the same mathematical model can describe different physical systems.
+### Automatic checks
+The program verifies:
+- zero symbolic residuals for both differential equations
+- the RC time constant of 1 second
+- the RL time constant of 0.05 second
+- zero initial voltage and current
+- equal normalized time axes
+- equal normalized RC and RL responses
+Successful execution prints:
+```text
+All RC/RL model checks passed.
+```
+### Visualizations
+The program creates:
+1. an RC step response showing capacitor voltage approaching 5 V
+2. an RL step response showing inductor current approaching 1 A
+3. a normalized comparison showing identical first-order response shapes
+### Run
+From the repository root:
+```powershell
+py applications/signal_visualizer/rc_rl_system_models.py
+```
