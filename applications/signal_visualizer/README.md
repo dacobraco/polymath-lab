@@ -270,7 +270,7 @@ Shifted unit impulse:
 
 ```text
 δ[n - n0] = 1, n = n0
-δ[n - n0] = 0, n ≠ n0
+δ[n - n0] = 0, n ≠  n0
 ```
 
 Example impulse responses:
@@ -1037,6 +1037,9 @@ Sinc RMSE < Linear RMSE < ZOH RMSE
 * `nyquist_sampling_explorer.py` - compares safe, boundary, and unsafe sampling rates and demonstrates phase sensitivity at the Nyquist boundary
 * `aliasing_lab.py` - demonstrates how 7 Hz and 3 Hz cosines produce identical samples when sampled at 10 Hz
 * `reconstruction_interpolation_lab.py` - compares zero-order hold, linear interpolation, and sinc reconstruction and reports their RMSE values
+* `fourier_sampling_lab.py` - integrates sampling, aliasing, normalized FFT analysis, reconstruction, RMSE verification, and a 3-by-3 dashboard
+* `test_fourier_sampling_lab.py` - tests classification, aliasing, FFT detection, sinc interpolation, and reconstruction error
+* `fourier_sampling_validation.m` - independently validates the safe sampling experiment in MATLAB
 
 ## Requirements
 
@@ -2178,3 +2181,155 @@ This project contains practical work from lessons 14 through 40 and related prac
 * Equality of discrete samples from different continuous-time cosine frequencies
 * Numerical alias verification using `np.allclose`
 * Two-panel visualization of a true signal and its apparent alias
+
+## Fourier and Sampling Laboratory
+
+`fourier_sampling_lab.py` integrates continuous-time signal generation, uniform sampling, Nyquist classification, alias-frequency calculation, FFT analysis, reconstruction, numerical verification, and visualization in one signal-processing workflow.
+
+### Files
+
+* `fourier_sampling_lab.py` - runs the complete Python laboratory and displays the 3-by-3 dashboard
+* `test_fourier_sampling_lab.py` - verifies classification, aliasing, FFT detection, sinc interpolation, and RMSE behavior
+* `fourier_sampling_validation.m` - independently validates the safe experiment in MATLAB
+
+### Experiment cases
+
+| Case | Original frequency | Sampling frequency | Nyquist frequency | Expected result |
+| --- | ---: | ---: | ---: | --- |
+| Safe | 3 Hz | 12 Hz | 6 Hz | FFT detects 3 Hz |
+| Boundary | 5 Hz | 10 Hz | 5 Hz | Phase-zero sine produces no reliable detected frequency |
+| Unsafe | 7 Hz | 10 Hz | 5 Hz | FFT detects the 3 Hz alias |
+
+The unsafe experiment uses a phase of `pi / 2`, so the generated sine is equivalent to a cosine. The 7 Hz cosine and 3 Hz cosine produce identical samples at a 10 Hz sampling frequency.
+
+### Signal chain
+
+```text
+continuous reference signal
+-> uniform samples
+-> sampling classification
+-> alias calculation
+-> normalized FFT spectrum
+-> dominant-frequency detection
+-> ZOH, linear, and sinc reconstruction
+-> RMSE and known-result checks
+```
+
+### Sampling classification
+
+```text
+f0 < fs / 2  -> Safe
+f0 = fs / 2  -> Boundary
+f0 > fs / 2  -> Unsafe
+```
+
+The practical sampling condition is `fs > 2f0`. Equality is treated as a boundary because the measured sequence can depend completely on signal phase.
+
+### Alias frequency
+
+The program first wraps the original frequency into one sampling-frequency interval and then folds frequencies above `fs / 2` back into the observable range.
+
+```text
+wrapped = f0 mod fs
+
+if wrapped > fs / 2:
+    alias = fs - wrapped
+else:
+    alias = wrapped
+```
+
+For the unsafe experiment:
+
+```text
+f0 = 7 Hz
+fs = 10 Hz
+alias = |7 - 10| = 3 Hz
+```
+
+### FFT analysis
+
+The real FFT calculates the nonnegative-frequency spectrum of the measured samples. The magnitude is normalized to produce a single-sided amplitude spectrum. A tolerance prevents floating-point noise from being reported as a real frequency in the boundary case.
+
+Expected dominant frequencies:
+
+```text
+Safe: 3 Hz
+Boundary: None
+Unsafe: 3 Hz
+```
+
+### Reconstruction
+
+The program compares three reconstruction methods:
+
+* zero-order hold keeps each sample value until the next sample arrives
+* linear interpolation connects adjacent samples with straight lines
+* sinc interpolation sums shifted normalized sinc kernels
+
+RMSE is calculated against the original dense reference signal:
+
+```text
+RMSE = sqrt(mean((reference - reconstruction)^2))
+```
+
+Expected results:
+
+| Case | ZOH RMSE | Linear RMSE | Sinc RMSE |
+| --- | ---: | ---: | ---: |
+| Safe | 0.601981 | 0.198782 | 0.067781 |
+| Boundary | 0.707107 | 0.707107 | 0.707107 |
+| Unsafe | 1.102325 | 0.804434 | 0.982830 |
+
+In the safe case, sinc reconstruction has the smallest error. In the boundary case, phase-zero samples are effectively all zero, so no method can recover the original sine. In the unsafe case, reconstruction follows the aliased information contained in the samples instead of recovering the original 7 Hz signal.
+
+### Dashboard
+
+The 3-by-3 dashboard shows:
+
+* original signals and measured samples
+* normalized sample spectra and detected frequencies
+* ZOH, linear, and sinc reconstructions with RMSE values
+
+### Known-result checks
+
+The main program checks:
+
+* safe, boundary, and unsafe classification
+* expected alias frequencies
+* FFT detection of 3 Hz in the safe case
+* rejection of numerical noise in the boundary case
+* FFT detection of the 3 Hz alias in the unsafe case
+* `sinc RMSE < linear RMSE < ZOH RMSE` in the safe case
+* sinc interpolation passing through every measured sample
+
+Additional pytest coverage is provided by `test_fourier_sampling_lab.py`.
+
+### Run the Python laboratory
+
+From `applications/signal_visualizer`:
+
+```bash
+python fourier_sampling_lab.py
+```
+
+On Windows with the Python launcher:
+
+```bash
+py fourier_sampling_lab.py
+```
+
+### Run the tests
+
+```bash
+py -m pytest -q test_fourier_sampling_lab.py
+```
+
+### Run the MATLAB validation
+
+Open and run:
+
+```text
+fourier_sampling_validation.m
+```
+
+The MATLAB script independently verifies the safe 3 Hz signal sampled at 12 Hz, its normalized spectrum, dominant frequency, three reconstructions, and RMSE values.
