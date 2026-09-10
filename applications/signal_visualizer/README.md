@@ -2584,3 +2584,220 @@ From the repository root:
 ```powershell
 py applications/signal_visualizer/first_order_numerical_solver.py
 ```
+## Second-Order Systems, Damping, and Resonance
+`second_order_response.py` models a normalized second-order system directly from its differential equation and solves its step response numerically with SciPy `solve_ivp`.
+The laboratory compares undamped, underdamped, critically damped, and overdamped responses. It also demonstrates how damping controls overshoot, settling time, and resonance.
+`second_order_response_validation.m` independently verifies the main numerical results with MATLAB `ode45`.
+### Second-order differential equation
+The normalized second-order system is described by:
+```text
+y''(t) + 2 zeta omega_n y'(t) + omega_n^2 y(t)
+= omega_n^2 u(t)
+```
+where:
+```text
+y(t) = system output
+y'(t) = output rate
+y''(t) = output acceleration
+u(t) = input
+omega_n = natural angular frequency
+zeta = damping ratio
+```
+The laboratory uses:
+```text
+omega_n = 5 rad/s
+u(t) = 1
+y(0) = 0
+y'(0) = 0
+```
+A second-order system requires two initial-state values because the same output can develop differently depending on its current rate of change.
+### First-order state representation
+SciPy `solve_ivp` solves systems of first-order differential equations.
+The second-order equation is therefore rewritten using:
+```text
+y1 = y
+y2 = y'
+```
+The two first-order equations are:
+```text
+y1' = y2
+y2' = omega_n^2 (u - y1) - 2 zeta omega_n y2
+```
+The solver state is:
+```text
+state = [output, output rate]
+```
+The derivative function returns:
+```text
+[output rate, output acceleration]
+```
+This extends the first-order workflow from Lesson 44 from one state variable to two state variables.
+### Meaning of the acceleration equation
+The isolated acceleration is:
+```text
+y'' = omega_n^2 (u - y) - 2 zeta omega_n y'
+```
+The term:
+```text
+omega_n^2 (u - y)
+```
+moves the output toward the target.
+The term:
+```text
+-2 zeta omega_n y'
+```
+opposes the current motion and removes energy from the response.
+For `omega_n = 5 rad/s` and `zeta = 0.2`:
+```text
+y'' = 25(1 - y) - 2y'
+```
+Selected derivative values are:
+```text
+y = 0.0, y' = 0.0  ->  y'' = 25.0
+y = 1.0, y' = 0.0  ->  y'' = 0.0
+y = 1.2, y' = 0.0  ->  y'' = -5.0
+y = 1.0, y' = 2.0  ->  y'' = -4.0
+```
+At the target with zero rate, the system is in equilibrium. If the system reaches the target with a positive rate, it continues moving past the target before damping slows it down. This produces overshoot.
+### Damping cases
+The program compares:
+```text
+zeta = 0.0
+zeta = 0.2
+zeta = 1.0
+zeta = 2.0
+```
+Their behaviors are:
+| Damping ratio | Classification | Behavior |
+| ---: | --- | --- |
+| 0.0 | Undamped | Permanent oscillations |
+| 0.2 | Underdamped | Decaying oscillations and overshoot |
+| 1.0 | Critically damped | Fastest response without overshoot |
+| 2.0 | Overdamped | Slow response without oscillations |
+The undamped system does not lose energy, so it never settles.
+The underdamped system exchanges stored energy while damping gradually reduces the oscillations.
+The critically damped system reaches the target as quickly as possible without oscillating.
+The overdamped system does not oscillate, but excessive damping makes it slower than the critically damped system.
+### Step-response results
+The numerical step-response results are:
+| Damping ratio | Peak output | Overshoot | Settling time |
+| ---: | ---: | ---: | ---: |
+| 0.0 | approximately 2.000000 | approximately 100% | Does not settle |
+| 0.2 | 1.526610 | 52.660989% | 3.925 s |
+| 1.0 | approximately 1.000000 | 0% | 1.170 s |
+| 2.0 | approaches 1.000000 | 0% | 2.980 s |
+Settling time is defined using a 2% tolerance:
+```text
+0.98 <= y(t) <= 1.02
+```
+The response is considered settled when it enters this interval and does not leave it again.
+### Overshoot
+For an underdamped second-order system, the theoretical percentage overshoot is:
+```text
+M_p = exp(-zeta pi / sqrt(1 - zeta^2)) * 100%
+```
+For `zeta = 0.2`:
+```text
+Python numerical overshoot = 52.660989042%
+MATLAB numerical overshoot = 52.660989052%
+Theoretical overshoot = 52.662059933%
+```
+The MATLAB numerical and theoretical difference is:
+```text
+0.001070881%
+```
+The close agreement verifies the numerical step response.
+### Peak time
+For an underdamped system, the damped angular frequency is:
+```text
+omega_d = omega_n sqrt(1 - zeta^2)
+```
+The first peak time is:
+```text
+t_p = pi / omega_d
+```
+For `omega_n = 5 rad/s` and `zeta = 0.2`:
+```text
+t_p is approximately 0.64 s
+```
+For the undamped case, repeated peaks have the same theoretical height. The program reports the first peak at:
+```text
+t_p = pi / omega_n
+t_p is approximately 0.628319 s
+```
+### Resonance
+Resonance occurs when a sinusoidal input frequency is close to the natural frequency and the output amplitude becomes larger than the input amplitude.
+The normalized frequency ratio is:
+```text
+r = omega / omega_n
+```
+The steady-state magnitude is calculated using:
+```text
+M(r) = 1 / sqrt((1 - r^2)^2 + (2 zeta r)^2)
+```
+A pronounced resonance peak exists when:
+```text
+zeta < 1 / sqrt(2)
+```
+For `zeta = 0.2`, the numerical results are:
+```text
+Python resonance frequency = 4.802367694 rad/s
+MATLAB resonance frequency = 4.802367694 rad/s
+Theoretical resonance frequency = 4.795831523 rad/s
+Maximum magnitude = 2.551499514
+```
+A magnitude of approximately `2.55` means that a sinusoidal input with amplitude `1` produces a steady-state output amplitude of approximately `2.55` near resonance.
+Systems with `zeta = 1.0` and `zeta = 2.0` do not have pronounced resonance peaks.
+The small difference between the numerical and theoretical resonance frequencies is caused by the finite frequency grid used by the programs.
+### Python workflow
+The Python program:
+1. defines the second-order differential equation
+2. converts it into two first-order state equations
+3. solves the equations with `solve_ivp`
+4. compares four damping ratios
+5. calculates peak output, overshoot, and settling time
+6. evaluates resonance magnitude over a frequency grid
+7. verifies known numerical results
+8. displays step-response and resonance plots
+### MATLAB validation
+MATLAB `ode45` independently solves the same second-order initial-value problems.
+The validation checks:
+* numerical and theoretical overshoot
+* numerical and theoretical resonance frequency
+* agreement within defined error tolerances
+* equivalent step-response and resonance plots
+Successful execution prints:
+```text
+MATLAB checks passed.
+```
+The MATLAB script saves:
+```text
+second_order_response_validation.png
+```
+### Visualizations
+The programs create:
+1. step responses for four damping ratios
+2. resonance magnitude for three damping ratios
+3. a marked natural-frequency ratio
+The plots demonstrate:
+```text
+less damping -> more oscillation, overshoot, and resonance
+critical damping -> fastest response without overshoot
+excessive damping -> slower response
+```
+### Files
+```text
+second_order_response.py
+second_order_response_validation.m
+second_order_response_validation.png
+```
+### Run the Python laboratory
+From the repository root:
+```powershell
+py applications/signal_visualizer/second_order_response.py
+```
+### Run the MATLAB validation
+From the repository root:
+```powershell
+matlab -batch "run('applications/signal_visualizer/second_order_response_validation.m')"
+```
