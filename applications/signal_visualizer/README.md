@@ -2801,3 +2801,249 @@ From the repository root:
 ```powershell
 matlab -batch "run('applications/signal_visualizer/second_order_response_validation.m')"
 ```
+
+## Laplace Transform Intuition
+`laplace_intuition.py` introduces the Laplace transform as a method for converting differential equations in the time domain into algebraic equations in the s-domain.
+The laboratory connects known time-domain signals with their Laplace transforms, demonstrates how initial conditions enter transformed derivatives, derives first- and second-order transfer functions, and connects the second-order model with the system from Lesson 45.
+### Time domain and s-domain
+A time-domain signal is written as:
+```text
+x(t)
+```
+Its Laplace transform is written as:
+```text
+X(s) = L{x(t)}
+```
+The transformation creates the mapping:
+```text
+time domain                 s-domain
+x(t)                        X(s)
+y(t)                        Y(s)
+u(t)                        U(s)
+differential equation       algebraic equation
+```
+The complete function `x(t)` is transformed into a new function `X(s)`. Time itself is not directly replaced by `s`.
+### Complex Laplace variable
+The Laplace variable is:
+```text
+s = sigma + j omega
+```
+The real part `sigma` describes exponential growth or decay.
+The imaginary part `omega` describes oscillation.
+Since:
+```text
+exp(-s t) = exp(-sigma t) exp(-j omega t)
+```
+the Laplace transform can analyze growth, decay, and oscillation together.
+The Fourier transform is obtained along the special line:
+```text
+sigma = 0
+s = j omega
+```
+The Laplace transform can therefore be understood as an extension of the Fourier transform.
+### Definition
+For causal signals considered from `t = 0`, the one-sided Laplace transform is:
+```text
+X(s) = integral from 0 to infinity of x(t) exp(-s t) dt
+```
+The transform exists only in the region where the integral converges.
+### Basic transform pairs
+The program verifies:
+```text
+1              ->  1 / s
+exp(-2t)       ->  1 / (s + 2)
+sin(3t)        ->  3 / (s^2 + 9)
+```
+The general exponential and sinusoidal pairs are:
+```text
+exp(-a t)      ->  1 / (s + a)
+sin(omega t)   ->  omega / (s^2 + omega^2)
+```
+### Transform conditions
+By default, SymPy `laplace_transform` returns:
+```text
+(transform, convergence boundary, additional condition)
+```
+For example:
+```text
+L{exp(-2t)} = (1 / (s + 2), -2, True)
+```
+The convergence boundary `-2` means:
+```text
+Re(s) > -2
+```
+The option:
+```python
+noconds=True
+```
+returns only the transformed expression and omits the convergence information and additional conditions.
+### Derivatives and initial conditions
+The Laplace transform converts derivatives into algebraic expressions:
+```text
+L{y'(t)} = sY(s) - y(0)
+```
+For the second derivative:
+```text
+L{y''(t)} = s^2 Y(s) - s y(0) - y'(0)
+```
+With zero initial conditions:
+```text
+y(0) = 0
+y'(0) = 0
+```
+these expressions become:
+```text
+L{y'(t)} = sY(s)
+L{y''(t)} = s^2 Y(s)
+```
+This explains why a second-order system requires both an initial output and an initial output rate.
+### First-order system
+The time-domain equation:
+```text
+y'(t) + 2y(t) = u(t)
+```
+with:
+```text
+y(0) = 0
+```
+becomes:
+```text
+sY(s) + 2Y(s) = U(s)
+```
+Factoring and solving for the output gives:
+```text
+Y(s)(s + 2) = U(s)
+Y(s) = U(s) / (s + 2)
+```
+The transfer function is therefore:
+```text
+H(s) = Y(s) / U(s)
+H(s) = 1 / (s + 2)
+```
+### Purpose of a transfer function
+A transfer function describes how a system converts an input into an output:
+```text
+Y(s) = H(s) U(s)
+```
+where:
+```text
+U(s) = input
+H(s) = system
+Y(s) = output
+```
+The same transfer function can be used with different inputs. The system remains unchanged while `U(s)` changes.
+Transfer functions are defined using zero initial conditions so that they describe only the input-output behavior of the system.
+Nonzero initial conditions introduce an additional response caused by previously stored energy.
+### DC gain
+For very slow or constant inputs, the transfer function is evaluated at:
+```text
+s = 0
+```
+For:
+```text
+H(s) = 1 / (s + 2)
+```
+the DC gain is:
+```text
+H(0) = 1 / 2
+```
+A constant input with amplitude `1` therefore produces a final output of `0.5`.
+### Frequency response
+The frequency response is obtained by evaluating the transfer function along:
+```text
+s = j omega
+```
+Therefore:
+```text
+H(s)  ->  H(j omega)
+```
+The frequency response describes how the system changes the amplitude and phase of sinusoidal inputs.
+### Second-order system
+The second-order equation from Lesson 45 is:
+```text
+y'' + 2 zeta omega_n y' + omega_n^2 y
+= omega_n^2 u
+```
+With zero initial conditions, its Laplace-domain equation is:
+```text
+s^2 Y + 2 zeta omega_n sY + omega_n^2 Y
+= omega_n^2 U
+```
+Factoring `Y(s)` gives:
+```text
+Y(s)(s^2 + 2 zeta omega_n s + omega_n^2)
+= omega_n^2 U(s)
+```
+The second-order transfer function is:
+```text
+H(s) = omega_n^2 / (s^2 + 2 zeta omega_n s + omega_n^2)
+```
+### Connection with Lesson 45
+For:
+```text
+omega_n = 5 rad/s
+zeta = 0.2
+```
+the transfer function becomes:
+```text
+H(s) = 25 / (s^2 + 2s + 25)
+```
+Its DC gain is:
+```text
+H(0) = 1
+```
+This means that a constant input is passed without changing its final value.
+For a unit-step input:
+```text
+U(s) = 1 / s
+```
+the output is:
+```text
+Y(s) = H(s) U(s)
+Y(s) = 25 / (s(s^2 + 2s + 25))
+```
+The inverse Laplace transform of this expression produces the time-domain step response. Inverse transformation is introduced in Lesson 48.
+### SymPy workflow
+The program uses SymPy to:
+* create time-domain and Laplace-domain symbols
+* calculate transforms with `laplace_transform`
+* omit transform conditions with `noconds=True`
+* construct Laplace-domain equations with `Eq`
+* solve equations for `Y` with `solve`
+* form transfer functions using `Y / U`
+* substitute concrete system parameters with `subs`
+* simplify symbolic expressions with `simplify`
+* verify known transform pairs and transfer functions
+### Automatic checks
+The program verifies:
+* the transform of a unit step
+* the transform of `exp(-2t)`
+* the transform of `sin(3t)`
+* the first-order transfer function
+* the general second-order transfer function
+* the concrete DC gain
+* the unit-step output relation
+Successful execution prints:
+```text
+All Laplace intuition checks passed.
+```
+### Main workflow
+```text
+time-domain signal or equation
+-> Laplace transformation
+-> algebraic s-domain equation
+-> solve for Y(s)
+-> divide by U(s)
+-> transfer function H(s)
+-> multiply by a selected input U(s)
+-> output Y(s)
+```
+### File
+```text
+laplace_intuition.py
+```
+### Run
+From the repository root:
+```powershell
+py applications/signal_visualizer/laplace_intuition.py
+```
