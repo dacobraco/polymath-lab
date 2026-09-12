@@ -3047,3 +3047,219 @@ From the repository root:
 ```powershell
 py applications/signal_visualizer/laplace_intuition.py
 ```
+
+## Poles, Zeros, and Stability
+`pole_zero_explorer.py` connects transfer-function coefficients, pole and zero locations, stability classification, and time-domain behavior.
+The experiment demonstrates how a small number of points in the complex s-plane can predict whether a system response decays, remains constant, or grows.
+### Transfer-function form
+A transfer function can be written as:
+```text
+H(s) = K (s - z1)(s - z2)... / ((s - p1)(s - p2)...)
+```
+where:
+```text
+zk = zeros
+pk = poles
+K  = overall gain
+```
+Zeros are the values of `s` that make the numerator equal to zero.
+Poles are the values of `s` that make the denominator equal to zero.
+The program calculates polynomial roots using:
+```python
+np.roots(coefficients)
+```
+For example:
+```text
+denominator coefficients: [1, 4]
+polynomial: s + 4
+pole: -4
+```
+A constant numerator such as `[3]` has no finite zeros.
+### Stability rule
+For a continuous-time linear system, pole locations determine stability:
+```text
+All pole real parts < 0       Stable
+Pole real part = 0            Marginally stable
+Any pole real part > 0        Unstable
+```
+Poles in the left half-plane produce responses that decay.
+Poles on the imaginary axis produce oscillations whose amplitudes do not naturally decay.
+Poles in the right half-plane produce responses whose amplitudes grow.
+A numerical tolerance is used when comparing real parts with zero:
+```text
+tolerance = 1e-9
+```
+This prevents tiny floating-point errors from incorrectly changing the stability classification.
+### Studied systems
+The first-order system:
+```text
+H(s) = 3 / (s + 4)
+```
+has:
+```text
+pole: -4
+zeros: none
+classification: Stable
+```
+The high-pass system:
+```text
+H(s) = s / (s + 2)
+```
+has:
+```text
+pole: -2
+zero: 0
+classification: Stable
+```
+The stable oscillatory system:
+```text
+H(s) = 25 / (s^2 + 2s + 25)
+```
+has:
+```text
+poles: -1 + j4.89897949 and -1 - j4.89897949
+classification: Stable
+```
+The marginally stable oscillator:
+```text
+H(s) = 1 / (s^2 + 9)
+```
+has:
+```text
+poles: 0 + j3 and 0 - j3
+classification: Marginally stable
+```
+The unstable oscillator:
+```text
+H(s) = 1 / (s^2 - s + 9.25)
+```
+has:
+```text
+poles: 0.5 + j3 and 0.5 - j3
+classification: Unstable
+```
+### Pole-zero map
+The program displays poles and zeros in the complex s-plane.
+The plotting convention is:
+```text
+red x          pole
+blue circle    zero
+horizontal     real axis
+vertical       imaginary axis
+green region   stable left half-plane
+red region     unstable right half-plane
+```
+A zero can lie on the imaginary axis without making the system unstable.
+Stability is determined by poles, while zeros shape how input components are transferred to the output.
+### Connection with the time response
+A complex-conjugate pole pair:
+```text
+p = sigma + j omega
+p* = sigma - j omega
+```
+produces a real response with the general form:
+```text
+x(t) = exp(sigma t) cos(omega t)
+```
+The real part controls the amplitude envelope:
+```text
+sigma < 0      amplitude decreases
+sigma = 0      amplitude remains constant
+sigma > 0      amplitude increases
+```
+The imaginary part controls the oscillation rate.
+For poles:
+```text
+-0.5 + j3 and -0.5 - j3
+```
+the amplitude envelope is:
+```text
+exp(-0.5t)
+```
+and the time constant is:
+```text
+tau = 1 / 0.5 = 2 s
+```
+The oscillation period is:
+```text
+T = 2 pi / 3
+T approximately 2.09 s
+```
+For poles:
+```text
+0.5 + j3 and 0.5 - j3
+```
+the envelope is:
+```text
+exp(0.5t)
+```
+At `t = 6 s`, its value is:
+```text
+exp(3) approximately 20.09
+```
+This explains the growing unstable response shown by the program.
+### Effect of a zero at the origin
+The high-pass transfer function is:
+```text
+H_HP(s) = s / (s + 2)
+```
+Its value at zero frequency is:
+```text
+H_HP(0) = 0
+```
+The zero at `s = 0` therefore blocks a constant, or DC, component.
+For a unit-step input, the high-pass output is:
+```text
+y_HP(t) = exp(-2t)
+```
+The output initially reacts to the sudden input change and then decreases to zero.
+For comparison, the low-pass system is:
+```text
+H_LP(s) = 2 / (s + 2)
+```
+Its unit-step response is:
+```text
+y_LP(t) = 1 - exp(-2t)
+```
+The two responses are complementary:
+```text
+y_HP(t) + y_LP(t) = 1
+```
+The common pole at `-2` gives the time constant:
+```text
+tau = 1 / 2 = 0.5 s
+```
+After one time constant:
+```text
+y_HP(0.5) approximately 0.368
+y_LP(0.5) approximately 0.632
+```
+### Engineering interpretation
+Pole-zero analysis makes it possible to predict system behavior without first calculating every point of the time response.
+It can be used to:
+* determine whether a control system is stable
+* predict whether a circuit response will decay or grow
+* recognize oscillatory system behavior
+* estimate settling speed from pole real parts
+* estimate oscillation speed from pole imaginary parts
+* understand why a high-pass filter removes DC offset
+* connect transfer functions with time-domain behavior
+The high-pass example is relevant to biomedical signal processing because a zero at the origin can help remove slowly varying baseline components from signals such as ECG measurements.
+### Main conclusions
+```text
+Poles determine natural system behavior.
+Pole real parts determine growth or decay.
+Pole imaginary parts determine oscillation.
+Zeros suppress selected input components.
+A zero at the origin blocks DC.
+Stable poles must lie in the left half-plane.
+```
+### File
+```text
+pole_zero_explorer.py
+```
+### Run
+From the repository root:
+```powershell
+py applications/signal_visualizer/pole_zero_explorer.py
+```
