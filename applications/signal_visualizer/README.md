@@ -3366,3 +3366,105 @@ Applications include:
 ### Run
 From the repository root:
     py applications/signal_visualizer/inverse_laplace_response.py
+
+
+## Transfer Functions in Software
+transfer_function_software.py and transfer_function_software_validation.m demonstrate how the same continuous-time transfer function is represented and analyzed in SciPy Signal and MATLAB.
+The studied system is:
+    H(s) = 9 / (s^2 + 2s + 10)
+The numerator and denominator coefficients are:
+    numerator = [9]
+    denominator = [1, 2, 10]
+The coefficients are written from the highest polynomial power to the lowest.
+### SciPy representation
+SciPy represents the system with:
+    signal.TransferFunction(numerator, denominator)
+This creates a continuous-time LTI system object.
+The system object can then be used to calculate:
+* poles
+* zeros
+* step response
+* impulse response
+For the studied system, SciPy returns the poles:
+    -1 + j3
+    -1 - j3
+and no finite zeros.
+The complex-conjugate poles agree with the theoretical analysis from the previous lessons.
+### Controlled time grid
+The simulation uses the same time interval in both platforms:
+    t = 0 to 8 s
+    number of points = 801
+    time step = 0.01 s
+Using the same time grid makes the numerical comparison between SciPy and MATLAB meaningful.
+### SciPy response values
+Selected step-response values are approximately:
+    t = 0 s    0.000000
+    t = 1 s    1.212204
+    t = 2 s    0.794394
+    t = 8 s    0.899963
+Selected impulse-response values are approximately:
+    t = 0 s    0.000000
+    t = 1 s    0.155745
+    t = 2 s   -0.113444
+    t = 8 s   -0.000911
+The step response approaches the DC gain:
+    H(0) = 0.9
+The impulse response approaches zero.
+### MATLAB representation
+MATLAB represents the same system with:
+    tf(numerator, denominator)
+The corresponding MATLAB commands for system analysis are:
+    pole
+    zero
+    step
+    impulse
+The MATLAB simulation uses the same transfer-function coefficients and the same time grid as SciPy.
+The MATLAB results match the SciPy results for the tested response values and reproduce the same step and impulse-response shapes.
+### Indexing difference
+Python indexing starts at zero.
+For the 0.01 s time grid:
+    t = 0 s -> index 0
+    t = 1 s -> index 100
+    t = 2 s -> index 200
+    t = 8 s -> index 800
+MATLAB indexing starts at one:
+    t = 0 s -> index 1
+    t = 1 s -> index 101
+    t = 2 s -> index 201
+    t = 8 s -> index 801
+The physical time values are identical. Only the array indexing convention differs.
+### Main conclusion
+SciPy and MATLAB use different software interfaces, but they represent the same mathematical system.
+The workflow is:
+    transfer-function coefficients
+            |
+            v
+    software system object
+            |
+            +--> poles
+            +--> zeros
+            +--> step response
+            +--> impulse response
+For the same transfer function and the same simulation times, both platforms produce the same system behavior.
+This demonstrates an important engineering idea:
+    mathematical model stays the same
+    software interface can change
+### Engineering interpretation
+Transfer-function objects allow system models to be analyzed without manually solving the differential equation every time.
+This approach is useful for:
+* control-system analysis
+* circuit models
+* analog filter models
+* transient-response analysis
+* stability analysis
+* comparison between engineering software platforms
+* later biomedical signal-processing and system-modeling work
+### Files
+    transfer_function_software.py
+    transfer_function_software_validation.m
+### Run Python
+From the repository root:
+    py applications/signal_visualizer/transfer_function_software.py
+### Run MATLAB
+From the repository root:
+    matlab -batch "run('applications/signal_visualizer/transfer_function_software_validation.m')"
