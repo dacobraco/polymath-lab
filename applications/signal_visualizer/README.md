@@ -3468,3 +3468,93 @@ From the repository root:
 ### Run MATLAB
 From the repository root:
     matlab -batch "run('applications/signal_visualizer/transfer_function_software_validation.m')"
+
+
+## Difference Equations and Discrete Systems
+recursive_system_simulator.py demonstrates a first-order recursive discrete-time system described by the difference equation:
+    y[n] = a * y[n - 1] + x[n]
+Unlike a continuous-time differential equation, a difference equation describes the system sample by sample.
+The current output depends on:
+* the current input x[n]
+* the previous output y[n - 1]
+* the recursive coefficient a
+Because the previous output is reused in the next calculation, the system has memory.
+### Recursive simulation
+The simulator processes the input sequence one sample at a time.
+For every new input sample, it calculates:
+    current_output = coefficient * previous_output + input_value
+The newly calculated output is then stored and becomes the previous output for the next iteration.
+This directly implements the mathematical recurrence:
+    y[n] = a * y[n - 1] + x[n]
+### Memory of the system
+For the input:
+    x[n] = [0, 0, 2, 2, 0, 0, 0]
+and coefficient:
+    a = 0.5
+the output is:
+    y[n] = [0, 0, 2, 3, 1.5, 0.75, 0.375]
+After the input returns to zero, the output does not immediately become zero.
+Instead:
+    3 -> 1.5 -> 0.75 -> 0.375
+This happens because the system continues to use its previous output.
+The recursive term therefore acts as memory.
+### Effect of the recursive coefficient
+The simulator compares several values of a.
+For:
+    a = 0.2
+the previous state disappears quickly.
+For:
+    a = 0.5
+the response decays more slowly.
+For:
+    a = 0.9
+the system remembers its previous state for much longer.
+For:
+    a = 1.0
+the previous state does not decay.
+For:
+    a = 1.1
+the previous state grows from sample to sample.
+The implemented qualitative classification is:
+    abs(a) < 1    Stable
+    abs(a) = 1    Marginal
+    abs(a) > 1    Unstable
+For this first-order recursive system, coefficients with magnitude below one produce a decaying zero-input response.
+### Impulse response
+The discrete-time impulse input is:
+    x[n] = [1, 0, 0, 0, ...]
+For:
+    a = 0.5
+the simulator produces:
+    h[n] = [1, 0.5, 0.25, 0.125, 0.0625, ...]
+The theoretical impulse response is:
+    h[n] = (0.5)^n
+The program calculates the theoretical sequence independently and verifies:
+    np.allclose(impulse_output, expected_impulse)
+The numerical check passes:
+    Impulse-response check: PASSED
+### Connection with continuous-time systems
+Continuous-time systems are commonly described by differential equations and signals such as:
+    x(t)
+    y(t)
+Discrete-time systems use sequences:
+    x[n]
+    y[n]
+A differential equation describes continuous evolution through derivatives.
+A difference equation describes evolution from one sample to the next using previous samples.
+The recursive coefficient in a discrete-time system plays a role similar to the natural decay or growth observed in continuous-time dynamic systems.
+### Engineering interpretation
+Difference equations are fundamental to digital signal processing.
+Recursive equations appear in:
+* digital filters
+* feedback systems
+* sampled control systems
+* signal smoothing
+* sensor processing
+* biomedical signal processing
+Later lessons will connect this recurrence to the Z-transform, poles, stability, and IIR digital filters.
+### File
+    recursive_system_simulator.py
+### Run
+From the repository root:
+    py applications/signal_visualizer/recursive_system_simulator.py
