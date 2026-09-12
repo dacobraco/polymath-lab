@@ -3263,3 +3263,106 @@ From the repository root:
 ```powershell
 py applications/signal_visualizer/pole_zero_explorer.py
 ```
+
+
+## Inverse Laplace Transform
+inverse_laplace_response.py connects transfer functions in the s-domain with impulse and step responses in the time domain.
+The experiment uses symbolic inverse Laplace transforms to recover system behavior directly from H(s).
+### Impulse and step responses
+For a transfer function:
+    H(s) = Y(s) / X(s)
+the impulse response is:
+    h(t) = L^-1{H(s)}
+because:
+    L{delta(t)} = 1
+For a unit-step input:
+    L{u(t)} = 1 / s
+so:
+    Y_step(s) = H(s) / s
+and:
+    y_step(t) = L^-1{H(s) / s}
+### First-order system
+The first system is:
+    H(s) = 2 / (s + 2)
+Its impulse response is:
+    h(t) = 2 exp(-2t)
+Its step response is:
+    y(t) = 1 - exp(-2t)
+The impulse response decays to zero.
+The step response approaches:
+    H(0) = 1
+which is the DC gain.
+### Second-order system
+The second system is:
+    H(s) = 9 / (s^2 + 2s + 10)
+The denominator can be written as:
+    (s + 1)^2 + 9
+so the poles are:
+    -1 + j3
+    -1 - j3
+The impulse response is:
+    h(t) = 3 exp(-t) sin(3t)
+The pole real part produces exponential decay:
+    real part -1 -> exponential decay
+The pole imaginary part produces oscillation:
+    imaginary part 3 -> oscillation
+The step response is:
+    y(t) = 9/10 - (3/10) exp(-t) sin(3t) - (9/10) exp(-t) cos(3t)
+The transient oscillations decay because the poles lie in the left half-plane.
+The final step-response value is:
+    y(infinity) = 9/10
+which matches:
+    H(0) = 9/10
+### Symbolic verification
+SymPy calculates the inverse Laplace transforms and verifies that the results match the expected analytical expressions.
+The program verifies:
+    first-order impulse at t = 0 = 2
+    first-order step at t = 0 = 0
+    second-order impulse at t = 0 = 0
+    second-order step at t = 0 = 0
+For both stable systems:
+    impulse response -> 0
+as:
+    t -> infinity
+The final values of the step responses are also verified against the corresponding DC gains.
+### Visualization
+The program plots:
+    first-order impulse response
+    first-order step response
+    second-order impulse response
+    second-order step response
+The first-order system shows exponential behavior.
+The second-order system shows damped oscillations caused by its complex-conjugate poles.
+The step-response plots include the DC gain as a reference line.
+### Connection with previous lessons
+The experiment connects:
+    differential equation
+            |
+            v
+    transfer function H(s)
+            |
+            v
+    poles and zeros
+            |
+            v
+    inverse Laplace transform
+            |
+            v
+    time-domain response
+Pole-zero analysis predicts the qualitative behavior.
+The inverse Laplace transform produces the exact time-domain response.
+### Engineering interpretation
+Inverse Laplace transforms convert algebraic system models in the s-domain back into measurable time-domain behavior.
+Applications include:
+* circuit transient analysis
+* control-system response analysis
+* filter behavior
+* stability interpretation
+* impulse-response calculation
+* step-response calculation
+* connecting mathematical models with physical systems
+### File
+    inverse_laplace_response.py
+### Run
+From the repository root:
+    py applications/signal_visualizer/inverse_laplace_response.py
