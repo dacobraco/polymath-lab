@@ -3736,3 +3736,94 @@ The sampling interval controls how frequently the discrete system updates, while
 ### Run
 From the repository root:
     py applications/signal_visualizer/continuous_discrete_bridge.py
+
+## Why We Need the DFT
+`dft_intuition.py` introduces the Discrete Fourier Transform as a practical tool for discovering the frequency content hidden inside a sampled signal.
+The main intuition is to treat the DFT as a prism for signals:
+    sampled signal
+    -> DFT
+    -> frequency spectrum
+A waveform that appears complicated in the time domain can be separated into its individual frequency components in the frequency domain.
+### Test signal
+The experiment uses a sampling frequency of:
+    Fs = 500 Hz
+and a duration of:
+    T = 4 s
+The sampled signal contains three sinusoidal components:
+    x(t) =
+        sin(2*pi*12*t)
+        + 0.75*sin(2*pi*35*t)
+        + 0.25*sin(2*pi*60*t)
+The three components therefore have frequencies and relative amplitudes:
+    12 Hz -> amplitude 1.00
+    35 Hz -> amplitude 0.75
+    60 Hz -> amplitude 0.25
+In the time domain these components combine into one complicated waveform.
+The DFT separates them again.
+### Frequency bins
+For a signal with sampling frequency `Fs` and `N` samples, the spacing between DFT frequency bins is:
+    delta_f = Fs / N
+For this experiment:
+    N = 2000
+    delta_f = 0.25 Hz
+The frequency represented by DFT bin `k` is:
+    f_k = k * Fs / N
+Therefore the expected positive-frequency bins are:
+    12 Hz -> k = 48
+    35 Hz -> k = 140
+    60 Hz -> k = 240
+### NumPy DFT workflow
+The DFT is calculated using:
+    spectrum = np.fft.fft(signal)
+The result is complex because the DFT contains both magnitude and phase information.
+The magnitude spectrum is obtained using:
+    magnitude = np.abs(spectrum)
+The corresponding frequency axis is generated with:
+    frequencies = np.fft.fftfreq(len(signal), d=1 / sampling_frequency)
+For a real-valued signal, the full DFT contains corresponding positive- and negative-frequency components.
+This experiment keeps the nonnegative-frequency part for visualization and dominant-frequency detection.
+### Automatic frequency detection
+The program does not receive the frequencies 12 Hz, 35 Hz, and 60 Hz as search targets.
+Instead, it examines the calculated magnitude spectrum and uses `np.argsort` to locate the three largest spectral peaks.
+The measured result is:
+    12.00 Hz, magnitude = 1000.00
+    35.00 Hz, magnitude = 750.00
+    60.00 Hz, magnitude = 250.00
+The detected frequencies exactly match the components used to construct the signal.
+The raw DFT magnitudes are not yet normalized to physical signal amplitudes. However, their ratios are preserved:
+    1000 : 750 : 250
+    =
+    1.00 : 0.75 : 0.25
+Amplitude normalization is treated separately later in the spectral-analysis block.
+### Why the DFT is useful
+A time-domain waveform shows how a signal changes with time, but it can hide the individual oscillations that produced it.
+The DFT provides another representation:
+    x[n]
+    -> X[k]
+where `x[n]` contains samples in time and `X[k]` describes their frequency content.
+This is especially useful when analyzing measured signals such as ECG data.
+A real measurement may contain:
+    physiological signal
+    + interference
+    + sensor noise
+    + power-line contamination
+The DFT can reveal narrow spectral components that are difficult to recognize directly in the time-domain waveform.
+The DFT itself does not decide whether a frequency is useful or unwanted. It reveals what frequency content exists. Engineering knowledge is then used to decide which components should be preserved, investigated, or filtered.
+### DFT and FFT
+The DFT is the mathematical transform.
+The FFT is an efficient algorithm for calculating the same DFT.
+Therefore:
+    FFT result = DFT result
+but the FFT computes it much more efficiently.
+### Main conclusion
+The central intuition of this lesson is:
+    time-domain samples
+    -> DFT / FFT
+    -> frequency-domain spectrum
+    -> identify dominant frequency components
+The DFT acts as a prism for a sampled signal: components that are mixed together in the time waveform become individually visible in the frequency spectrum.
+### File
+    dft_intuition.py
+### Run
+From the repository root:
+    py applications/signal_visualizer/dft_intuition.py
