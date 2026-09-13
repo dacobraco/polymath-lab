@@ -3827,3 +3827,58 @@ The DFT acts as a prism for a sampled signal: components that are mixed together
 ### Run
 From the repository root:
     py applications/signal_visualizer/dft_intuition.py
+## DFT Matrix and Complex Spectrum
+`dft_matrix.py` builds the Discrete Fourier Transform directly from its matrix definition instead of using the FFT as the primary calculation method.
+For a signal with `N` samples, each DFT matrix element is:
+    W[k, n] = exp(-j * 2*pi*k*n / N)
+Each row of the DFT matrix corresponds to one DFT frequency bin. The row acts as a frequency detector that measures how strongly the input signal matches that complex exponential.
+For `N = 4`, the theoretical matrix is:
+    [ 1   1    1   1  ]
+    [ 1  -j   -1   j  ]
+    [ 1  -1    1  -1  ]
+    [ 1   j   -1  -j  ]
+Small numerical values around `1e-16` appear in the NumPy result because floating-point arithmetic cannot represent some trigonometric values as exact zeros.
+The DFT is calculated through matrix multiplication:
+    X = W @ x
+For the test signal:
+    x = [1, 0, -1, 0]
+the matrix calculation produces approximately:
+    X = [0, 2, 0, 2]
+The result is compared with:
+    np.fft.fft(signal)
+and the two results agree within floating-point precision:
+    Matrix DFT matches NumPy FFT: True
+This demonstrates that the FFT does not compute a different transform. It is an efficient algorithm for computing the same DFT.
+### Complex spectrum
+A second signal is used to demonstrate phase information:
+    x = [0, 1, 0, -1]
+Its DFT is approximately:
+    X = [0, -2j, 0, 2j]
+The significant spectral components have magnitudes:
+    2, 2
+and phases:
+    -90 deg, +90 deg
+This shows why the full complex DFT contains more information than the magnitude spectrum alone.
+For a complex spectral value:
+    X[k] = a + j*b
+the magnitude is:
+    |X[k]| = sqrt(a^2 + b^2)
+and the complex angle represents phase.
+For real-valued input signals, the DFT has conjugate symmetry:
+    X[N-k] = conjugate(X[k])
+Therefore corresponding positive- and negative-frequency components contain related information.
+Phase values at bins whose magnitude is approximately zero are not meaningful, because an almost-zero complex vector has no physically useful direction.
+### Main conclusion
+The DFT can be viewed as a linear transformation:
+    time-domain samples
+    -> DFT matrix
+    -> complex frequency spectrum
+or simply:
+    X = W x
+Each row of `W` tests one discrete frequency. Each value in `X` contains magnitude and phase information for that frequency.
+The FFT produces the same DFT result but computes it much more efficiently.
+### File
+    dft_matrix.py
+### Run
+From the repository root:
+    py applications/signal_visualizer/dft_matrix.py
