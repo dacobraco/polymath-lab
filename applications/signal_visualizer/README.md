@@ -3882,3 +3882,49 @@ The FFT produces the same DFT result but computes it much more efficiently.
 ### Run
 From the repository root:
     py applications/signal_visualizer/dft_matrix.py
+## C Introduction Through DFT Implementation
+`dft.c` implements the Discrete Fourier Transform directly in C.
+The implementation uses the DFT definition:
+    X[k] = sum x[n] * exp(-j * 2*pi*k*n / N)
+Using Euler's formula:
+    exp(-j*theta) = cos(theta) - j*sin(theta)
+the real and imaginary parts are calculated separately:
+    Re{X[k]} = sum x[n] * cos(2*pi*k*n/N)
+    Im{X[k]} = -sum x[n] * sin(2*pi*k*n/N)
+The implementation uses two nested loops:
+    k -> selects the DFT frequency bin
+    n -> iterates through all input samples
+For each bin, the program accumulates the real and imaginary contributions from every signal sample.
+### DFT function
+The transform is implemented as a reusable function:
+    void dft(const double signal[], int N, double real_part[], double imag_part[])
+The input signal is marked `const` because the DFT function reads the samples but does not modify them.
+The complex spectrum is stored using two arrays:
+    real_part[k]
+    imag_part[k]
+so that:
+    X[k] = real_part[k] + j*imag_part[k]
+### Test signal
+The test signal is:
+    x = [0, 1, 0, -1]
+Its expected DFT is approximately:
+    X = [0, -2j, 0, 2j]
+The C implementation produces the expected result.
+### Floating-point verification
+Direct equality is not used for floating-point values because numerical calculations can produce very small residual errors near zero.
+Instead, the program checks:
+    abs(calculated - expected) < tolerance
+with:
+    tolerance = 1e-9
+The final verification result is:
+    DFT test: PASSED
+### Compile and run
+From the `applications/signal_visualizer` directory:
+    gcc dft.c -o dft.exe && ./dft.exe
+The source file must be recompiled after changes before the executable reflects the updated code.
+### Main conclusion
+This lesson connects the mathematical definition of the DFT with a low-level implementation.
+The same transform previously calculated with NumPy is now calculated explicitly in C using loops, trigonometric functions, arrays, and floating-point arithmetic.
+This provides a foundation for later DSP implementations on embedded systems and for comparing high-level numerical tools with lower-level implementations.
+### File
+    dft.c
