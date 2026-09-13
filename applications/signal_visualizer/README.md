@@ -3558,3 +3558,101 @@ Later lessons will connect this recurrence to the Z-transform, poles, stability,
 ### Run
 From the repository root:
     py applications/signal_visualizer/recursive_system_simulator.py
+## Z-Transform, ROC, and Stability
+`z_plane_explorer.py` demonstrates how poles, zeros, the region of convergence, and the unit circle determine the behavior and stability of discrete-time systems.
+### Recursive system
+The explored first-order recursive system is:
+    y[n] = a y[n - 1] + x[n]
+Applying the Z-transform gives:
+    Y(z) = a z^(-1) Y(z) + X(z)
+Therefore, the transfer function is:
+    H(z) = Y(z) / X(z)
+    H(z) = 1 / (1 - a z^(-1))
+    H(z) = z / (z - a)
+The system has:
+    pole: z = a
+    zero: z = 0
+### Region of convergence
+For a causal impulse response:
+    h[n] = a^n u[n]
+the Z-transform converges when:
+    |a / z| < 1
+Therefore, the causal region of convergence is:
+    |z| > |a|
+The pole itself is never part of the ROC.
+The program displays the causal ROC as the green area outside the dotted ROC boundary.
+### Unit circle and stability
+A discrete-time system is BIBO stable when its ROC contains the complete unit circle:
+    |z| = 1
+For this causal first-order system:
+    |a| < 1  -> stable
+    |a| = 1  -> boundary, but not BIBO stable
+    |a| > 1  -> unstable
+The program compares four real poles:
+| System | Pole | Causal ROC | Result |
+| --- | ---: | --- | --- |
+| Fast decay | 0.5 | `|z| > 0.5` | Stable |
+| Slow decay | 0.9 | `|z| > 0.9` | Stable |
+| Boundary | 1.0 | `|z| > 1.0` | Not BIBO stable |
+| Growing response | 1.1 | `|z| > 1.1` | Unstable |
+### Impulse responses
+For an impulse input, the system response is:
+    h[n] = a^n
+The four main cases produce different behavior:
+    a = 0.5  -> rapid decay
+    a = 0.9  -> slow decay
+    a = 1.0  -> constant amplitude
+    a = 1.1  -> growing amplitude
+Selected values at sample 20 are approximately:
+    0.5^20 = 0.000001
+    0.9^20 = 0.121577
+    1.0^20 = 1
+    1.1^20 = 6.727500
+This demonstrates that the distance of a pole from the origin determines whether the response decays, remains constant, or grows.
+### Negative pole
+The experiment also uses:
+    a = -0.9
+Its impulse response is:
+    1, -0.9, 0.81, -0.729, 0.6561, ...
+The pole is inside the unit circle because:
+    |-0.9| = 0.9 < 1
+The system is stable, but consecutive samples alternate between positive and negative values.
+A negative real pole therefore produces an alternating response while its magnitude still decays.
+### Complex-conjugate poles
+The final experiment uses a complex-conjugate pole pair with:
+    radius = 0.9
+    angle = pi / 4 radians per sample
+The poles are approximately:
+    z1 = 0.6364 + j0.6364
+    z2 = 0.6364 - j0.6364
+The corresponding real impulse response is:
+    h[n] = 0.9^n cos((pi / 4)n)
+The pole radius controls the amplitude envelope:
+    0.9^n
+The pole angle controls the oscillation rate:
+    omega = pi / 4 radians per sample
+The oscillation period is:
+    N = 2pi / omega
+    N = 2pi / (pi / 4)
+    N = 8 samples
+Complex poles occur in conjugate pairs for systems with real coefficients. Together, the two poles produce a real oscillatory response.
+### Main interpretation
+The Z-plane provides two important pieces of information:
+    pole radius -> growth or decay
+    pole angle  -> oscillation rate
+For causal systems:
+    pole inside the unit circle  -> stable decay
+    pole on the unit circle      -> persistent response
+    pole outside the unit circle -> growing response
+A stable system can still oscillate. Stability means that the oscillation amplitude eventually decreases, not that oscillation is absent.
+### Visualizations
+The program creates four groups of visualizations:
+1. real poles, zeros, and the unit circle
+2. causal ROC regions for stable, boundary, and unstable cases
+3. impulse responses for four real poles
+4. negative and complex-pole oscillatory responses
+The green area represents the ROC. The blue dashed circle represents the unit circle, red crosses represent poles, and blue open circles represent zeros.
+### Run
+From the repository root:
+    py applications/signal_visualizer/z_plane_explorer.py
+The program prints the pole, zero, causal ROC, and stability classification for each system and displays the corresponding Z-plane and time-domain figures.
