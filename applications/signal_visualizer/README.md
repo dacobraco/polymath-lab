@@ -4011,3 +4011,41 @@ The difference is implementation efficiency and convenience, not the mathematica
 This provides a direct bridge between the underlying DFT mathematics, a custom FFT implementation, and a production numerical library.
 ### File
     recursive_fft.py
+## Frequency Bins, Scaling, and Normalization
+FFT output indices are frequency bins. The frequency represented by bin k is
+    f_k = k * Fs / N
+and the frequency resolution is
+    delta_f = Fs / N
+For
+    Fs = 64 Hz
+    N = 64
+the frequency resolution is
+    delta_f = 1 Hz
+so bin 8 corresponds to 8 Hz.
+The test signal was
+    x(t) = 2 + 3 sin(2 pi 8 t)
+The raw FFT magnitude at bin 8 was
+    |X[8]| = 96
+which is not yet the physical signal amplitude.
+For a real signal, the one-sided amplitude spectrum is obtained by dividing the FFT magnitude by N and doubling the interior positive-frequency bins.
+DC and the Nyquist bin are not doubled because they do not have separate negative-frequency partners.
+The normalized spectrum correctly recovered
+    DC amplitude = 2
+    frequency = 8 Hz
+    sinusoidal amplitude = 3
+The dominant component was determined only after constructing the correctly normalized one-sided spectrum:
+    Dominant bin: 8
+    Dominant frequency: 8.0 Hz
+    Dominant amplitude: 3.0
+### Main conclusion
+Raw FFT magnitudes are not physical amplitudes by themselves.
+Correct frequency-bin mapping and amplitude normalization are required before interpreting a spectrum.
+For real signals, the correct workflow is:
+    FFT
+    -> magnitude
+    -> divide by N
+    -> keep frequencies from 0 to Fs/2
+    -> double only the interior bins
+    -> interpret frequency and amplitude
+### File
+    fft_bins_scaling.py
