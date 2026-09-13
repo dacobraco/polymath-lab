@@ -3928,3 +3928,60 @@ The same transform previously calculated with NumPy is now calculated explicitly
 This provides a foundation for later DSP implementations on embedded systems and for comparing high-level numerical tools with lower-level implementations.
 ### File
     dft.c
+## FFT and Cooley-Tukey Intuition
+`recursive_fft.py` implements a small radix-2 Fast Fourier Transform recursively.
+The FFT computes the same Discrete Fourier Transform as the direct DFT, but reorganizes the calculation to reuse intermediate results.
+A direct DFT requires approximately:
+    O(N^2)
+operations.
+A radix-2 FFT reduces this to approximately:
+    O(N log2(N))
+### Divide
+The signal is separated into samples with even and odd indices:
+    even_signal = signal[::2]
+    odd_signal = signal[1::2]
+The FFT is then calculated recursively for both halves:
+    even_fft = recursive_fft(even_signal)
+    odd_fft = recursive_fft(odd_signal)
+The recursion continues until only one sample remains.
+The base case is:
+    FFT([a]) = [a]
+### Combine
+The two smaller transforms are combined using the complex rotation factor:
+    W_N^k = exp(-j * 2*pi*k/N)
+For each k:
+    factor = W_N^k * odd_fft[k]
+    X[k]       = even_fft[k] + factor
+    X[k + N/2] = even_fft[k] - factor
+This pair of operations is the basic FFT butterfly.
+### Example
+For:
+    x = [1, 2, 3, 4]
+the recursive FFT produces:
+    X = [10, -2+2j, -2, -2-2j]
+which matches the manually calculated DFT.
+Verification:
+    Results are matching: True
+### Impulse test
+A second test uses:
+    x = [1, 0, 0, 0, 0, 0, 0, 0]
+An impulse at n = 0 has equal contribution to every DFT bin, so the expected spectrum is:
+    X = [1, 1, 1, 1, 1, 1, 1, 1]
+The recursive implementation produces the expected result:
+    Results are matching: True
+This test also verifies multiple recursion levels:
+    8
+    -> 4 + 4
+    -> 2 + 2 + 2 + 2
+    -> 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1
+### Radix-2 assumption
+This implementation assumes that the signal length is a power of two:
+    N = 2^m
+for example:
+    2, 4, 8, 16, 32, ...
+### Main conclusion
+The FFT is not a different frequency transform.
+It computes the same DFT spectrum, but avoids repeating unnecessary calculations by recursively splitting the signal into even and odd samples and recombining their smaller transforms.
+This is why practical spectrum analyzers and DSP systems normally use FFT algorithms instead of evaluating the DFT definition directly.
+### File
+    recursive_fft.py
