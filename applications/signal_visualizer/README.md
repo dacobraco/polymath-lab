@@ -3985,3 +3985,29 @@ It computes the same DFT spectrum, but avoids repeating unnecessary calculations
 This is why practical spectrum analyzers and DSP systems normally use FFT algorithms instead of evaluating the DFT definition directly.
 ### File
     recursive_fft.py
+## NumPy FFT Validation
+The recursive FFT implementation is now compared directly with NumPy's FFT implementation.
+For the signal:
+    x = [1, 2, 3, 4]
+the theoretical DFT is:
+    X = [10, -2+2j, -2, -2-2j]
+The custom recursive FFT produces:
+    [10, -2+2j, -2, -2-2j]
+NumPy FFT produces:
+    [10, -2+2j, -2, -2-2j]
+Verification:
+    Results are matching: True
+    Recursive FFT matches NumPy: True
+    NumPy FFT matches theory: True
+An additional impulse test uses:
+    x = [1, 0, 0, 0, 0, 0, 0, 0]
+The expected spectrum is:
+    X = [1, 1, 1, 1, 1, 1, 1, 1]
+The recursive FFT and NumPy FFT also match for this test:
+    Recursive FFT matches NumPy: True
+### Main conclusion
+`np.fft.fft()` computes the same Discrete Fourier Transform as the manually derived result and the custom recursive Cooley-Tukey FFT.
+The difference is implementation efficiency and convenience, not the mathematical transform itself.
+This provides a direct bridge between the underlying DFT mathematics, a custom FFT implementation, and a production numerical library.
+### File
+    recursive_fft.py
