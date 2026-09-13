@@ -3655,7 +3655,9 @@ The green area represents the ROC. The blue dashed circle represents the unit ci
 ### Run
 From the repository root:
     py applications/signal_visualizer/z_plane_explorer.py
-The program prints the pole, zero, causal ROC, and stability classification for each system and displays the corresponding Z-plane and time-domain figures.## Continuous and Discrete System Solver
+The program prints the pole, zero, causal ROC, and stability classification for each system and displays the corresponding Z-plane and time-domain figures.
+
+## Continuous and Discrete System Solver
 `continuous_discrete_bridge.py` connects a continuous-time first-order system with its equivalent discrete-time recursive model.
 The experiment focuses on the mathematical bridge between the s-plane and the Z-plane without duplicating the project in multiple software tools.
 ### Continuous-time system
