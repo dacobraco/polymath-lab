@@ -3655,4 +3655,82 @@ The green area represents the ROC. The blue dashed circle represents the unit ci
 ### Run
 From the repository root:
     py applications/signal_visualizer/z_plane_explorer.py
-The program prints the pole, zero, causal ROC, and stability classification for each system and displays the corresponding Z-plane and time-domain figures.
+The program prints the pole, zero, causal ROC, and stability classification for each system and displays the corresponding Z-plane and time-domain figures.## Continuous and Discrete System Solver
+`continuous_discrete_bridge.py` connects a continuous-time first-order system with its equivalent discrete-time recursive model.
+The experiment focuses on the mathematical bridge between the s-plane and the Z-plane without duplicating the project in multiple software tools.
+### Continuous-time system
+The continuous first-order model is:
+    tau dy(t) / dt + y(t) = x(t)
+For a unit-step input and zero initial output, its response is:
+    y(t) = 1 - exp(-t / tau)
+The experiment uses:
+    tau = 1.0 s
+    sample interval = 0.2 s
+    duration = 5.0 s
+The continuous-system pole is:
+    s = -1 / tau
+    s = -1
+Because the pole is in the left half of the s-plane, the continuous system is stable.
+### Continuous-to-discrete mapping
+The continuous pole is mapped into the Z-plane using:
+    z = exp(s T_s)
+For:
+    s = -1
+    T_s = 0.2 s
+the discrete pole is:
+    z = exp(-0.2)
+    z = 0.8187307530779818
+The discrete pole is inside the unit circle:
+    |z| < 1
+Therefore, the discrete system is also stable.
+### Discrete-time system
+The equivalent recursive model is:
+    y[n] = a y[n - 1] + (1 - a) x[n]
+where:
+    a = exp(-T_s / tau)
+For this experiment:
+    a = 0.8187307530779818
+    1 - a = 0.18126924692201818
+The recursive calculation therefore becomes:
+    y[n] = 0.8187307531 y[n - 1]
+         + 0.1812692469 x[n]
+At each new sample, the system keeps approximately 81.87 percent of its previous output and adds approximately 18.13 percent of the current input.
+### Numerical comparison
+The experiment calculates:
+* a dense continuous-time step response
+* the discrete response at 26 sampling instants
+* the exact continuous response at the same sampling instants
+* the absolute difference between both representations
+The measured result is:
+    Maximum error: 1.1102230246251565e-16
+This value is effectively zero at floating-point precision.
+The result confirms that the discrete recursive model matches the continuous first-order response at every sampling instant when the coefficient is calculated using the exact pole mapping.
+### Visualization
+The graph displays:
+* the continuous response as a smooth blue curve
+* the discrete response as orange sample markers
+* the sampling instants using a stem plot
+The discrete markers lie on the continuous curve.
+The vertical stem lines are only a visual representation of discrete samples. They do not describe the system behavior between sampling instants.
+### Main connection
+The experiment connects the two system descriptions:
+    continuous pole: s = -1 / tau
+    discrete pole: z = exp(s T_s)
+    continuous model:
+    tau dy(t) / dt + y(t) = x(t)
+    discrete model:
+    y[n] = a y[n - 1] + (1 - a) x[n]
+The continuous and discrete models use different mathematical languages, but they describe the same first-order memory and decay.
+### Main conclusions
+    left-half-plane continuous pole
+    -> pole inside the Z-plane unit circle
+    continuous exponential decay
+    -> discrete geometric decay
+    continuous time constant tau
+    -> discrete coefficient a = exp(-T_s / tau)
+The sampling interval controls how frequently the discrete system updates, while the exact pole mapping preserves the continuous response at the sampling instants.
+### File
+    continuous_discrete_bridge.py
+### Run
+From the repository root:
+    py applications/signal_visualizer/continuous_discrete_bridge.py
