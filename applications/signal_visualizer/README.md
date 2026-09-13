@@ -4049,3 +4049,34 @@ For real signals, the correct workflow is:
     -> interpret frequency and amplitude
 ### File
     fft_bins_scaling.py
+## Spectral Leakage
+Spectral leakage appears when a sinusoidal component does not align exactly with an FFT frequency bin.
+For
+    Fs = 64 Hz
+    N = 64
+the frequency resolution is
+    delta_f = 1 Hz
+An 8 Hz sinusoid aligns exactly with FFT bin 8.
+Its one-sided spectrum correctly shows
+    Dominant frequency: 8.0 Hz
+    Dominant amplitude: 3.0
+with all surrounding bins approximately zero.
+A second sinusoid at 8.5 Hz lies between the 8 Hz and 9 Hz FFT bins.
+The signal still contains only one sinusoidal frequency, but its FFT contribution spreads across multiple bins.
+This is spectral leakage.
+For the 8.5 Hz signal with true amplitude 3, the largest FFT bin gave approximately
+    Dominant frequency: 8.0 Hz
+    Dominant amplitude: 1.9541
+which produced
+    Frequency error: 0.5 Hz
+    Amplitude error: 1.0459
+    Amplitude error percent: 34.86 %
+The leakage spectrum had strong neighboring components around 8 Hz and 9 Hz and progressively smaller components farther away.
+### Main conclusion
+A spread-out FFT spectrum does not necessarily mean that the original signal contains all of those frequencies.
+When a finite observation contains a sinusoid that does not align with an FFT bin, spectral leakage can spread its contribution across many bins.
+Therefore, blindly taking the largest FFT bin can give an inaccurate estimate of both frequency and amplitude.
+A spread spectrum in a real measurement can also be caused by actual multiple frequency components, noise, or time-varying behavior, so leakage must be interpreted in context.
+Window functions will be introduced in the next lesson to control spectral leakage.
+### File
+    leakage_explorer.py
