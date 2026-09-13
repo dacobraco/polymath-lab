@@ -4080,3 +4080,56 @@ A spread spectrum in a real measurement can also be caused by actual multiple fr
 Window functions will be introduced in the next lesson to control spectral leakage.
 ### File
     leakage_explorer.py
+## Window Functions
+Window functions reduce spectral leakage by smoothly weighting the samples of a finite signal block before computing its FFT.
+The experiment used
+    Fs = 64 Hz
+    N = 64
+    f = 8.5 Hz
+    amplitude = 3
+The 8.5 Hz sinusoid lies between FFT bins because the frequency resolution is
+    delta_f = Fs / N = 1 Hz
+Four windows were compared:
+    Rectangular
+    Hann
+    Hamming
+    Blackman
+The rectangular window leaves every sample unchanged:
+    w[n] = 1
+The other windows reduce the signal toward the edges of the observation interval.
+Windowed signals were formed using
+    x_windowed[n] = x[n] * w[n]
+### Coherent gain
+Windowing reduces the average signal amplitude, so the FFT amplitude scale was corrected using the coherent gain
+    G = mean(w)
+Measured gains were
+    Rectangular: 1.00
+    Hann:        0.50
+    Hamming:     0.54
+    Blackman:    0.42
+The one-sided amplitude spectrum was therefore normalized using the window gain in addition to the usual FFT normalization.
+### Leakage comparison
+The spectra were normalized to their own maxima and compared in decibels.
+At 15 Hz, far from the 8.5 Hz signal, the measured relative leakage was approximately
+    Rectangular: -24.16 dB
+    Hamming:     -44.31 dB
+    Hann:        -57.24 dB
+    Blackman:    -66.25 dB
+In this experiment, Blackman provided the strongest suppression of distant spectral leakage.
+Compared with the rectangular window, the Blackman result at 15 Hz was about 42.1 dB lower.
+### Main-lobe and side-lobe tradeoff
+Window functions do not simply make the FFT better.
+Reducing side lobes and distant leakage generally widens the main lobe around the real frequency component.
+Therefore there is a tradeoff:
+    narrower main lobe <-> stronger side lobes
+    wider main lobe   <-> weaker side lobes
+The rectangular window gives a narrow main lobe but strong leakage.
+Hann and Hamming provide useful compromises.
+Blackman strongly suppresses distant leakage but produces a wider main lobe.
+There is no universally best window. The correct choice depends on whether frequency separation or leakage suppression is more important.
+### Important conclusion
+A window changes the finite block before the FFT.
+It does not change the underlying physical signal, and it does not completely eliminate spectral leakage.
+Coherent-gain correction compensates for the average amplitude reduction caused by the window, but an off-bin sinusoid may still not appear as its exact amplitude in one FFT bin.
+### File
+    window_comparison.py
