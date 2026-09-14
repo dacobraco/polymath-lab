@@ -4442,4 +4442,130 @@ The real FFT is an optimization based on real-signal symmetry. It is not a unive
     real_complex_fft.py
 ### Run
 From the repository root:
-    py applications/signal_visualizer/real_complex_fft.py
+    py applications/signal_visualizer/real_complex_fft.py## STFT and Spectrogram
+`stft_spectrogram.py` demonstrates how the Short-Time Fourier Transform tracks frequencies that change over time.
+A normal FFT analyzes the complete signal as one block. It can show which frequencies exist in the recording, but it cannot show when each frequency appears.
+The STFT solves this problem by dividing the signal into short overlapping segments and calculating a local FFT for every segment.
+### Test signal
+The experiment generates a linear chirp.
+The signal frequency increases continuously from 10 Hz to 50 Hz during four seconds.
+The parameters are:
+    sample rate = 256 Hz
+    duration = 4 s
+    starting frequency = 10 Hz
+    ending frequency = 50 Hz
+    number of samples = 1024
+The frequency changes approximately according to:
+    f(t) = 10 + 10t
+Therefore, the expected frequencies include:
+    t = 1 s -> 20 Hz
+    t = 2 s -> 30 Hz
+    t = 3 s -> 40 Hz
+    t = 4 s -> 50 Hz
+### Short-Time Fourier Transform
+The STFT repeatedly performs the following operations:
+1. Select a short segment of the signal.
+2. Multiply the segment by a window function.
+3. Calculate the FFT of the windowed segment.
+4. Move the segment forward.
+5. Repeat the calculation until the complete signal has been analyzed.
+The final configuration uses:
+    window = Hann
+    segment length = 256 samples
+    overlap = 192 samples
+    hop size = 64 samples
+The hop size is:
+    256 - 192 = 64 samples
+At a sample rate of 256 Hz, the time distance between neighboring STFT columns is:
+    64 / 256 = 0.25 s
+The frequency-bin spacing is:
+    256 / 256 = 1 Hz
+The resulting STFT matrix has:
+    129 frequency rows
+    17 time columns
+Each column contains the local spectrum of one signal segment.
+Each row represents one nonnegative frequency bin.
+### Dominant-frequency tracking
+The complex STFT coefficients are converted into magnitudes using:
+    stft_magnitude = abs(stft_values)
+For every time column, the program finds the frequency row with the largest magnitude.
+This produces a sequence of dominant frequencies that follows the chirp from approximately 10 Hz to 50 Hz.
+The measured sequence for the selected configuration was:
+    12, 13, 15, 18, 20, 23, 25, 28, 30,
+    33, 35, 38, 40, 43, 45, 47, 48 Hz
+The estimates near the beginning and end are less accurate because the first and final STFT windows extend beyond the available signal. SciPy pads these boundary regions with zeros.
+### Spectrogram
+The spectrogram displays the STFT magnitude using three dimensions:
+    horizontal position -> time
+    vertical position -> frequency
+    color -> magnitude at that time and frequency
+The magnitude is converted to decibels:
+    magnitude_db = 20 log10(magnitude + 1e-12)
+The small value `1e-12` prevents the calculation of the logarithm of zero.
+The spectrogram shows a bright diagonal ridge that rises from approximately 10 Hz to 50 Hz. This ridge represents the changing instantaneous frequency of the chirp.
+A cyan line shows the strongest detected frequency in every STFT time segment.
+### Window-length comparison
+The experiment also compares three segment lengths.
+#### Short window
+The short-window configuration uses:
+    segment length = 64 samples
+    overlap = 48 samples
+    hop size = 16 samples
+Its frequency spacing is:
+    256 / 64 = 4 Hz
+This configuration provides more frequent time measurements, but the detected frequency moves in steps of 4 Hz. The spectrogram has better time localization and poorer frequency precision.
+#### Balanced window
+The selected final configuration uses:
+    segment length = 256 samples
+    overlap = 192 samples
+    frequency spacing = 1 Hz
+It provides a useful balance between time localization and frequency precision for this chirp.
+#### Long window
+The long-window configuration uses:
+    segment length = 512 samples
+    overlap = 384 samples
+    hop size = 128 samples
+Its frequency spacing is:
+    256 / 512 = 0.5 Hz
+The frequency bins are more precise, but each segment lasts two seconds. During those two seconds, the chirp changes by approximately 20 Hz.
+A single local FFT therefore contains a wide range of chirp frequencies. The long window provides poorer information about the exact time at which each frequency appears.
+### Time-frequency tradeoff
+A short window provides:
+    better time localization
+    poorer frequency resolution
+A long window provides:
+    better frequency-bin resolution
+    poorer time localization
+Overlap creates more time columns and reduces visible discontinuities between neighboring segments. It does not remove the fundamental tradeoff between time and frequency resolution.
+The correct window length depends on the signal and the engineering question.
+A short window is useful for locating brief events, impacts, transients, and sudden changes.
+A long window is useful for separating stable frequency components that are close together.
+### Connection with earlier lessons
+This experiment combines several earlier concepts:
+* FFT calculates the spectrum of each local segment.
+* Real FFT produces the nonnegative frequency rows.
+* The Hann window reduces spectral leakage at segment boundaries.
+* FFT-bin spacing determines frequency resolution.
+* Decibels make weak and strong spectral components easier to compare.
+* Complex STFT coefficients contain magnitude and phase information.
+### Engineering applications
+STFT and spectrograms are useful for:
+* speech and music analysis
+* machine vibration monitoring
+* ECG and EEG analysis
+* radar and communication signals
+* transient fault detection
+* rotating-machine startup analysis
+* frequency-modulated signals
+For example, a normal FFT of an accelerating motor shows a range of vibration frequencies. A spectrogram additionally shows how the vibration frequency changes while the motor accelerates.
+### Main conclusion
+A normal FFT answers:
+    Which frequencies exist in the complete recording?
+The STFT and spectrogram answer:
+    Which frequencies exist, and when do they exist?
+The experiment demonstrates that frequency analysis of a changing signal requires both frequency information and time localization.
+### File
+    applications/signal_visualizer/stft_spectrogram.py
+### Run
+From the repository root:
+    py applications/signal_visualizer/stft_spectrogram.py
