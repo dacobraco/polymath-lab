@@ -4287,4 +4287,159 @@ Amplitude, energy, and PSD are related, but they are not interchangeable quantit
     power_spectrum_lab.py
 ### Run
 From the repository root:
-    py applications/signal_visualizer/power_spectrum_lab.py
+    py applications/signal_visualizer/power_spectrum_lab.py## Real FFT and Complex FFT
+`real_complex_fft.py` compares the full complex FFT with the optimized real FFT.
+The experiment demonstrates:
+* conjugate symmetry of real-signal spectra
+* amplitude and phase stored in complex FFT coefficients
+* information retained by `rfft`
+* reconstruction with `irfft`
+* the difference between real and complex IQ signals
+* centered spectrum visualization with `fftshift`
+### Real test signal
+The real signal contains two components:
+    x(t) = 1.5 cos(2 pi 8t + 0.4)
+         + 0.7 sin(2 pi 15t - 0.2)
+The experiment uses:
+    sampling frequency = 64 Hz
+    duration = 1 s
+    number of samples = 64
+    frequency resolution = 1 Hz
+The first component has:
+    frequency = 8 Hz
+    amplitude = 1.5
+    phase = 0.4 rad
+The second component has:
+    frequency = 15 Hz
+    amplitude = 0.7
+    phase = -0.2 rad relative to its sine representation
+### Full complex FFT
+The full FFT is calculated with:
+    full_fft = np.fft.fft(signal)
+Its corresponding frequency axis is calculated with:
+    full_frequencies = np.fft.fftfreq(number_of_samples, d=1 / sample_rate)
+The full FFT returns 64 complex values and includes both positive and negative frequencies.
+For a real input signal, the FFT has conjugate symmetry:
+    X(-f) = conjugate(X(+f))
+At 8 Hz, the program obtains:
+    FFT at +8 Hz:
+    44.21092771213851 + 18.69208043081514j
+    FFT at -8 Hz:
+    44.21092771213851 - 18.69208043081514j
+The real parts are equal and the imaginary parts have opposite signs.
+The negative-frequency coefficient is exactly the complex conjugate of the positive-frequency coefficient within numerical precision.
+### Magnitude and phase
+A complex FFT coefficient contains both magnitude and phase.
+Magnitude is calculated with:
+    positive_magnitude = np.abs(positive_coefficient)
+Phase is calculated with:
+    positive_phase = np.angle(positive_coefficient)
+The measured results at 8 Hz are:
+    magnitude = 47.99999999999999
+    phase = 0.39999999999999813 rad
+The raw FFT magnitude is not yet the physical amplitude because the full FFT distributes a real sinusoidal component between positive and negative frequencies.
+The original amplitude is recovered with:
+    amplitude = 2 * magnitude / number_of_samples
+The program obtains:
+    recovered amplitude = 1.4999999999999998
+This agrees with the original amplitude of 1.5.
+### Real FFT
+The optimized real FFT is calculated with:
+    real_fft = np.fft.rfft(signal)
+Its frequency axis is calculated with:
+    real_frequencies = np.fft.rfftfreq(number_of_samples, d=1 / sample_rate)
+For an even number of samples, `rfft` returns:
+    N / 2 + 1
+For this experiment:
+    full FFT values = 64
+    real FFT values = 33
+The 33 values contain:
+    one DC component
+    31 positive-frequency components
+    one Nyquist component
+The real FFT frequencies extend from:
+    0 Hz to 32 Hz
+### Equivalence with the full FFT
+The nonnegative part of the full FFT is:
+    positive_half_of_full_fft = full_fft[:number_of_samples // 2 + 1]
+The program compares it with the complete `rfft` result.
+The measured result is:
+    same nonnegative-frequency values = True
+    largest difference = 9.804086858027901e-16
+The difference is only floating-point rounding.
+This proves that `rfft` preserves every unique frequency-domain value required to describe a real signal.
+### Reconstruction with inverse real FFT
+The signal is reconstructed with:
+    reconstructed_signal = np.fft.irfft(real_fft, n=number_of_samples)
+`irfft` recreates the missing conjugate negative-frequency coefficients and then performs the inverse transform.
+The measured result is:
+    reconstructed samples = 64
+    maximum reconstruction error = 4.440892098500626e-16
+The reconstruction error is effectively zero.
+This confirms that reducing the spectrum from 64 to 33 stored values does not lose information for a real input signal.
+### Complex IQ signal
+The complex IQ signal is:
+    x_IQ(t) = exp(j 2 pi 8t)
+Using the complex exponential identity:
+    exp(j theta) = cos(theta) + j sin(theta)
+the real part represents the I component and the imaginary part represents the Q component.
+Unlike a real sinusoid, this signal represents rotation in only one direction in the complex plane.
+Its full FFT produces:
+    IQ coefficient at +8 Hz:
+    64 - 6.835823427767763e-14j
+    IQ coefficient at -8 Hz:
+    -3.7682219008410606e-15 - 2.052713367029386e-15j
+The coefficient at positive 8 Hz has magnitude approximately 64, while the coefficient at negative 8 Hz is effectively zero.
+The program confirms:
+    IQ spectrum has conjugate symmetry = False
+Positive and negative frequencies can contain different information in a complex IQ signal. Therefore, the negative half cannot be discarded and the full `fft` must be used.
+### Centering the spectrum
+The normal FFT output begins with DC, continues through positive frequencies, and places negative frequencies at the end of the array.
+For visualization, the program uses:
+    np.fft.fftshift(values)
+`fftshift` changes only the order of the values. It places negative frequencies before zero and positive frequencies after zero.
+The centered frequency axis therefore runs from negative to positive frequencies.
+### Visualization results
+The real-signal spectrum contains symmetric peaks:
+    -8 Hz and +8 Hz with magnitude 0.75
+    -15 Hz and +15 Hz with magnitude 0.35
+The full two-sided FFT divides each real sinusoidal amplitude between its positive and negative components:
+    1.5 / 2 = 0.75
+    0.7 / 2 = 0.35
+The complex IQ spectrum contains one significant peak:
+    +8 Hz with magnitude 1.0
+It does not contain a matching peak at negative 8 Hz.
+### When to use each transform
+Use `rfft` when:
+* the input signal contains only real values
+* only the unique nonnegative-frequency information is required
+* memory and computation should not be wasted on redundant coefficients
+* signals come from audio, ECG, EEG, vibration, or similar real sensors
+Use the full `fft` when:
+* the input signal is complex
+* positive and negative frequencies may contain different information
+* processing IQ radio signals
+* the complete two-sided complex spectrum is required
+### Main conclusions
+For real signals:
+    negative FFT frequencies
+    -> complex conjugates of positive frequencies
+    full FFT
+    -> N complex values
+    real FFT
+    -> N / 2 + 1 unique complex values
+    inverse real FFT
+    -> complete reconstruction without information loss
+For complex IQ signals:
+    positive and negative frequencies
+    -> independent information
+    conjugate symmetry
+    -> not guaranteed
+    required transform
+    -> full complex FFT
+The real FFT is an optimization based on real-signal symmetry. It is not a universal replacement for the full complex FFT.
+### File
+    real_complex_fft.py
+### Run
+From the repository root:
+    py applications/signal_visualizer/real_complex_fft.py
