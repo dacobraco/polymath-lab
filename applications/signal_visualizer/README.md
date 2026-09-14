@@ -4133,3 +4133,158 @@ It does not change the underlying physical signal, and it does not completely el
 Coherent-gain correction compensates for the average amplitude reduction caused by the window, but an off-bin sinusoid may still not appear as its exact amplitude in one FFT bin.
 ### File
     window_comparison.py
+## Amplitude, Energy, and Power Spectral Density
+`power_spectrum_lab.py` demonstrates three different descriptions of a signal in the frequency domain:
+* amplitude spectrum
+* energy spectrum
+* power spectral density
+The program also compares an ordinary periodogram with the Welch PSD estimate for a signal containing random noise.
+### Test signal
+The clean signal is a sinusoid:
+    x(t) = A sin(2 pi f t)
+The experiment uses:
+    sampling frequency = 256 Hz
+    duration = 4 s
+    number of samples = 1024
+    signal frequency = 8 Hz
+    signal amplitude = 4
+The frequency resolution is:
+    delta_f = sampling_frequency / number_of_samples
+    delta_f = 256 / 1024
+    delta_f = 0.25 Hz
+Because 8 Hz lies exactly on an FFT bin, the spectrum does not suffer from spectral leakage in this experiment.
+### Mean-square power
+The theoretical mean-square power of a sinusoid is:
+    P = A^2 / 2
+For an amplitude of 4:
+    P = 4^2 / 2
+    P = 8
+The numerical calculation uses the average squared signal:
+    measured_power = mean(signal^2)
+The program obtains:
+    theoretical mean-square power = 8.0
+    measured mean-square power = 7.999999999999999
+The tiny difference is caused only by floating-point precision.
+### Amplitude spectrum
+The real FFT is calculated with:
+    fft_values = np.fft.rfft(signal)
+The corresponding positive frequency bins are calculated with:
+    frequencies = np.fft.rfftfreq(number_of_samples, d=1 / sample_rate)
+The one-sided amplitude spectrum is:
+    amplitude_spectrum = 2 abs(FFT) / N
+The DC and Nyquist components are not doubled.
+The measured result is:
+    detected frequency = 8.0 Hz
+    measured amplitude = 4.0
+This confirms that the properly normalized amplitude spectrum returns the physical amplitude of the sinusoidal component.
+### Energy spectrum
+The signal energy in the time domain is:
+    E_time = sum(signal^2)
+The energy contribution of each FFT bin is calculated from the squared FFT magnitude:
+    energy_spectrum = abs(FFT)^2 / N
+For a one-sided spectrum, the internal positive-frequency bins are multiplied by two to include the matching negative-frequency contributions.
+The program obtains:
+    time-domain energy = 8191.999999999999
+    frequency-domain energy = 8192.0
+These values are equal within floating-point precision.
+This is a numerical confirmation of Parseval's theorem:
+    sum(abs(x[n])^2) = (1 / N) sum(abs(X[k])^2)
+The signal energy is also related to its mean-square power:
+    energy = power * number_of_samples
+    energy = 8 * 1024
+    energy = 8192
+### Power spectral density
+Power spectral density describes how mean-square signal power is distributed per unit of frequency.
+Its units are:
+    amplitude^2 / Hz
+The clean PSD is calculated with `scipy.signal.periodogram` using density scaling.
+Total power is recovered from the area under the PSD:
+    power = sum(PSD[k]) * delta_f
+For the clean sinusoid, the program obtains:
+    clean power from PSD = 8.0
+The PSD peak itself is not the total power. Its height must be multiplied by the frequency-bin width.
+For this experiment:
+    PSD peak is approximately 32 amplitude^2/Hz
+    bin width is 0.25 Hz
+    represented power is 32 * 0.25 = 8
+### Signal with random noise
+The program adds normally distributed random noise to the clean sinusoid.
+A fixed random seed is used:
+    random_generator = np.random.default_rng(42)
+The fixed seed makes the experiment reproducible because every program run generates the same noise samples.
+For noise with standard deviation 3, the expected noise power is approximately:
+    P_noise = standard_deviation^2
+    P_noise = 3^2
+    P_noise = 9
+The expected combined power is approximately:
+    P_total = P_signal + P_noise
+    P_total = 8 + 9
+    P_total = 17
+The measured value does not have to equal exactly 17 because the program uses one finite realization of a random process.
+The recorded result is:
+    noisy signal power = 17.646261988282397
+### Periodogram
+The ordinary periodogram analyzes the complete four-second record as one block.
+Because it uses all 1024 samples, its frequency resolution is:
+    delta_f = 256 / 1024
+    delta_f = 0.25 Hz
+The measured result is:
+    power from periodogram = 17.638558578474235
+    periodogram resolution = 0.25 Hz
+The periodogram preserves the full-record frequency resolution, but its noise estimate is visually irregular because it is based on a single finite record.
+### Welch PSD estimate
+The Welch method divides the signal into shorter overlapping segments.
+The experiment uses:
+    window = Hann
+    samples per segment = 256
+    overlapping samples = 128
+    overlap = 50 percent
+Each segment produces one PSD estimate. Welch averages these estimates to reduce random variation.
+The segment frequency resolution is:
+    delta_f = 256 / 256
+    delta_f = 1 Hz
+The recorded result is:
+    power from Welch PSD = 18.080208564710226
+    Welch resolution = 1.0 Hz
+Welch produces a smoother and more stable noise estimate, but its shorter segments provide weaker frequency resolution than the full-record periodogram.
+This is the main tradeoff:
+    more averaging
+    -> lower random variation
+    -> weaker frequency resolution
+### Visualization
+The program displays four graphs:
+* the clean sinusoid and the noisy measurement in the time domain
+* the amplitude spectrum of the clean signal
+* the energy spectrum of the clean signal
+* the periodogram and Welch PSD of the noisy signal
+The PSD comparison uses a logarithmic vertical axis. This allows the strong 8 Hz component and the much weaker noise floor to remain visible on the same graph.
+### Choosing the correct spectrum
+Use the amplitude spectrum when the goal is to determine:
+* which sinusoidal components are present
+* the amplitude of each component
+Use the energy spectrum when the goal is to study:
+* a finite-duration event
+* the distribution of its total energy
+* Parseval equivalence between time and frequency domains
+Use PSD when the goal is to study:
+* long-lasting or random signals
+* noise power per hertz
+* power inside a selected frequency band
+Use Welch PSD when a more stable noise estimate is more important than the finest available frequency resolution.
+### Main conclusions
+The same signal can answer different engineering questions depending on the selected spectral representation.
+The experiment confirms:
+    amplitude spectrum
+    -> physical sinusoidal amplitude
+    energy spectrum
+    -> energy contribution of FFT bins
+    area under PSD
+    -> mean-square signal power
+    Welch averaging
+    -> smoother PSD with reduced frequency resolution
+Amplitude, energy, and PSD are related, but they are not interchangeable quantities.
+### File
+    power_spectrum_lab.py
+### Run
+From the repository root:
+    py applications/signal_visualizer/power_spectrum_lab.py
