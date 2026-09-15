@@ -4726,3 +4726,375 @@ From `applications/signal_visualizer`:
     py wav_audio_analysis.py
     py record_voice.py
     py real_voice_analysis.py
+
+### FFT Spectrum Analyzer v1
+
+This experiment converts the earlier Fourier-analysis laboratory code into a reusable command-line spectrum analyzer.
+
+The analyzer accepts a WAV file and user-selected analysis parameters instead of relying on fixed values inside the source code.
+
+The processing pipeline is:
+
+    command-line arguments
+    -> WAV loading
+    -> stereo-to-mono conversion
+    -> segment selection
+    -> mean removal
+    -> Hann window
+    -> real FFT
+    -> one-sided amplitude spectrum
+    -> dominant-frequency detection
+
+### Command-line interface
+
+The analyzer can be run from the `applications/signal_visualizer` directory using:
+
+    py fft_spectrum_analyzer.py recorded_voice.wav --start 1 --duration 1 --min-frequency 60 --max-frequency 1200
+
+The arguments are:
+
+* `file_path` is the path to the input WAV file.
+* `--start` is the segment start time in seconds.
+* `--duration` is the required segment duration in seconds.
+* `--min-frequency` is the lowest frequency included in dominant-frequency detection.
+* `--max-frequency` is the optional upper frequency limit.
+
+If `--start` is omitted, the analysis begins at `0.0 s`.
+
+If `--max-frequency` is omitted, the analysis continues to the final real-FFT bin, which is the Nyquist frequency for an even-length signal.
+
+The Python `argparse` module validates the command-line data types and automatically provides a help page:
+
+    py fft_spectrum_analyzer.py --help
+
+### WAV loading
+
+The `load_wav` function reads the WAV file using `soundfile`.
+
+It returns:
+
+* a one-dimensional mono signal
+* the sampling rate
+* the original channel count
+* the original array shape
+
+A mono file already has the form:
+
+    (N,)
+
+A multichannel file has the form:
+
+    (N, channels)
+
+Multichannel audio is converted to mono by calculating the mean across the channel axis.
+
+The function also verifies that:
+
+* the file exists
+* the loaded data is mono or multichannel
+* every sample is finite
+* the signal contains at least two sample frames
+
+### Segment selection
+
+The `select_segment` function converts the user-selected times into sample indices:
+
+    start_index = int(start_time * sample_rate)
+
+    segment_frame_count = int(segment_duration * sample_rate)
+
+    end_index = start_index + segment_frame_count
+
+The Python slice is:
+
+    signal[start_index:end_index]
+
+The ending index is exclusive. Therefore, an ending index equal to the complete signal length is valid.
+
+The function rejects:
+
+* a non-positive sampling rate
+* a negative starting time
+* a non-positive duration
+* a segment shorter than two samples
+* a starting point outside the signal
+* an ending point outside the signal
+
+### Amplitude-spectrum calculation
+
+The selected segment is first converted into a one-dimensional floating-point NumPy array.
+
+Its mean is removed:
+
+    centered_signal = signal - mean(signal)
+
+Mean removal reduces the DC component caused by a constant offset.
+
+A Hann window is then applied:
+
+    windowed_signal = centered_signal * window
+
+The real FFT is calculated using:
+
+    complex_spectrum = np.fft.rfft(windowed_signal)
+
+The corresponding nonnegative frequencies are calculated using:
+
+    frequencies = np.fft.rfftfreq(N, d=1 / sample_rate)
+
+For an even number of samples, the number of real-FFT bins is:
+
+    N / 2 + 1
+
+The basic amplitude normalization is:
+
+    amplitudes = abs(complex_spectrum) / sum(window)
+
+Dividing by the window sum compensates for the coherent amplitude reduction produced by the Hann window.
+
+For a one-sided amplitude spectrum, the internal positive-frequency bins are multiplied by two.
+
+The DC bin is not doubled.
+
+For an even-length signal, the final Nyquist bin is also not doubled because it does not have a separate negative-frequency partner.
+
+The frequency-bin spacing is:
+
+    frequency_resolution = sample_rate / N
+
+### Numerical amplitude proof
+
+A controlled test signal was defined as:
+
+    x(t) = 0.7 sin(2 pi 100 t)
+
+with:
+
+    sample rate = 1000 Hz
+    duration = 1 s
+    sample count = 1000
+
+The expected results were:
+
+    frequency resolution = 1 Hz
+    dominant frequency = 100 Hz
+    dominant amplitude = 0.7
+
+The measured results were:
+
+    frequency resolution = 1.0 Hz
+    dominant frequency = 100.0 Hz
+    dominant amplitude = 0.6999999868722516
+    original mean = 2.4646951146678477e-16
+
+The small numerical differences are caused by finite floating-point precision.
+
+### Dominant-frequency detection
+
+The `find_dominant_frequency` function searches only inside a user-selected frequency range.
+
+A Boolean mask selects the permitted frequency bins.
+
+The original indices of those bins are obtained using:
+
+    valid_indices = np.flatnonzero(frequency_mask)
+
+The largest amplitude is then located only among the permitted indices.
+
+This prevents a large DC component or an irrelevant low-frequency component from being reported when the user is interested in a different frequency range.
+
+The function returns:
+
+* dominant frequency
+* dominant amplitude
+* dominant bin index in the original spectrum
+
+### Real voice result
+
+The analyzer was applied to a one-second segment of `recorded_voice.wav`.
+
+The parameters were:
+
+    sample rate = 44100 Hz
+    start time = 1.0 s
+    duration = 1.0 s
+    minimum frequency = 60 Hz
+    maximum frequency = 1200 Hz
+
+The measured results were:
+
+    segment frames = 44100
+    frequency-bin count = 22051
+    frequency resolution = 1.0 Hz
+    dominant frequency = 89.0 Hz
+    dominant amplitude = 0.035952283083658415
+    dominant bin = 89
+
+This agrees with the earlier real-voice analysis from the WAV laboratory.
+
+### Automated tests
+
+The analyzer is tested using `pytest`.
+
+The test suite verifies:
+
+* amplitude and frequency recovery for a known sinusoid
+* correct restriction to a selected frequency range
+* segment selection ending exactly at the final sample
+* rejection of invalid segment ranges
+* rejection of invalid spectral inputs
+* stereo-to-mono WAV conversion
+* command-line argument parsing
+* the complete WAV-to-dominant-frequency pipeline
+
+The complete test suite produced:
+
+    8 passed
+
+The tests can be run from the `applications/signal_visualizer` directory using:
+
+    py -m pytest test_fft_spectrum_analyzer.py -v
+
+Temporary WAV files are created using the pytest `tmp_path` fixture. They do not remain in the repository after the tests.
+
+### Python FFT benchmark
+
+The Python benchmark measures the complete `calculate_amplitude_spectrum` function.
+
+The measured operations include:
+
+* validation
+* mean removal
+* Hann-window creation
+* window multiplication
+* real FFT calculation
+* frequency-axis calculation
+* amplitude normalization
+
+Each signal size is measured 20 times after one unmeasured warm-up call.
+
+The median time is used to reduce the influence of occasional operating-system interruptions.
+
+The measured results on the development computer were:
+
+    Samples     Median [ms]     Time/sample [ns]
+       1024        0.059950               58.545
+       4096        0.167100               40.796
+      16384        0.627050               38.272
+      65536        2.792750               42.614
+     262144       12.566850               47.939
+
+When the sample count increased from `65536` to `262144`, the input size increased by four while the measured time increased by approximately `4.50`.
+
+The theoretical FFT scaling ratio is:
+
+    (262144 * log2(262144)) / (65536 * log2(65536))
+    = (262144 * 18) / (65536 * 16)
+    = 4.5
+
+The measured scaling therefore closely matches `O(N log N)` behavior.
+
+At a sampling rate of `48000 Hz`, `262144` samples represent approximately `5.46 s` of audio.
+
+The measured processing time was approximately `12.57 ms`, so the spectral-analysis core processed this signal much faster than its real-time duration.
+
+Benchmark times depend on the processor, memory system, operating system, and current computer load.
+
+The Python benchmark can be run using:
+
+    py benchmark_fft_spectrum_analyzer.py
+
+### Direct C DFT benchmark
+
+A separate C benchmark measures the direct DFT implementation.
+
+The tested sizes were:
+
+    64, 128, 256, 512, 1024 samples
+
+Each size was measured over 20 repetitions after one warm-up calculation.
+
+The measured results were:
+
+    Samples    Average [ms]
+         64        0.050000
+        128        0.250000
+        256        1.150000
+        512        4.500000
+       1024       17.950000
+
+Doubling the input size from `512` to `1024` increased the measured time by:
+
+    17.95 / 4.50 = 3.99
+
+For a direct DFT with `O(N^2)` complexity, doubling the input size theoretically increases the required work by:
+
+    (2N)^2 / N^2 = 4
+
+The measured ratio therefore closely matches quadratic scaling.
+
+For `1024` samples, the direct C DFT took approximately `17.95 ms`, while the NumPy real-FFT analyzer took approximately `0.05995 ms`.
+
+The two measurements are not perfectly identical operations because the direct DFT calculates all complex bins while `rfft` calculates the nonnegative bins of a real signal. However, the comparison clearly demonstrates the algorithmic advantage of the FFT.
+
+The C benchmark uses a volatile checksum so that the compiler cannot discard calculations whose results would otherwise appear unused.
+
+Compile and run the benchmark from Git Bash using:
+
+    gcc dft_benchmark.c -O2 -Wall -Wextra -o dft_benchmark.exe -lm
+
+    ./dft_benchmark.exe
+
+### Continuous integration
+
+The GitHub Actions workflow automatically performs the following operations after a push or pull request:
+
+1. Check out the repository.
+2. Set up Python 3.13.
+3. Install NumPy, SoundFile, and pytest.
+4. Run the Python test suite.
+5. Run the Python FFT benchmark as a smoke test.
+6. Compile and test the C direct DFT.
+7. Compile and run the C DFT benchmark.
+
+The workflow runs on a temporary Ubuntu GitHub-hosted runner.
+
+Local Windows commands use the `py` launcher, while the Ubuntu workflow uses the `python` command.
+
+The C correctness output is explicitly checked for:
+
+    DFT test: PASSED
+
+This ensures that a printed failure cannot be mistaken for a successful workflow merely because the C program returned exit code zero.
+
+### Complexity conclusion
+
+The direct DFT calculates every output bin using every input sample:
+
+    N output bins * N input samples = N^2 operations
+
+Its complexity is:
+
+    O(N^2)
+
+The FFT reuses intermediate calculations and has complexity:
+
+    O(N log N)
+
+For `N = 1024`, the approximate operation-count comparison is:
+
+    direct DFT: 1024^2 = 1048576
+
+    FFT: 1024 log2(1024) = 1024 * 10 = 10240
+
+Compiled C improves the speed of individual operations, but it does not remove the quadratic growth of the direct DFT.
+
+The benchmark demonstrates that selecting a more efficient algorithm can be more important than selecting a lower-level programming language.
+
+### Files
+
+    applications/signal_visualizer/fft_spectrum_analyzer.py
+    applications/signal_visualizer/test_fft_spectrum_analyzer.py
+    applications/signal_visualizer/benchmark_fft_spectrum_analyzer.py
+    applications/signal_visualizer/dft_benchmark.c
+    .github/workflows/fft-spectrum-analyzer.yml

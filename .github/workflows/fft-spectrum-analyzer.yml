@@ -1,0 +1,48 @@
+name: FFT Spectrum Analyzer CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-benchmark:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: applications/signal_visualizer
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy soundfile pytest
+
+      - name: Run Python tests
+        run: python -m pytest test_fft_spectrum_analyzer.py -v
+
+      - name: Run Python FFT benchmark
+        run: python benchmark_fft_spectrum_analyzer.py
+
+      - name: Compile and test C DFT
+        run: |
+          gcc dft.c -O2 -Wall -Wextra -o dft_test -lm
+          dft_output=$(./dft_test)
+          echo "$dft_output"
+          echo "$dft_output" | grep -q "DFT test: PASSED"
+
+      - name: Compile and run C DFT benchmark
+        run: |
+          gcc dft_benchmark.c -O2 -Wall -Wextra -o dft_benchmark -lm
+          ./dft_benchmark
