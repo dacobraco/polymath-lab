@@ -4569,3 +4569,160 @@ The experiment demonstrates that frequency analysis of a changing signal require
 ### Run
 From the repository root:
     py applications/signal_visualizer/stft_spectrogram.py
+## Lesson 64: Audio I/O and WAV Analysis
+### Goal
+This experiment applies sampling, windowing, real FFT, and spectral peak detection to WAV audio files.
+
+It uses two stages:
+* a controlled stereo signal with known frequencies and amplitudes
+* a real microphone recording with unknown spectral content
+
+The controlled signal verifies that the complete WAV-analysis pipeline works correctly before it is applied to real audio.
+
+### WAV audio data
+A WAV file stores audio samples together with metadata such as:
+* sample rate
+* channel count
+* sample format
+* bit depth
+
+For `N` sample frames and sample rate `Fs`, the recording duration is:
+    duration = N / Fs
+
+The Nyquist frequency is:
+    Nyquist frequency = Fs / 2
+
+The experiments use:
+    sample rate = 44100 Hz
+    Nyquist frequency = 22050 Hz
+
+### Controlled stereo signal
+The controlled recording lasts three seconds:
+    duration = 3 s
+    sample frames = 132300
+    channels = 2
+    array shape = (132300, 2)
+
+Both channels contain:
+    fundamental frequency = 220 Hz
+    second harmonic = 440 Hz
+    third harmonic = 660 Hz
+
+The channels use different component amplitudes so that stereo-to-mono conversion can be verified.
+
+### PCM-16 write-read test
+The signal is written as 16-bit PCM and loaded again using `soundfile`.
+
+The largest measured write-read difference was:
+    3.0505081764581332e-05
+
+This agrees with the approximate PCM-16 quantization step:
+    1 / 32768 = 3.0518e-05
+
+The WAV file stores PCM-16 samples, while `soundfile` loads them into Python as normalized `float64` values.
+
+### Stereo-to-mono downmix
+The loaded stereo signal has:
+    shape = (132300, 2)
+
+The mono signal is calculated using:
+    mono[n] = (left[n] + right[n]) / 2
+
+The resulting mono shape is:
+    (132300,)
+
+A direct numerical check produced:
+    downmix verification error = 0.0
+
+### Controlled frequency analysis
+The complete controlled signal lasts three seconds, so its frequency-bin spacing is:
+    frequency resolution = 44100 / 132300
+                         = 0.333333 Hz
+
+The Hann-windowed real FFT detected:
+    220 Hz -> amplitude approximately 0.500
+    440 Hz -> amplitude approximately 0.225
+    660 Hz -> amplitude approximately 0.100
+
+These results agree with the amplitudes predicted from the stereo downmix.
+
+### Spectral peak detection
+`scipy.signal.find_peaks` automatically identifies significant local maxima.
+
+Two conditions are used:
+* minimum height removes weak peaks
+* minimum distance prevents nearby fluctuations from being reported as separate components
+
+For the controlled signal:
+    minimum peak height = 0.02
+    minimum peak distance = 50 Hz
+    detected peak count = 3
+
+The three automatically detected peaks are:
+    220 Hz
+    440 Hz
+    660 Hz
+
+### Real voice recording
+A four-second mono recording of the sustained vowel `aaa` was captured using `sounddevice`.
+
+The recording contains:
+    sample rate = 44100 Hz
+    sample frames = 176400
+    duration = 4 s
+    channels = 1
+    largest absolute amplitude = 0.103485
+
+The amplitude remains far below full scale, so no clipping was detected.
+
+### Real voice spectrum
+A segment from 1 s to 2 s was selected for analysis:
+    segment duration = 1 s
+    segment frames = 44100
+    frequency resolution = 1 Hz
+
+The detected spectral peaks were:
+    89, 179, 268, 358, 446, 536,
+    623, 712, 801, 897, 985, 1075 Hz
+
+The neighboring peak spacings are mostly close to 89 Hz.
+
+This indicates:
+    fundamental frequency approximately 89 Hz
+    fundamental period approximately 11.24 ms
+
+The remaining peaks form a harmonic series. Their amplitudes do not decrease uniformly because the vocal tract strengthens some frequency regions and weakens others.
+
+### Main conclusion
+A WAV file is not only sound. It is a structured collection of sampled numerical data.
+
+A correct analysis requires:
+* reading the sample rate and channel structure
+* calculating duration and Nyquist frequency
+* converting stereo data to mono when appropriate
+* checking amplitude and clipping
+* selecting a suitable analysis segment
+* removing the mean
+* applying a window
+* calculating the real FFT
+* interpreting spectral peaks carefully
+
+The controlled signal provides a known reference. The real voice experiment demonstrates how the same methods reveal the fundamental frequency and harmonics of a physical recording.
+
+### Privacy and generated files
+Recorded audio and generated figures remain local and are excluded by `.gitignore`.
+
+### Files
+    applications/signal_visualizer/wav_audio_analysis.py
+    applications/signal_visualizer/record_voice.py
+    applications/signal_visualizer/real_voice_analysis.py
+    applications/signal_visualizer/.gitignore
+
+### Requirements
+    py -m pip install numpy matplotlib scipy soundfile sounddevice
+
+### Run
+From `applications/signal_visualizer`:
+    py wav_audio_analysis.py
+    py record_voice.py
+    py real_voice_analysis.py
