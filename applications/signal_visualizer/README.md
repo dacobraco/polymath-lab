@@ -5098,3 +5098,128 @@ The benchmark demonstrates that selecting a more efficient algorithm can be more
     applications/signal_visualizer/benchmark_fft_spectrum_analyzer.py
     applications/signal_visualizer/dft_benchmark.c
     .github/workflows/fft-spectrum-analyzer.yml
+
+### Digital Filter Specifications
+
+This experiment defines and verifies the requirements for a digital low-pass filter before the filter itself is designed.
+
+The example represents an IMU signal from a robot. Useful motion is expected below `20 Hz`, while unwanted motor vibration should be strongly attenuated from `50 Hz` onward.
+
+The filter specifications are:
+
+    sample rate = 200 Hz
+    Nyquist frequency = 100 Hz
+    passband edge = 20 Hz
+    stopband edge = 50 Hz
+    maximum passband loss = 1 dB
+    minimum stopband attenuation = 40 dB
+
+### Frequency regions
+
+The frequency range is divided into three regions:
+
+* The passband extends from `0 Hz` to `20 Hz`.
+* The transition band extends from `20 Hz` to `50 Hz`.
+* The stopband extends from `50 Hz` to the Nyquist frequency of `100 Hz`.
+
+The transition-band width is:
+
+    50 Hz - 20 Hz = 30 Hz
+
+No exact magnitude requirement is imposed inside the transition band. It gives a realizable filter space in which to change gradually from passing to attenuating frequencies.
+
+A narrower transition band generally requires a higher filter order, more calculations, more memory, and potentially more delay.
+
+### Decibel limits
+
+The relationship between a magnitude ratio and decibels is:
+
+    magnitude_db = 20 log10(amplitude_ratio)
+
+The inverse conversion is:
+
+    amplitude_ratio = 10 ** (magnitude_db / 20)
+
+A maximum passband loss of `1 dB` gives a minimum permitted amplitude ratio of:
+
+    10 ** (-1 / 20) = 0.8912509381
+
+A minimum stopband attenuation of `40 dB` gives a maximum permitted amplitude ratio of:
+
+    10 ** (-40 / 20) = 0.01
+
+Therefore:
+
+* frequencies in the passband must retain at least approximately `89.1%` of their original amplitude
+* frequencies in the stopband must retain no more than `1%` of their original amplitude
+
+The corresponding power ratio in the stopband is:
+
+    0.01 ** 2 = 0.0001
+
+Amplitude is reduced to one hundredth, while power is reduced to one ten-thousandth.
+
+### Normalized frequencies
+
+Filter-design functions often express frequencies relative to the Nyquist frequency.
+
+For this example:
+
+    normalized passband edge = 20 / 100 = 0.2
+
+    normalized stopband edge = 50 / 100 = 0.5
+
+A normalized frequency of `0` represents DC, while a normalized frequency of `1` represents the Nyquist frequency.
+
+### Specification mask
+
+The program creates a magnitude specification mask in decibels.
+
+The plot shows:
+
+* the permitted passband region between `-1 dB` and `0 dB`
+* the unrestricted transition band from `20 Hz` to `50 Hz`
+* the permitted stopband region at or below `-40 dB`
+* forbidden regions in which a candidate filter response would violate the requirements
+
+The plot is saved locally as:
+
+    filter_specification_mask.png
+
+This generated image is excluded from Git because it can be reproduced by running the program.
+
+### Automated response check
+
+A sampled candidate response is checked using Boolean NumPy masks.
+
+The passband mask selects frequencies at or below the passband edge:
+
+    passband_mask = test_frequencies <= passband_edge
+
+The stopband mask selects frequencies at or above the stopband edge:
+
+    stopband_mask = test_frequencies >= stopband_edge
+
+`np.all` verifies that every selected value satisfies its corresponding limit.
+
+The passing example uses:
+
+    Frequencies [Hz]:  10.0, 20.0, 35.0, 50.0, 80.0
+    Magnitudes [dB]:   -0.3, -0.8, -18.0, -42.0, -55.0
+
+The results are:
+
+    Passband passed: True
+    Stopband passed: True
+    Complete specification passed: True
+    Filter specification checks: PASSED
+
+The value at `35 Hz` is not checked because it lies inside the transition band.
+
+An earlier value of `-38 dB` at `50 Hz` failed because the stopband requires a value at or below `-40 dB`.
+
+A real filter must be evaluated on a dense frequency grid. Checking only a few isolated frequencies could miss a specification violation between the sampled points.
+
+### File
+
+    applications/signal_visualizer/digital_filter_specifications.py
