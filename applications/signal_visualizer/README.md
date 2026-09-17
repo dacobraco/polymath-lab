@@ -5223,3 +5223,106 @@ A real filter must be evaluated on a dense frequency grid. Checking only a few i
 ### File
 
     applications/signal_visualizer/digital_filter_specifications.py
+
+### Moving-Average FIR Filter
+
+This experiment applies a five-sample moving-average FIR filter to a noisy sinusoidal signal and measures how much the filter reduces noise.
+
+The clean input signal is a `2 Hz` sinusoid sampled at:
+
+    sample rate = 100 Hz
+    duration = 2 s
+    number of samples = 200
+
+The moving-average window length is:
+
+    M = 5
+
+The FIR coefficients are:
+
+    h[n] = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+Their sum is:
+
+    0.2 + 0.2 + 0.2 + 0.2 + 0.2 = 1.0
+
+A coefficient sum of `1.0` preserves a constant signal level.
+
+The noisy measurement is modeled as:
+
+    noisy signal = clean signal + noise
+
+The noise is generated using a fixed random seed for reproducible results.
+
+The measured noise standard deviation before filtering was:
+
+    0.4426704561
+
+After the five-sample moving-average filter, the measured standard deviation was:
+
+    0.1997009495
+
+The theoretical prediction for independent noise is:
+
+    sigma_out = sigma_in / sqrt(M)
+
+For this experiment:
+
+    0.4426704561 / sqrt(5) = 0.1979682463
+
+The measured result is close to the theoretical prediction.
+
+The measured standard deviation was reduced by approximately `54.9%`, corresponding to about a `2.22x` reduction in noise spread.
+
+### Error relative to the clean signal
+
+The root mean square error between the noisy signal and the clean signal was:
+
+    RMSE before filtering = 0.4428681248
+
+After filtering:
+
+    RMSE after filtering = 0.2017956334
+
+The RMSE was reduced by approximately `54.4%`.
+
+This confirms numerically that the filtered signal is closer to the clean reference signal.
+
+### Edge handling
+
+The filter is applied using:
+
+    np.convolve(..., mode="same")
+
+This keeps the filtered signal the same length as the input.
+
+Near the beginning and end of the signal, the convolution does not have a complete five-sample neighborhood. These edge samples are excluded when measuring noise standard deviation and RMSE so that boundary effects do not distort the comparison.
+
+### Visualization
+
+The program compares:
+
+* the noisy signal with the clean reference signal
+* the filtered signal with the clean reference signal
+
+The generated plot is saved locally as:
+
+    moving_average_fir_filter.png
+
+The generated image is excluded from Git because it can be reproduced by running the program.
+
+### Automated checks
+
+The program verifies that:
+
+* the FIR coefficients sum to `1.0`
+* the noise standard deviation decreases after filtering
+* the RMSE relative to the clean signal decreases after filtering
+
+A successful run ends with:
+
+    Moving-average FIR checks: PASSED
+
+### File
+
+    applications/signal_visualizer/moving_average_fir.py
