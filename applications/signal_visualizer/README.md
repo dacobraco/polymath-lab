@@ -5326,3 +5326,131 @@ A successful run ends with:
 ### File
 
     applications/signal_visualizer/moving_average_fir.py
+
+### FIR Window Design
+
+This experiment designs finite impulse response filters using the window method with `scipy.signal.firwin`.
+
+The common design parameters are:
+
+    sample rate = 200 Hz
+    number of taps = 51
+    filter order = 50
+    window = Hamming
+
+For a linear-phase FIR filter with `51` taps, the delay is:
+
+    D = (N - 1) / 2
+    D = 25 samples
+
+At a sample rate of `200 Hz`, this corresponds to:
+
+    delay = 25 / 200 = 0.125 s
+
+Three FIR filters are designed.
+
+### Low-pass filter
+
+The low-pass filter uses:
+
+    cutoff frequency = 35 Hz
+    pass_zero = True
+
+The cutoff was selected between the example passband edge at `20 Hz` and stopband edge at `50 Hz`.
+
+The measured coefficient sum is:
+
+    0.9999999999999999
+
+A coefficient sum close to `1.0` means that the DC component is preserved.
+
+The first, middle, and last coefficients are:
+
+    first = 0.0007189926172323871
+    middle = 0.34938750347414294
+    last = 0.0007189926172323871
+
+The coefficients are symmetric.
+
+### High-pass filter
+
+The high-pass filter uses:
+
+    cutoff frequency = 50 Hz
+    pass_zero = False
+
+The measured coefficient sum is:
+
+    -0.0009807056841317449
+
+A coefficient sum close to zero means that the DC component is strongly suppressed.
+
+The first, middle, and last coefficients are:
+
+    first = -0.0010175926971811064
+    middle = 0.49950964715793467
+    last = -0.0010175926971811064
+
+The coefficients are symmetric.
+
+### Band-pass filter
+
+The band-pass filter uses:
+
+    lower cutoff frequency = 50 Hz
+    upper cutoff frequency = 80 Hz
+    pass_zero = False
+
+The passband is therefore located approximately between the two cutoff frequencies.
+
+The measured coefficient sum is:
+
+    -0.0013068148640968205
+
+The coefficient sum is close to zero because DC is outside the band-pass region.
+
+The first, middle, and last coefficients are:
+
+    first = -0.0010207617387359698
+    middle = 0.30063914807610526
+    last = -0.0010207617387359698
+
+The coefficients are symmetric.
+
+### Linear phase
+
+All three filters satisfy:
+
+    h[n] = h[N - 1 - n]
+
+This coefficient symmetry produces a linear-phase FIR filter.
+
+The program verifies the symmetry numerically using `np.allclose`.
+
+### Cutoff interpretation
+
+For a window-designed FIR filter, the cutoff frequency represents the transition location rather than an ideal brick-wall boundary.
+
+The cutoff does not by itself prove that passband ripple, stopband attenuation, or transition-band requirements are satisfied.
+
+Those properties must be measured from the actual frequency response.
+
+Detailed frequency-response analysis is intentionally left for the next lesson.
+
+### Automated checks
+
+The program verifies that:
+
+* all three filters contain `51` coefficients
+* all three filters have symmetric coefficients
+* the low-pass coefficient sum is approximately `1.0`
+* the high-pass coefficient sum is close to zero
+* the band-pass coefficient sum is close to zero
+
+A successful run ends with:
+
+    All FIR design checks passed.
+
+### File
+
+    applications/signal_visualizer/fir_window_design.py
