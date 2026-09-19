@@ -5454,3 +5454,142 @@ A successful run ends with:
 ### File
 
     applications/signal_visualizer/fir_window_design.py
+
+### FIR Frequency Response and Group Delay
+
+This experiment analyzes the actual frequency response of the window-designed low-pass FIR filter from the previous lesson using `scipy.signal.freqz`.
+
+The filter parameters are:
+
+    sample rate = 200 Hz
+    number of taps = 51
+    filter order = 50
+    cutoff frequency = 35 Hz
+    frequency-response points = 1024
+
+The analysis uses the same example specification introduced earlier:
+
+    passband edge = 20 Hz
+    stopband edge = 50 Hz
+    maximum passband loss = 1 dB
+    minimum stopband attenuation = 40 dB
+
+### Frequency response
+
+`freqz` returns the frequency grid and the complex frequency response:
+
+    H(f)
+
+The magnitude response is calculated using:
+
+    magnitude = |H(f)|
+
+and converted to decibels using:
+
+    magnitude_db = 20 log10(magnitude)
+
+Selected measured values are:
+
+    10 Hz: magnitude = 0.9979619983, magnitude = -0.0177199210 dB
+    20 Hz: magnitude = 0.9963673619, magnitude = -0.0316101426 dB
+    35 Hz: magnitude = 0.5039165082, magnitude = -5.9528282804 dB
+    50 Hz: magnitude = 0.0009804995, magnitude = -60.1710520604 dB
+    80 Hz: magnitude = 0.0002100757, magnitude = -73.5524849264 dB
+
+The response at the `35 Hz` cutoff is close to `-6 dB`, which is consistent with the transition behavior of this window-designed FIR filter.
+
+### Dense-grid specification check
+
+The full frequency grid is evaluated instead of checking only a few isolated frequencies.
+
+The measured passband results are:
+
+    best passband magnitude = 0.0016389428 dB
+    worst passband magnitude = -0.0323445358 dB
+    passband ripple = 0.0339834786 dB
+
+The measured worst-case stopband magnitude is:
+
+    -60.1710520604 dB
+
+Therefore:
+
+* the passband remains above the required `-1 dB` minimum
+* the stopband remains below the required `-40 dB` maximum
+
+The filter satisfies both example magnitude specifications on the evaluated frequency grid.
+
+### Phase response
+
+The complex frequency response also contains phase information.
+
+The wrapped phase is obtained from:
+
+    angle(H(f))
+
+and `np.unwrap` is used to reveal the underlying phase trend.
+
+In the passband, the unwrapped phase decreases approximately linearly with frequency.
+
+For a symmetric linear-phase FIR filter:
+
+    H(e^jw) = A(w) e^(-jwD)
+
+where `D` is the constant delay.
+
+The phase therefore follows approximately:
+
+    phase(w) = -wD
+
+Phase behavior becomes less physically useful near deep stopband zeros because the response magnitude is close to zero.
+
+### Group delay
+
+The group delay is evaluated using `scipy.signal.group_delay`.
+
+For a `51`-tap symmetric FIR filter, the theoretical delay is:
+
+    D = (N - 1) / 2
+    D = (51 - 1) / 2
+    D = 25 samples
+
+At a sample rate of `200 Hz`:
+
+    delay = 25 / 200
+    delay = 0.125 s
+
+The measured results are:
+
+    first group delay = 25.000000000000004 samples
+    minimum group delay = 24.99999990484936 samples
+    maximum group delay = 25.000000005166864 samples
+
+The tiny differences from exactly `25` samples are numerical floating-point effects.
+
+The essentially constant group delay confirms the linear-phase behavior of the symmetric FIR filter.
+
+### Visualization
+
+The program displays three frequency-domain plots:
+
+* magnitude response in decibels
+* unwrapped phase response
+* group delay in samples
+
+The magnitude and phase plots provide a Bode-style view of the FIR frequency response, while the group-delay plot shows an approximately horizontal line at `25` samples.
+
+### Automated checks
+
+The program verifies that:
+
+* the worst passband magnitude is at least `-1 dB`
+* the worst stopband magnitude is at most `-40 dB`
+* the measured group delay is numerically equal to the expected `25` samples
+
+A successful run ends with:
+
+    FIR frequency-response checks: PASSED
+
+### File
+
+    applications/signal_visualizer/fir_frequency_response.py
