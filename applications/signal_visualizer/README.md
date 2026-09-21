@@ -6009,3 +6009,55 @@ The DC gain is approximately:
 * The frequency-response plot shows that prewarping produces only a small coefficient change but places the cutoff at the intended digital frequency.
 #### File
     applications/signal_visualizer/bilinear_transform.py
+
+### Real-Time Audio Stream Basics
+Lesson #75 demonstrates a microphone input stream without audio processing using Python and sounddevice.
+#### Goal
+Receive microphone audio in successive blocks while the program is running, count incoming blocks and frames, and monitor input overflow reports.
+#### Configuration
+* Input device in the observed run: index 3, Microphone (Realtek(R) Audio), MME
+* Sampling frequency: 44100 Hz
+* Input channels: 1 (mono)
+* Block size: 1024 frames
+* Sample format: float32
+* Stop condition: pressing Enter
+Device indices depend on the local audio configuration and should be checked before running on another setup.
+#### Stream and Buffer Concepts
+* A stream delivers successive blocks while audio capture continues.
+* A buffer temporarily holds audio samples.
+* Each frame contains one sample per channel.
+* With one channel, a block of 1024 frames contains 1024 samples.
+* Each input block has a NumPy array shape of (1024, 1).
+* Block duration is calculated as block_size / sampling_frequency.
+For this configuration:
+    Block duration = 1024 / 44100
+    Block duration ~= 0.02322 s = 23.22 ms
+Block duration is not the total input latency; the device, driver, and additional buffering also contribute.
+#### Implementation
+* query_devices was used to inspect the available audio devices.
+* check_input_settings successfully checked the selected input configuration before the final stream run.
+* InputStream opens the microphone input stream.
+* The with statement starts the stream and stops and closes it when the block is exited.
+* audio_callback receives indata, frames, time, and status from the audio library.
+* The callback counts received blocks and frames without modifying or storing the audio samples.
+* status.input_overflow reports discarded input data.
+* The overflow counter counts callback reports, not the number of lost samples.
+* input keeps the main program waiting for Enter while the callback receives audio.
+* The counters are printed after the stream has stopped.
+The callback performs no console output or file writes.
+#### Observed Results
+The completed run produced:
+    {'blocks': 244, 'frames': 249856, 'overflows': 0}
+The frame count matches the configured block size:
+    244 * 1024 = 249856 frames
+The received frames represent approximately:
+    249856 / 44100 ~= 5.67 s of audio
+No input overflow was reported during this run. These counters confirm block delivery but do not measure audio amplitude or verify the recorded content.
+#### Conclusions
+* Real-time audio arrives progressively in blocks.
+* The callback must keep pace with incoming audio.
+* If input buffering is exhausted, audio data can be discarded.
+* The microphone stream ran without reported input overflow in the observed run.
+* No filtering, FFT processing, playback, or audio file recording was performed.
+#### File
+    applications/signal_visualizer/realtime_audio_stream.py
