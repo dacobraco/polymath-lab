@@ -5860,3 +5860,40 @@ This lesson connects recursive digital filtering directly with difference equati
 ### File
 
     applications/signal_visualizer/iir_filter.py
+
+### Butterworth and Chebyshev I Filters
+Lesson #72 compares fourth-order Butterworth and Chebyshev Type I digital low-pass filters.
+#### Goal
+Understand the trade-off between a smooth passband response and a sharper transition toward the stopband.
+#### Configuration
+* Sampling frequency: 200 Hz
+* Filter order: 4
+* Frequency boundary: 10 Hz
+* Chebyshev Type I passband ripple: 1 dB
+* Representation: second-order sections (SOS)
+The frequency boundary has different meanings for these designs:
+* Butterworth: approximately -3.01 dB at 10 Hz.
+* Chebyshev Type I: -1 dB at the passband edge of 10 Hz.
+This comparison uses the same order and boundary frequency, rather than identical passband and stopband specifications.
+#### Implementation
+* `butter` and `cheby1` calculate the filter coefficients.
+* Each filter contains two second-order sections.
+* `freqz_sos` evaluates the frequency response at 2048 frequencies.
+* `np.abs` extracts the amplitude gain from the complex response.
+* Both amplitude responses are plotted from 0 to 40 Hz.
+* Additional evaluations check the gains at specific frequencies.
+#### Numerical Results
+| Frequency [Hz] | Butterworth amplitude gain | Chebyshev I amplitude gain |
+|---|---|---|
+| 2 | 0.999999 | 0.942412 |
+| 10 | 0.707107 | 0.891251 |
+| 15 | 0.186114 | 0.078831 |
+| 30 | 0.009336 | 0.002536 |
+#### Conclusions
+* Butterworth has a smooth, monotonic amplitude response without passband ripple.
+* Chebyshev Type I allows passband ripple in exchange for a sharper transition.
+* For these designs, Chebyshev Type I attenuates the 15 Hz and 30 Hz components more strongly.
+* For a sinusoidal input, steady-state output amplitude equals input amplitude multiplied by the filter's amplitude gain at that frequency.
+* This experiment analyzes frequency responses; it does not filter a time-domain signal.
+#### File
+    applications/signal_visualizer/butterworth_chebyshev_filters.py
