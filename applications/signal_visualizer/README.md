@@ -6111,3 +6111,55 @@ The interference amplitude was reduced by approximately 1660 times.
 * No microphone streaming, playback, audio file export, MATLAB validation, or pytest run was performed for this lesson.
 #### File
     applications/signal_visualizer/noise_remover.py
+
+
+### Multiband Audio Equalizer
+Lesson #77 implements an adjustable three-band audio equalizer using NumPy and SciPy FFT functions.
+#### Goal
+Independently adjust the amplitudes of low, mid, and high frequency components.
+#### Configuration
+* Sampling frequency: 44100 Hz
+* Duration: 2 seconds
+* Input tones: 100 Hz, 1000 Hz, and 5000 Hz
+* Initial amplitude of each tone: 0.2
+* Low band: frequencies below 300 Hz, gain 1.5
+* Mid band: frequencies from 300 Hz up to but excluding 3000 Hz, gain 0.5
+* High band: frequencies at or above 3000 Hz, gain 1.0
+The three gain variables can be adjusted independently before running the program.
+#### Implementation
+* rfft transforms the real input signal into complex frequency-domain coefficients.
+* rfftfreq provides the frequency associated with each coefficient.
+* spectrum.copy creates an independent copy for processing while preserving the original spectrum.
+* Boolean masks assign every FFT bin to exactly one band.
+* Each band's complex coefficients are multiplied by its selected gain.
+* Positive real gains scale amplitudes without changing the phases of nonzero coefficients.
+* irfft reconstructs the real output signal with the original number of samples.
+FFT coefficients are kept complex during processing. Absolute values are used only for amplitude measurement.
+The inverse transform supplies the required normalization; no extra factor of two or division by the sample count is applied to the reconstructed signal.
+#### Numerical Verification
+A new FFT of the reconstructed output is used to measure the resulting tone amplitudes.
+For the three test tones, which are neither DC nor Nyquist components:
+    amplitude = 2 * abs(rFFT(signal)) / sample_count
+The observed output was:
+    Frequency: 100.0 Hz
+    Amplitude before: 0.200000
+    Amplitude after:  0.300000
+    Gain: 1.500000, expected: 1.500000
+    Frequency: 1000.0 Hz
+    Amplitude before: 0.200000
+    Amplitude after:  0.100000
+    Gain: 0.500000, expected: 0.500000
+    Frequency: 5000.0 Hz
+    Amplitude before: 0.200000
+    Amplitude after:  0.200000
+    Gain: 1.000000, expected: 1.000000
+All three measured gains matched their configured values to the displayed precision.
+#### Conclusions
+* An equalizer independently controls the amplitudes of different frequency bands.
+* The low tone was boosted, the mid tone was attenuated, and the high tone was preserved.
+* This implementation processes the entire generated signal offline.
+* Whole-record FFT processing assumes periodic continuation of the record. Sharp gain transitions can produce ringing on general audio signals.
+* The demonstration uses periodic test tones and does not establish artifact-free processing of arbitrary recordings.
+* No real-time streaming, playback, audio file export, MATLAB validation, or pytest run was performed for this lesson.
+#### File
+    applications/signal_visualizer/audio_equalizer.py
