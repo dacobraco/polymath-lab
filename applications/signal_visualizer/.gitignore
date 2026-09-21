@@ -7,3 +7,4 @@ recorded_voice_waveform.png
 *.exe
 filter_specification_mask.png
 moving_average_fir_filter.png
+bilinear_transform_response.png

@@ -5950,3 +5950,62 @@ The float64 SOS response is a higher-precision numerical reference, not an exact
 * This comparison demonstrates reduced numerical error, not divergence of the BA implementation.
 #### File
     applications/signal_visualizer/filter_stability_sos.py
+
+### Bilinear Transform and Prewarping
+Lesson #74 converts a continuous-time analog low-pass prototype into a discrete-time digital IIR filter using the bilinear transform.
+#### Goal
+Convert an analog first-order low-pass prototype from the s-domain into a digital filter in the z-domain and demonstrate frequency warping and prewarping.
+#### Configuration
+* Sampling frequency: 200 Hz
+* Desired digital cutoff frequency: 10 Hz
+* Analog prototype: first-order low-pass filter
+* Frequency-response grid: 4096 points
+The analog prototype is:
+    H(s) = omega_c / (s + omega_c)
+For a direct 10 Hz analog cutoff:
+    omega_c = 2*pi*10
+    omega_c ~= 62.831853 rad/s
+#### Bilinear Transform
+The bilinear transform maps the analog s-domain system into the digital z-domain:
+    s = 2*fs*(1 - z^-1)/(1 + z^-1)
+The direct bilinear conversion produces:
+    Numerator coefficients: [0.13575525, 0.13575525]
+    Denominator coefficients: [1.0, -0.72848950]
+The corresponding digital transfer function is approximately:
+    H(z) = (0.13575525 + 0.13575525*z^-1) / (1 - 0.72848950*z^-1)
+The equivalent difference equation is:
+    y[n] = 0.13575525*x[n] + 0.13575525*x[n-1] + 0.72848950*y[n-1]
+#### Frequency Warping
+The analog frequency axis extends toward infinity, while the unique positive digital frequency range is limited by the Nyquist frequency.
+For a sampling frequency of 200 Hz:
+    Nyquist frequency = 100 Hz
+A direct analog cutoff of 10 Hz is mapped to a digital cutoff of approximately:
+    9.912109375 Hz
+The exact value read from the numerical frequency-response grid depends on grid resolution.
+#### Prewarping
+Prewarping compensates for the nonlinear frequency mapping of the bilinear transform.
+The prewarped analog angular cutoff is:
+    Omega_c = 2*fs*tan(pi*fc/fs)
+For the desired digital cutoff of 10 Hz:
+    Prewarped angular cutoff frequency: 63.35377612981451 rad/s
+The resulting digital coefficients are:
+    Prewarped digital numerator: [0.13672874, 0.13672874]
+    Prewarped digital denominator: [1.0, -0.72654253]
+The corresponding difference equation is approximately:
+    y[n] = 0.13672874*x[n] + 0.13672874*x[n-1] + 0.72654253*y[n-1]
+The measured cutoff on the 4096-point frequency grid is:
+    10.009765625 Hz
+The gain near the desired 10 Hz cutoff is approximately:
+    0.707
+The DC gain is approximately:
+    1.0
+#### Conclusions
+* Laplace-domain transfer functions describe continuous-time systems, while z-domain transfer functions describe discrete-time systems.
+* The bilinear transform converts a stable analog filter prototype into a digital IIR representation.
+* The bilinear transform preserves stability but introduces nonlinear frequency warping.
+* Directly transforming a 10 Hz analog cutoff produces a digital cutoff slightly below 10 Hz in this experiment.
+* Prewarping adjusts the analog prototype before transformation so that the desired digital cutoff is obtained.
+* The final digital filter can be implemented directly as a recursive difference equation.
+* The frequency-response plot shows that prewarping produces only a small coefficient change but places the cutoff at the intended digital frequency.
+#### File
+    applications/signal_visualizer/bilinear_transform.py
