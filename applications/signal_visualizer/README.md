@@ -5729,3 +5729,134 @@ The implementation connects the mathematical convolution equation directly to a 
 ### File
 
     applications/signal_visualizer/fir_filter.c
+
+### #71 — One-Pole IIR Filter
+
+This lesson introduced a first-order Infinite Impulse Response (IIR) low-pass filter and connected its recursive difference equation with impulse response, step response, noise filtering, poles, stability, and frequency response.
+
+The implemented one-pole IIR filter is described by:
+
+    y[n] = (1 - alpha) * x[n] + alpha * y[n - 1]
+
+where:
+
+- `x[n]` is the current input sample
+- `y[n]` is the current output sample
+- `y[n - 1]` is the previous output sample
+- `alpha` controls the amount of feedback and memory
+
+The filter uses feedback because the current output depends on the previous output.
+
+Unlike an FIR filter, whose impulse response becomes exactly zero after a finite number of samples, the IIR impulse response theoretically continues indefinitely.
+
+For `alpha = 0.5` and an impulse input:
+
+    [1, 0, 0, 0, 0, 0]
+
+the output is:
+
+    [0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625]
+
+The response continues because each output sample feeds part of its value into the next sample.
+
+For a unit-step input and `alpha = 0.5`, the output begins as:
+
+    [0.5, 0.75, 0.875, 0.9375, 0.96875, ...]
+
+and approaches 1.
+
+For `alpha = 0.9`, the response is significantly slower:
+
+    [0.1, 0.19, 0.271, 0.3439, 0.40951, ...]
+
+A larger `alpha` gives the filter more memory and therefore produces stronger smoothing but a slower response.
+
+A noisy 2 Hz sinusoidal signal was generated using:
+
+    fs = 100 Hz
+    duration = 2 s
+    noise standard deviation = 0.5
+    random seed = 42
+
+The RMSE before filtering was:
+
+    RMSE before = 0.440126
+
+Different values of `alpha` produced:
+
+    alpha = 0.2 -> RMSE = 0.370302
+    alpha = 0.5 -> RMSE = 0.288059
+    alpha = 0.7 -> RMSE = 0.291841
+    alpha = 0.9 -> RMSE = 0.533590
+
+Among the tested values, `alpha = 0.5` produced the smallest RMSE.
+
+This demonstrates an important filtering trade-off: stronger smoothing does not necessarily produce a more accurate reconstruction. A very large `alpha` can suppress noise while introducing significant delay and distortion.
+
+The Z-domain transfer function of the filter is:
+
+    H(z) = (1 - alpha) / (1 - alpha * z^(-1))
+
+or equivalently:
+
+    H(z) = (1 - alpha) * z / (z - alpha)
+
+Therefore:
+
+    zero = 0
+    pole = alpha
+
+For `alpha = 0.7`:
+
+    zero = 0
+    pole = 0.7
+
+Since the pole lies inside the unit circle, the filter is stable.
+
+For this first-order system:
+
+    |alpha| < 1 -> stable
+    |alpha| > 1 -> unstable
+
+Moving the pole closer to 1 increases the memory of the system and causes the impulse response to decay more slowly.
+
+The frequency-response magnitude was evaluated using:
+
+    |H(e^jw)| = (1 - alpha) / sqrt(1 + alpha^2 - 2 * alpha * cos(w))
+
+At zero frequency:
+
+    |H(0)| = 1
+
+so DC is passed without attenuation.
+
+The magnitude decreases as frequency increases, confirming that the filter is low-pass.
+
+The cutoff frequency was defined at:
+
+    |H| = 1 / sqrt(2) ≈ 0.707
+
+which corresponds to the -3 dB point.
+
+For `fs = 100 Hz`, the measured cutoff frequencies were:
+
+    alpha = 0.2 -> fc ≈ 35.27 Hz
+    alpha = 0.5 -> fc ≈ 11.52 Hz
+    alpha = 0.7 -> fc ≈ 5.71 Hz
+    alpha = 0.9 -> fc ≈ 1.70 Hz
+
+The results show:
+
+    larger alpha
+        -> pole closer to 1
+        -> more feedback
+        -> longer memory
+        -> stronger smoothing
+        -> slower response
+        -> lower cutoff frequency
+
+This lesson connects recursive digital filtering directly with difference equations, Z-transform concepts, pole locations, stability, and frequency-domain behavior.
+
+### File
+
+    applications/signal_visualizer/iir_filter.py
