@@ -6061,3 +6061,53 @@ No input overflow was reported during this run. These counters confirm block del
 * No filtering, FFT processing, playback, or audio file recording was performed.
 #### File
     applications/signal_visualizer/realtime_audio_stream.py
+
+
+### Audio Noise Removal
+Lesson #76 demonstrates attenuation of a known tonal interference using a Butterworth low-pass filter.
+#### Goal
+Preserve a useful 440 Hz audio tone while reducing unwanted interference at 6000 Hz.
+#### Configuration
+* Sampling frequency: 44100 Hz
+* Duration: 2 seconds
+* Total samples: 88200
+* Useful tone: 440 Hz, amplitude 0.5
+* Tonal interference: 6000 Hz, amplitude 0.2
+* Filter: fourth-order Butterworth low-pass
+* Cutoff frequency: 1000 Hz
+* Coefficient representation: second-order sections (SOS)
+#### Signal Model
+The noisy signal is the sum of the useful signal and interference:
+    clean_signal = 0.5 * sin(2*pi*440*time)
+    noise = 0.2 * sin(2*pi*6000*time)
+    noisy_signal = clean_signal + noise
+This experiment uses a deterministic tonal interference rather than broadband random noise.
+#### Implementation
+* butter designs the low-pass filter and returns its SOS coefficients.
+* sosfilt applies the causal filter to the complete generated signal.
+* The output has the same number of samples as the input.
+* Filtering changes both amplitude and phase.
+* The first 0.1 seconds are excluded from the amplitude measurement to avoid the initial filter transient.
+#### Numerical Verification
+The remaining 1.9 seconds contain 83790 samples and an integer number of periods of both tones.
+An unwindowed real FFT is used to measure the amplitudes before and after filtering.
+For these tones, which are neither DC nor Nyquist components:
+    amplitude = 2 * abs(rFFT(signal)) / sample_count
+The observed output was:
+    Frequency: 440.0 Hz
+    Amplitude before: 0.50000000
+    Amplitude after:  0.49965297
+    Frequency: 6000.0 Hz
+    Amplitude before: 0.20000000
+    Amplitude after:  0.00012045
+Approximately 99.93% of the useful tone amplitude was preserved.
+The interference amplitude was reduced by approximately 1660 times.
+#### Conclusions
+* Frequency-selective filtering can reduce interference when its frequency content is separated from the useful signal.
+* A low-pass filter preserved the 440 Hz tone while strongly attenuating the 6000 Hz interference.
+* The cutoff is not an abrupt boundary: attenuation increases gradually.
+* The filter changes phase, so direct sample-by-sample comparison with the original clean signal would also include phase differences.
+* These results demonstrate suppression of the selected tonal interference, not general removal of arbitrary audio noise.
+* No microphone streaming, playback, audio file export, MATLAB validation, or pytest run was performed for this lesson.
+#### File
+    applications/signal_visualizer/noise_remover.py
