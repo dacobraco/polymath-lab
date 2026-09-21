@@ -5897,3 +5897,56 @@ This comparison uses the same order and boundary frequency, rather than identica
 * This experiment analyzes frequency responses; it does not filter a time-domain signal.
 #### File
     applications/signal_visualizer/butterworth_chebyshev_filters.py
+
+### Filter Stability, Precision, and Second-Order Sections
+Lesson #73 connects IIR filter stability with finite-precision arithmetic and second-order sections.
+#### Goal
+Implement a stable SOS filter and demonstrate how the numerical representation affects filtering accuracy.
+#### Configuration
+* Sampling frequency: 200 Hz
+* Butterworth low-pass cutoff frequency: 10 Hz
+* Initial filter order: 4
+* Initial SOS shape: (2, 6)
+* Input: a 1000-sample unit impulse
+* Precision comparison: an eighth-order Butterworth filter
+* Compared implementations: BA float32 and SOS float32
+* Numerical reference: SOS float64
+#### Implementation
+* `butter` designs the Butterworth filters.
+* Each SOS row contains `[b0, b1, b2, a0, a1, a2]`.
+* With `a0 = 1`, each section follows the difference equation below.
+* `sosfilt` filters the impulse through the cascaded sections, starting from zero initial state.
+* `sos2zpk` extracts the zeros, poles, and transfer-function gain factor.
+* `np.abs` and `np.max` determine the largest pole magnitude.
+* `astype(np.float32)` converts the comparison coefficients and input to reduced precision.
+* `lfilter` evaluates the single BA representation.
+* Both float32 responses are compared with the same SOS float64 reference.
+    y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2] - a1*y[n-1] - a2*y[n-2]
+The output of each section becomes the input to the next section.
+#### Stability Results
+The fourth-order filter has the following pole magnitudes:
+    [0.7455344, 0.7455344, 0.88797508, 0.88797508]
+The maximum pole magnitude is approximately:
+    0.8879750783751188
+All poles lie inside the unit circle, confirming stability of this causal filter.
+The first impulse-response sample is approximately 0.000416599. The final five samples have magnitudes around 1e-52 or smaller, consistent with a decaying response.
+An initial rise or oscillation in the impulse response does not imply instability. A finite observation of the response alone is not a general proof of stability.
+#### Precision Comparison
+The eighth-order comparison uses one BA representation or four second-order sections.
+Maximum absolute error is calculated over the 1000 output samples:
+    max(abs(float32_response - reference_response))
+| Implementation | Maximum absolute error |
+|---|---|
+| BA float32 | 3.8143867715674205e-03 |
+| SOS float32 | 1.507441382136987e-07 |
+In this experiment, the SOS maximum absolute error is approximately 25,300 times smaller.
+The float64 SOS response is a higher-precision numerical reference, not an exact analytical solution. Last digits may vary across environments.
+#### Conclusions
+* Mathematical stability and numerical accuracy are different properties.
+* Finite precision affects both stored coefficients and intermediate calculations.
+* Recursive filtering carries numerical errors into subsequent calculations.
+* SOS reduces numerical sensitivity by organizing a higher-order filter into smaller sections.
+* SOS does not increase the precision of the number format or guarantee immunity to all numerical problems.
+* This comparison demonstrates reduced numerical error, not divergence of the BA implementation.
+#### File
+    applications/signal_visualizer/filter_stability_sos.py
