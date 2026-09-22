@@ -6163,3 +6163,63 @@ All three measured gains matched their configured values to the displayed precis
 * No real-time streaming, playback, audio file export, MATLAB validation, or pytest run was performed for this lesson.
 #### File
     applications/signal_visualizer/audio_equalizer.py
+
+
+### WAV Processing CLI
+Lesson #78 implements a command-line tool for filtering a WAV file with an adjustable Butterworth low-pass filter.
+#### Goal
+Select the input file, output file, cutoff frequency, and filter order from the terminal without editing the Python source.
+#### Command-Line Arguments
+* input_path: input WAV file.
+* output_path: a new output path; existing paths are rejected.
+* --cutoff: cutoff frequency in Hz, default 1000.0.
+* --order: positive integer filter order, default 4.
+* --help: automatically generated usage and argument descriptions.
+Commands run from applications/signal_visualizer:
+    python wav_filter_cli.py controlled_tone.wav filtered_tone.wav
+    python wav_filter_cli.py controlled_tone.wav filtered_tone_300.wav --cutoff 300 --order 4
+Relative paths are interpreted from the terminal's current working directory.
+#### Implementation
+* argparse reads command-line arguments and converts numeric options to their configured types.
+* pathlib.Path.exists checks whether the output path is already occupied before processing.
+* scipy.io.wavfile.read returns the sampling frequency and audio samples.
+* The tool requires int16 PCM input.
+* Samples are converted to float64 and divided by 32768.0 for processing.
+* butter designs the low-pass filter using the input file's sampling frequency and returns SOS coefficients.
+* sosfilt uses axis=0 to filter along time independently for each channel.
+* The filter order must be at least 1.
+* The cutoff must be greater than zero and below half the sampling frequency.
+* Filtered samples are multiplied by 32768.0, rounded, clipped to [-32768, 32767], and converted to int16.
+* A warning is printed if rounded output values exceed the int16 range.
+* scipy.io.wavfile.write saves the result using the original sampling frequency.
+#### Numerical Verification
+The verified input was controlled_tone.wav:
+* Sampling frequency: 44100 Hz.
+* Data type: int16.
+* Shape: (132300, 2), representing stereo audio.
+* Duration: 3.0 seconds.
+Initial argument checks confirmed that explicit values of 2000 Hz and order 6 were parsed correctly. Omitting these options selected the defaults of 1000.0 Hz and order 4.
+The default configuration successfully saved filtered_tone.wav.
+For the numerical filtering check, the tool saved filtered_tone_300.wav using a 300 Hz cutoff and a fourth-order filter.
+A separate verification block read the original and saved output. It confirmed that sampling frequency, array shape, int16 format, and duration were preserved.
+The first 0.1 seconds were excluded from amplitude measurements to avoid the initial filter transient. The three strongest detected input tones were measured in the channel where each input tone was strongest. These tones were neither DC nor Nyquist components.
+Observed results:
+    Format check: OK
+    Duration: 3.0 s
+    220.0 Hz | 0.550000 -> 0.528360 | measured gain=0.960654 | expected gain=0.960654
+    440.0 Hz | 0.250000 -> 0.052773 | measured gain=0.211091 | expected gain=0.211092
+    660.0 Hz | 0.100000 -> 0.004255 | measured gain=0.042551 | expected gain=0.042550
+    Filtering check: OK
+Expected gains were calculated from the filter frequency response using sosfreqz. All measured gains satisfied the absolute error tolerance of 0.005.
+#### Conclusions and Limitations
+* One program can process different files and filter settings through terminal arguments.
+* The saved WAV demonstrated progressively stronger attenuation above the selected cutoff.
+* Processing is offline and loads the complete recording into memory.
+* Causal filtering changes phase and introduces an initial transient.
+* Rounding introduces quantization error; clipping can distort samples that exceed the output range.
+* The numerical verification used a stereo recording with controlled tones.
+* Other WAV sample formats are rejected by the int16 check.
+* No real-time streaming, playback, MATLAB validation, or pytest run was performed for this lesson.
+* Generated WAV files are not included in the lesson commit.
+#### File
+    applications/signal_visualizer/wav_filter_cli.py
