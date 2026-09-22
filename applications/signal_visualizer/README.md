@@ -6223,3 +6223,61 @@ Expected gains were calculated from the filter frequency response using sosfreqz
 * Generated WAV files are not included in the lesson commit.
 #### File
     applications/signal_visualizer/wav_filter_cli.py
+
+### Python-C Benchmark
+Lesson #79 compares an explicit Python loop with a C loop for the same numerical signal-processing task and introduces Julia and Rust as alternative compiled-language approaches.
+#### Goal
+Compare execution time and signal-data memory for equivalent Python and C implementations while keeping the numerical task and data representation consistent.
+#### Benchmark Task
+Both implementations:
+* Use 1,000,000 samples spanning 0.0 to 1.0.
+* Use 64-bit floating-point samples: NumPy float64 in Python and double in C.
+* Compute signal energy using:
+    energy = sum(x[i] * x[i])
+* Exclude signal generation from the measured loop time.
+* Produce the same energy to the displayed precision.
+Python uses an explicit for loop over the NumPy array. This benchmark therefore does not represent the performance of vectorized NumPy operations.
+#### Timing Method
+Python uses time.perf_counter around only the energy loop.
+Observed Python loop times included:
+    0.226048800 s
+    0.225181900 s
+    0.273646500 s
+    0.206578900 s
+The variation between runs demonstrates why a single timing measurement should not be treated as an exact universal performance value.
+C uses QueryPerformanceCounter around only the corresponding energy loop.
+The C program was compiled with GCC 16.1.0 from MSYS2.
+Observed C timing without an explicit optimization option:
+    0.002661700 s
+Observed C timings with -O2:
+    0.000738400 s
+    0.000786500 s
+The small variation between repeated runs shows that measured execution time is not perfectly constant even when the program and compiler settings are unchanged.
+Compiler optimization materially affected the measured C execution time even though the source algorithm and numerical result were unchanged.
+#### Numerical Verification
+The Python implementation produced:
+    Energy: 333333.5000001668
+The C implementation produced:
+    Energy is 333333.500000
+The displayed results are consistent for the benchmark purpose.
+#### Memory Comparison
+The NumPy array reported:
+    Number of bytes: 8000000
+The C signal allocation size was:
+    Number of bytes: 8000000
+Both signal data buffers therefore contain 1,000,000 samples at 8 bytes per sample.
+These values describe the signal data only. They are not measurements of total process memory. Python also requires the interpreter, NumPy, and other runtime objects, while the C process also uses memory beyond the allocated signal buffer.
+#### Interpretation
+* The explicit Python loop was much slower than the compiled C loop in this specific benchmark.
+* This does not mean that Python is always slower by the same factor.
+* NumPy operations can execute substantial work in compiled native code and may perform very differently from explicit Python loops.
+* C performance depends on compiler settings; the -O2 build was substantially faster than the build without an explicit optimization option in the observed runs.
+* Fair benchmarking requires equivalent algorithms, input sizes, numerical types, and measured regions.
+* Data-buffer size must not be presented as total program memory.
+#### Julia and Rust Alternatives
+Julia targets scientific and numerical computing with high-level syntax and JIT compilation, allowing numerical loops to be compiled to efficient machine code.
+Rust targets compiled systems programming with performance comparable to low-level languages while enforcing stronger memory-safety rules at compile time.
+Neither language was installed, executed, or benchmarked in this lesson.
+#### Files
+    applications/signal_visualizer/python_c_benchmark.py
+    applications/signal_visualizer/python_c_benchmark.c
