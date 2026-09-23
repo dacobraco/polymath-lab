@@ -6391,3 +6391,60 @@ Both satisfy the 1e-10 validation tolerance. Empty input, invalid text, and NaN 
     applications/signal_visualizer/audio_processor_demo.py
     applications/signal_visualizer/audio_metrics.c
     applications/signal_visualizer/audio_metrics_validation.py
+
+
+### Signal Probability and Monte Carlo Simulation
+
+Lesson #81 introduces probability concepts through a numerical simulation of noisy voltage measurements.
+
+#### Goal
+
+Estimate the probability that a noisy voltage measurement exceeds a specified threshold and investigate the law of large numbers.
+
+#### Experiment
+
+* Ideal voltage: 1.0 V.
+* Uniform noise: -1.0 V to +1.0 V.
+* Measurement threshold: 1.6 V.
+* Random seed: 81.
+* Total measurements: 10,000.
+* Sample sizes: 10, 100, 1,000 and 10,000.
+
+#### Method
+
+* Generate independent uniformly distributed noise samples using NumPy.
+* Add noise to the ideal voltage.
+* Identify measurements exceeding the threshold.
+* Estimate event probability using relative frequencies.
+* Calculate cumulative event counts using `np.cumsum`.
+* Visualize probability convergence with Matplotlib.
+
+#### Results
+
+| Measurements | Events | Estimated probability |
+|---|---:|---:|
+| 10 | 1 | 0.1000 |
+| 100 | 17 | 0.1700 |
+| 1,000 | 190 | 0.1900 |
+| 10,000 | 1,988 | 0.1988 |
+
+The theoretical probability is 0.2.
+
+The final estimate differs from the theoretical probability by 0.0012.
+
+#### Validation
+
+* Verified the total number of measurements.
+* Verified the cumulative event count for the fixed random seed.
+* Verified the final probability estimate using `np.isclose`.
+* All validation checks passed.
+
+#### Conclusion
+
+The simulation illustrates the law of large numbers. As the number of measurements increases, the estimated probability tends to approach the theoretical value.
+
+Individual estimates are not guaranteed to improve monotonically.
+
+#### File
+
+    applications/signal_visualizer/signal_probability.py
