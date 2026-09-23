@@ -6448,3 +6448,44 @@ Individual estimates are not guaranteed to improve monotonically.
 #### File
 
     applications/signal_visualizer/signal_probability.py
+
+### Random Variables and Distributions
+
+Lesson #82 introduces continuous random variables and compares simulated samples with theoretical probability distributions using SciPy Stats.
+
+#### Uniform Distribution
+
+* Generated 10,000 uniformly distributed samples between -1.0 and 1.0 using a fixed random seed.
+* Compared the normalized histogram with the theoretical uniform probability density function.
+* The theoretical density over the interval is 0.5.
+* The simulated histogram fluctuates around the theoretical density because the sample count is finite.
+
+#### Normal Distribution
+
+* Generated 10,000 normally distributed samples with mean 0.0 and standard deviation 1.0.
+* Compared the normalized histogram with the theoretical normal probability density function.
+* The theoretical PDF reaches its maximum near zero and decreases toward the tails.
+
+#### CDF Probability Check
+
+For the standard normal distribution:
+
+    P(-1 <= X <= 1) = 0.6826894921370859
+
+The simulation produced:
+
+    Empirical probability: 0.6807
+    Theoretical probability: 0.6826894921370859
+
+The empirical result was checked against the theoretical result using an absolute tolerance of 0.02.
+
+#### Key Concepts
+
+* A normalized histogram estimates a probability density.
+* A PDF describes probability density, not the probability of an exact continuous value.
+* Interval probabilities can be calculated using differences of CDF values.
+* Monte Carlo estimates approach theoretical probabilities as the number of samples increases.
+
+#### File
+
+    applications/signal_visualizer/random_distributions.py
