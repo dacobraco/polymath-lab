@@ -6489,3 +6489,117 @@ The empirical result was checked against the theoretical result using an absolut
 #### File
 
     applications/signal_visualizer/random_distributions.py
+
+### Expectation, Variance, and Moments
+Lesson #83 explores expectation, variance, statistical moments, and Monte Carlo verification using discrete probability distributions and simulated noise.
+
+#### Expectation
+For a discrete random variable:
+
+    E[X] = sum(x_i * p_i)
+
+Expectation represents the long-term average or center of a random variable.
+
+#### Variance
+Variance measures the spread around the expectation:
+
+    Var(X) = E[(X - E[X])^2]
+
+It can also be calculated as:
+
+    Var(X) = E[X^2] - E[X]^2
+
+The second central moment is equal to the variance.
+
+#### Statistical Moments
+The experiment evaluates:
+
+* First moment: E[X]
+* Second moment: E[X^2]
+* Second central moment: E[(X - E[X])^2]
+* Third central moment: E[(X - E[X])^3]
+* Fourth moment: E[X^4]
+* Fourth central moment: E[(X - E[X])^4]
+
+The third central moment indicates distribution asymmetry. A symmetric distribution has a theoretical third central moment of zero.
+
+The fourth central moment strongly emphasizes large deviations and is therefore sensitive to rare extreme values and heavy tails.
+
+#### Monte Carlo Verification
+Monte Carlo simulations were performed with:
+
+* 10 samples
+* 100 samples
+* 1,000 samples
+* 10,000 samples
+* 100,000 samples
+
+For the symmetric distribution:
+
+    values = [0, 2, 4]
+    probabilities = [0.25, 0.50, 0.25]
+
+The theoretical values are:
+
+    E[X] = 2.0
+    Var(X) = 2.0
+    E[X^2] = 6.0
+    Third central moment = 0.0
+    E[X^4] = 72.0
+    Fourth central moment = 8.0
+
+With 100,000 samples, the Monte Carlo estimates were approximately:
+
+    E[X] = 2.003760
+    Var(X) = 1.997906
+    E[X^2] = 6.012960
+    Third central moment = -0.007496
+    E[X^4] = 72.182400
+    Fourth central moment = 7.991623
+
+For the asymmetric distribution:
+
+    values = [0, 2, 4]
+    probabilities = [0.10, 0.30, 0.60]
+
+The theoretical values are:
+
+    E[X] = 3.0
+    Var(X) = 1.8
+    E[X^2] = 10.8
+    Third central moment = -2.4
+    E[X^4] = 158.4
+    Fourth central moment = 9.0
+
+With 100,000 samples, the Monte Carlo estimates were approximately:
+
+    E[X] = 2.999480
+    Var(X) = 1.794000
+    E[X^2] = 10.790880
+    Third central moment = -2.379721
+    E[X^4] = 158.169600
+    Fourth central moment = 8.935047
+
+The simulations demonstrate that larger sample counts generally produce more stable estimates of theoretical moments, although convergence is not monotonic for every individual simulation.
+
+#### Impulsive Noise Experiment
+A Gaussian noise signal with 100,000 samples was compared with a copy containing only 20 large impulses.
+
+Normal noise:
+
+    Expectation = 0.000548
+    Variance = 0.995941
+    Third central moment = 0.008268
+    Fourth central moment = 2.974853
+
+Noise with impulses:
+
+    Expectation = 0.000571
+    Variance = 1.075821
+    Third central moment = 0.008165
+    Fourth central moment = 34.974605
+
+The symmetric positive and negative impulses leave the expectation and third central moment almost unchanged, while the fourth central moment increases dramatically. This demonstrates the sensitivity of higher-order moments to rare extreme events.
+
+#### File
+    applications/signal_visualizer/expectation_variance_moments.py
