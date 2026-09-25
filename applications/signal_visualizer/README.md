@@ -6723,3 +6723,47 @@ This demonstrates that zero Pearson correlation does not imply that two variable
 
 #### File
     applications/signal_visualizer/correlation_explorer.py
+
+### Random Processes and Stationarity
+
+Lesson #86 introduces random processes, realizations, stationarity, and the difference between time and ensemble statistics.
+
+#### Goal
+Demonstrate how a stationary random process can be analyzed using one long realization and many independent realizations.
+
+#### Experiment
+A zero-mean Gaussian random process with standard deviation 1 is generated using NumPy.
+
+The time-average experiment uses one long realization and calculates the mean and variance using increasing numbers of samples:
+
+* 10 samples
+* 100 samples
+* 1,000 samples
+* 10,000 samples
+
+The ensemble experiment generates 1,000 realizations with 1,000 samples each. Mean and variance are calculated across all realizations at several fixed time indices.
+
+#### Results
+
+For one long realization, the estimated mean approaches 0 and the variance approaches 1 as more samples are used.
+
+For the ensemble experiment, the statistics remain approximately constant at different time indices:
+
+* Mean ≈ 0
+* Variance ≈ 1
+
+This demonstrates the practical idea of stationarity and shows the difference between time averages and ensemble averages.
+
+#### Key Idea
+
+Time average:
+* One realization
+* Many time samples
+
+Ensemble average:
+* Many realizations
+* One fixed time index
+
+#### File
+
+    applications/signal_visualizer/random_process_stationarity.py
