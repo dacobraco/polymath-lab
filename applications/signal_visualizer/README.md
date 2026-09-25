@@ -6603,3 +6603,40 @@ The symmetric positive and negative impulses leave the expectation and third cen
 
 #### File
     applications/signal_visualizer/expectation_variance_moments.py
+
+### Joint and Conditional Distributions
+
+Lesson #84 introduces joint, marginal, and conditional probability distributions using correlated random variables.
+
+#### Model
+
+The experiment generates:
+
+* `X ~ N(0, 1)`
+* Gaussian noise with mean 0 and standard deviation 0.5
+* `Y = 2X + noise`
+
+A scatter plot visualizes the joint distribution of `X` and `Y`.
+
+#### Conditioning
+
+Samples satisfying:
+
+`0.9 < X < 1.1`
+
+are selected to approximate conditioning on `X ≈ 1`.
+
+The corresponding conditional samples of `Y` are compared with the full marginal distribution of `Y`.
+
+#### Results
+
+* Total samples: 10,000
+* Conditional Y samples: 441
+* Mean of all Y samples: approximately -0.0103
+* Mean of conditional Y samples: approximately 2.0185
+
+The full distribution of `Y` is centered near zero, while the conditional distribution is much narrower and centered near 2, demonstrating how knowledge of `X` changes the distribution of `Y`.
+
+#### File
+
+    applications/signal_visualizer/joint_conditional_distributions.py
