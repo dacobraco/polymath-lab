@@ -6767,3 +6767,32 @@ Ensemble average:
 #### File
 
     applications/signal_visualizer/random_process_stationarity.py
+
+### Autocorrelation and Delay
+
+Lesson #87 explores autocorrelation as a method for detecting periodic structure in noisy signals.
+
+#### Goal
+
+Estimate the period and frequency of a noisy periodic signal from its autocorrelation peaks.
+
+#### Experiment
+
+* Sampling frequency: 100 Hz.
+* Signal frequency: 7 Hz.
+* Gaussian noise standard deviation: 1.5.
+* Autocorrelation is calculated using the full correlation sequence.
+* Only non-negative lags are used for period estimation.
+* `scipy.signal.find_peaks` detects significant autocorrelation peaks.
+* Period is estimated from the mean spacing between consecutive detected peaks.
+
+#### Result
+
+* Mean peak spacing: approximately 14.2857 samples.
+* Estimated period: approximately 0.142857 s.
+* Estimated frequency: 7.0 Hz.
+* The periodic component is recovered despite substantial additive noise.
+
+#### File
+
+    applications/signal_visualizer/autocorrelation_delay.py
