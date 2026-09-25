@@ -6796,3 +6796,49 @@ Estimate the period and frequency of a noisy periodic signal from its autocorrel
 #### File
 
     applications/signal_visualizer/autocorrelation_delay.py
+
+### Wiener-Khinchin Theorem
+
+Lesson #88 connects the autocorrelation function of a random signal with its power spectral density through the Wiener-Khinchin theorem.
+
+#### Goal
+Verify numerically that the Fourier transform of the autocorrelation describes the same dominant spectral structure as a direct PSD estimate.
+
+#### Signal
+The experiment uses:
+* Sampling rate: 200 Hz.
+* Duration: 10 s.
+* Sinusoidal frequency: 10 Hz.
+* Gaussian noise standard deviation: 0.5.
+* Random seed: 42.
+
+The signal is centered before the autocorrelation and PSD calculations.
+
+#### Wiener-Khinchin Verification
+The autocorrelation is calculated with `np.correlate` and transformed into the frequency domain using the FFT.
+
+A second PSD estimate is calculated independently using the Welch method.
+
+The detected dominant frequencies were:
+* Expected frequency: 10.0 Hz.
+* FFT of autocorrelation: 10.002500625156289 Hz.
+* Welch PSD: 10.15625 Hz.
+
+The difference in the Welch peak is caused by its finite frequency-bin resolution.
+
+#### Power Verification
+The measured values were:
+* Signal variance: 0.7388926582554294.
+* Power from Wiener-Khinchin PSD: 0.738852511700237.
+* Power from Welch PSD: 0.7394457083834028.
+
+These results verify that the integrated PSD is approximately equal to the signal variance for the zero-mean signal.
+
+The experiment demonstrates the relationship:
+
+    autocorrelation <-> Fourier transform <-> power spectral density
+
+A periodic structure with a period of approximately 0.1 s in the autocorrelation corresponds to the dominant spectral component near 10 Hz.
+
+#### File
+    applications/signal_visualizer/wiener_khinchin.py
