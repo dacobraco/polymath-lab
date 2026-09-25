@@ -6640,3 +6640,86 @@ The full distribution of `Y` is centered near zero, while the conditional distri
 #### File
 
     applications/signal_visualizer/joint_conditional_distributions.py
+
+### Covariance and Correlation
+Lesson #85 explores covariance and Pearson correlation for linear, noisy, negative, and nonlinear relationships.
+
+#### Covariance
+Covariance measures whether two variables tend to deviate from their means in the same or opposite directions.
+
+For the clean relationship:
+
+    y = 2*x
+
+the covariance matrix was:
+
+    [[ 33.343335  66.68667 ]
+     [ 66.68667  133.37334 ]]
+
+The result verifies that:
+
+* Cov(X, Y) = 2*Var(X).
+* Var(Y) = 4*Var(X).
+* Covariance depends on signal scale.
+
+#### Correlation
+Pearson correlation normalizes covariance and measures the strength and direction of a linear relationship on the interval [-1, 1].
+
+For the clean relationship y = 2*x, the correlation matrix was:
+
+    [[1. 1.]
+     [1. 1.]]
+
+The signals therefore have perfect positive linear correlation.
+
+#### Noise Experiment
+Gaussian noise was added to the linear relationship while keeping the same base noise realization and changing only its standard deviation.
+
+Measured correlations:
+
+* Noise std 0.1: 0.999962
+* Noise std 1.0: 0.996227
+* Noise std 2.0: 0.985170
+* Noise std 5.0: 0.916995
+* Noise std 10.0: 0.754948
+
+Increasing independent noise spreads the scatter plot around the underlying linear trend and reduces the magnitude of the correlation.
+
+#### Positive and Negative Relationships
+The noisy positive relationship:
+
+    y = 2*x + noise
+
+produced:
+
+    correlation = 0.996227
+
+The noisy negative relationship:
+
+    y = -2*x + noise
+
+produced:
+
+    correlation = -0.996223
+
+The sign of the correlation therefore indicates the direction of the linear relationship.
+
+#### Nonlinear Relationship
+The deterministic nonlinear relationship:
+
+    y = x**2
+
+was evaluated for x symmetrically distributed from -10 to 10.
+
+The measured Pearson correlation was:
+
+    1.774786e-16
+
+which is numerically approximately zero.
+
+Although y is completely determined by x, Pearson correlation is approximately zero because the relationship is nonlinear and symmetric.
+
+This demonstrates that zero Pearson correlation does not imply that two variables are unrelated. It only indicates the absence of an overall linear relationship.
+
+#### File
+    applications/signal_visualizer/correlation_explorer.py
