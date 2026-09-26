@@ -6842,3 +6842,21 @@ A periodic structure with a period of approximately 0.1 s in the autocorrelation
 
 #### File
     applications/signal_visualizer/wiener_khinchin.py
+
+### SNR and Noise Power Estimation
+
+Lesson #89 introduces signal-to-noise ratio and noise-power estimation from a noise-only reference segment.
+
+The experiment uses a 5 Hz sinusoidal signal sampled at 100 Hz. The first second contains only Gaussian noise, while the remaining two seconds contain the useful signal and noise.
+
+Signal and noise power are estimated using the mean squared sample value. The estimated signal power is obtained by subtracting the estimated noise power from the total active-segment power.
+
+For stationary noise with standard deviation 0.2, the estimated SNR was 13.08 dB and the true simulated SNR was 10.96 dB, giving an estimation error of 2.13 dB.
+
+A second experiment increased the active-segment noise standard deviation from 0.2 to 0.5. The estimator still used the first noise-only segment as its reference and produced an estimated SNR of 11.84 dB, while the true SNR was only 2.93 dB. The resulting estimation error was 8.90 dB.
+
+This demonstrates that a noise-only SNR estimator can become inaccurate when the noise statistics change over time.
+
+#### File
+
+    applications/signal_visualizer/snr_estimator.py
