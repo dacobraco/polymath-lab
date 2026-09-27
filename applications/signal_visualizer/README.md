@@ -7082,3 +7082,83 @@ This demonstrates how multiple signal-processing methods can be combined to anal
 ### **File**
 
     applications/signal_visualizer/random_signal_noise_lab.py
+
+## **Feedback Control Explorer**
+
+Lesson #93 introduces negative feedback and closed-loop control through a simple temperature-control model.
+
+### **Concepts**
+
+* Reference, output, error, and feedback.
+* Negative feedback and closed-loop control.
+* Proportional controller.
+* Steady-state error caused by a constant disturbance.
+* PI controller and integral error correction.
+
+### **Temperature Model**
+
+The controller regulates a room toward a reference temperature while the room continuously loses heat to the outside environment.
+
+The proportional controller is defined by:
+
+\[
+u = K_p e
+\]
+
+where the control error is:
+
+\[
+e = r - y
+\]
+
+Heat loss is modeled as proportional to the difference between the room and outside temperatures.
+
+### **P Controller Result**
+
+With:
+
+* Reference temperature: 22.0 °C
+* Initial temperature: 18.0 °C
+* Outside temperature: 5.0 °C
+* \(K_p = 0.5\)
+* Heat-loss coefficient: 0.05
+
+the system converged to approximately:
+
+\[
+20.4545^\circ C
+\]
+
+This demonstrates steady-state error because the proportional controller requires a nonzero error to continuously compensate for heat loss.
+
+### **PI Controller**
+
+The controller was extended to:
+
+\[
+u = K_p e + K_i \int e(t)\,dt
+\]
+
+with:
+
+\[
+K_i = 0.05
+\]
+
+The integral term accumulates previous error and allows the controller to compensate for the constant heat loss.
+
+After 50 iterations, the temperature reached approximately:
+
+\[
+21.9942^\circ C
+\]
+
+which is very close to the 22.0 °C reference.
+
+### **Visualization**
+
+The temperature history is plotted with Matplotlib together with the 22.0 °C reference line, showing the closed-loop response approaching the desired temperature.
+
+### **File**
+
+    applications/signal_visualizer/feedback_explorer.py
