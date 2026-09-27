@@ -6997,3 +6997,88 @@ Detection and estimation solve different problems:
 
 #### File
     applications/signal_visualizer/threshold_detector.py
+
+## **Random Signal and Noise Lab**
+
+Lesson #92 combines several random-signal analysis techniques to detect and characterize a sinusoidal signal corrupted by Gaussian white noise.
+
+### **Goal**
+
+Analyze a noisy periodic signal using time-domain visualization, Welch power spectral density, autocorrelation, and signal-to-noise ratio.
+
+### **Signal Model**
+
+The clean signal is:
+
+\[
+s(t) = A\sin(2\pi ft)
+\]
+
+The measured signal is:
+
+\[
+x(t) = s(t) + n(t)
+\]
+
+where \(n(t)\) is Gaussian white noise.
+
+### **Experiment**
+
+* Sampling frequency: 1000 Hz
+* Duration: 5 s
+* Signal frequency: 10 Hz
+* Signal amplitude: 1.0
+* Noise standard deviations tested: 0.5, 1.0, and 2.0
+* Random seed: 42
+
+### **Welch PSD**
+
+For all tested noise levels, Welch PSD detected the dominant frequency at:
+
+\[
+f_{\text{PSD}} = 9.765625\text{ Hz}
+\]
+
+The difference from the exact 10 Hz frequency is caused by the frequency resolution determined by the Welch segment length.
+
+### **Autocorrelation**
+
+For noise standard deviation 0.5:
+
+\[
+T \approx 0.097\text{ s}
+\]
+
+For noise standard deviation 1.0:
+
+\[
+T \approx 0.101\text{ s}
+\]
+
+For noise standard deviation 2.0:
+
+\[
+T \approx 0.093\text{ s}
+\]
+
+At higher noise levels, small local autocorrelation peaks can produce incorrect period estimates. Welch PSD was therefore used to define a reasonable lag search region around the expected period.
+
+### **SNR Results**
+
+* std = 0.5: approximately 3.01 dB
+* std = 1.0: approximately -3.01 dB
+* std = 2.0: approximately -9.03 dB
+
+The noise power increases with the square of its standard deviation.
+
+### **Conclusion**
+
+The experiment shows that a periodic signal can still be detected even when noise power exceeds signal power.
+
+Welch PSD remained very stable as the noise level increased. Autocorrelation also detected the approximate period when its search region was guided by the spectral estimate.
+
+This demonstrates how multiple signal-processing methods can be combined to analyze noisy measurements more reliably.
+
+### **File**
+
+    applications/signal_visualizer/random_signal_noise_lab.py
