@@ -6935,3 +6935,65 @@ The time-domain plots also show the expected behavior. White noise changes rapid
 #### File
 
     applications/signal_visualizer/noise_generator.py
+
+### Introduction to Detection and Estimation
+Lesson #91 introduces the basic distinction between detection and estimation using a Monte Carlo threshold detector.
+
+#### Detection Model
+Two hypotheses are simulated:
+
+* \(H_0: y = n\)
+* \(H_1: y = A + n\)
+
+where:
+
+* \(A = 1.0\) is the signal amplitude.
+* \(n\) is zero-mean Gaussian noise.
+* Noise standard deviation is \(\sigma = 0.4\).
+* The detection threshold is \(\gamma = 0.5\).
+* The simulation uses 100,000 Monte Carlo experiments.
+
+The detector applies the decision rule:
+
+* If \(y > \gamma\), decide \(H_1\).
+* Otherwise, decide \(H_0\).
+
+#### Detection Results
+The simulation produced:
+
+* False alarm probability: 0.10616
+* Detection probability: 0.89465
+
+A false alarm occurs when the detector decides \(H_1\) although \(H_0\) is true.
+
+A successful detection occurs when the detector decides \(H_1\) while \(H_1\) is actually true.
+
+Increasing noise causes the \(H_0\) and \(H_1\) distributions to overlap more strongly, increasing detection errors and making the two hypotheses harder to distinguish.
+
+#### Amplitude Estimation
+Under \(H_1\), the signal model is:
+
+\[
+y = A + n
+\]
+
+Because the noise has zero mean, averaging many measurements provides an estimate of the signal amplitude:
+
+\[
+\hat{A} = \frac{1}{N}\sum_{i=1}^{N} y_i
+\]
+
+The Monte Carlo simulation produced:
+
+* Exact amplitude: 1.0
+* Estimated amplitude: 1.0010869084464467
+* Estimation error: 0.001086908446446655
+
+#### Key Idea
+Detection and estimation solve different problems:
+
+* Detection produces a discrete decision such as \(H_0\) or \(H_1\).
+* Estimation produces a numerical estimate of an unknown parameter.
+
+#### File
+    applications/signal_visualizer/threshold_detector.py
