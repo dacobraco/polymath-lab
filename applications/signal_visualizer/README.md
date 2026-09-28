@@ -7506,3 +7506,29 @@ feedback_control_simulink.slx
 ```
 
 This is the first Simulink block-diagram model in the Polymath control-systems section.
+
+## **Block Diagram Reduction and Signal-Flow Graph**
+
+This lesson demonstrates block-diagram reduction using series, parallel, and negative-feedback connections.
+
+The original Simulink model contains:
+
+- proportional gain `K = 2`;
+- two parallel transfer functions `1 / (s + 1)` and `0.5 / (s + 1)`;
+- unity negative feedback.
+
+The parallel branches reduce to:
+
+G_p(s) = 1.5 / (s + 1)
+
+After the series gain:
+
+G(s) = 3 / (s + 1)
+
+With unity negative feedback, the equivalent closed-loop transfer function is:
+
+T(s) = 3 / (s + 4)
+
+The Simulink experiment compares the original block diagram with the reduced transfer function. Their step responses overlap, confirming that both representations are equivalent.
+
+The same system can also be represented as a signal-flow graph, where nodes represent signal variables and directed branches represent gains or transfer functions.
