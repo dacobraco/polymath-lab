@@ -7162,3 +7162,85 @@ The temperature history is plotted with Matplotlib together with the 22.0 °C re
 ### **File**
 
     applications/signal_visualizer/feedback_explorer.py
+
+## **Transfer Functions in Control Systems**
+
+Lesson #94 introduces transfer-function models for plants, controllers, series connections, and closed-loop feedback systems.
+
+### **Plant Models**
+
+Two first-order plants were compared:
+
+* G1(s) = 2 / (s + 1)
+* G2(s) = 2 / (5s + 1)
+
+Both systems have the same steady-state gain of 2, but different time constants.
+
+* G1 has tau = 1 s.
+* G2 has tau = 5 s.
+
+Their step responses demonstrate that the time constant controls how quickly a first-order system approaches its final value.
+
+### **Controller and Series Connection**
+
+A proportional controller was modeled as:
+
+* Gc(s) = 4
+
+The controller was connected in series with the second plant:
+
+* Gp(s) = 2 / (5s + 1)
+
+The resulting open-loop transfer function is:
+
+* Gopen(s) = 8 / (5s + 1)
+
+The proportional controller increases the system gain while leaving the plant time constant unchanged in this example.
+
+### **Closed-Loop Feedback**
+
+Unity negative feedback was applied to the open-loop system.
+
+Using:
+
+* T(s) = G(s) / (1 + G(s))
+
+the closed-loop transfer function becomes:
+
+* T(s) = 8 / (5s + 9)
+
+In first-order standard form:
+
+* T(s) = (8 / 9) / ((5 / 9)s + 1)
+
+Therefore:
+
+* Closed-loop gain = 8 / 9 ≈ 0.889
+* Closed-loop time constant = 5 / 9 ≈ 0.556 s
+
+The feedback system responds much faster than the original plant and approaches the reference value, while a proportional controller still leaves a steady-state error.
+
+### **Python Implementation**
+
+Python Control Systems Library was used to:
+
+* Create transfer-function models with `control.tf()`.
+* Connect controller and plant models with `control.series()`.
+* Create a unity negative-feedback system with `control.feedback()`.
+* Compare plant, open-loop, and closed-loop step responses with `control.step_response()`.
+
+### **MATLAB Validation**
+
+The Python results were independently reproduced in MATLAB using `tf`, `series`, `feedback`, and `step`.
+
+MATLAB produced:
+
+* Open-loop: 8 / (5s + 1)
+* Closed-loop: 8 / (5s + 9)
+
+The MATLAB models therefore matched the analytical and Python results.
+
+### **Files**
+
+* `applications/signal_visualizer/transfer_function_explorer.py`
+* `applications/signal_visualizer/transfer_function_validation.m`
