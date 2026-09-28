@@ -7532,3 +7532,47 @@ T(s) = 3 / (s + 4)
 The Simulink experiment compares the original block diagram with the reduced transfer function. Their step responses overlap, confirming that both representations are equivalent.
 
 The same system can also be represented as a signal-flow graph, where nodes represent signal variables and directed branches represent gains or transfer functions.
+
+## **Step Response and Time-Domain Specifications**
+
+`step_response_specs.py` explores the transient response of standard second-order control systems.
+
+The system is written in the standard form:
+
+\[
+G(s)=\frac{\omega_n^2}{s^2+2\zeta\omega_n s+\omega_n^2}
+\]
+
+The experiment compares several damping ratios while keeping the natural frequency constant at:
+
+\[
+\omega_n=5\ \text{rad/s}
+\]
+
+The analyzed damping ratios are:
+
+- \(\zeta=0.2\)
+- \(\zeta=0.4\)
+- \(\zeta=0.7\)
+- \(\zeta=0.8\)
+- \(\zeta=1.0\)
+
+For each system, the script calculates and compares:
+
+- rise time
+- settling time
+- overshoot
+- peak response
+- peak time
+- steady-state value
+
+The results demonstrate the main damping trade-off:
+
+- low damping produces a faster initial rise but large overshoot and oscillation
+- increasing damping reduces overshoot and oscillation
+- critical damping removes overshoot while producing a monotonic response
+- rise time and settling time describe different aspects of system speed
+
+For the tested systems, the measured overshoot decreased from approximately 52.6% at \(\zeta=0.2\) to 0% at critical damping.
+
+This experiment connects transfer-function coefficients directly with practical transient-response specifications used in control-system design.
