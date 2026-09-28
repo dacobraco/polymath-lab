@@ -7244,3 +7244,265 @@ The MATLAB models therefore matched the analytical and Python results.
 
 * `applications/signal_visualizer/transfer_function_explorer.py`
 * `applications/signal_visualizer/transfer_function_validation.m`
+
+## **#95 — Simulink Introduction**
+
+This lesson introduces MATLAB Simulink through the construction and simulation of a closed-loop control system.
+
+The goal is to connect the mathematical control-system representation from the previous lesson with a graphical block-diagram representation.
+
+### **System**
+
+The controller is
+
+\[
+C(s)=4
+\]
+
+and the plant is
+
+\[
+P(s)=\frac{2}{5s+1}.
+\]
+
+With unity negative feedback, the closed-loop transfer function is
+
+\[
+T(s)=\frac{C(s)P(s)}{1+C(s)P(s)}
+\]
+
+which gives
+
+\[
+T(s)=\frac{8}{5s+9}.
+\]
+
+### **Simulink Model**
+
+The closed-loop system was constructed from the following blocks:
+
+- `Step` — reference input \(r(t)\)
+- `Sum` — computes the control error
+- `Gain` — proportional controller with gain \(K=4\)
+- `Transfer Fcn` — plant model
+- `Scope` — displays the simulated signals
+
+The Sum block uses the signs:
+
+```text
++-
+```
+
+so that the error is
+
+\[
+e(t)=r(t)-y(t).
+\]
+
+The main signal flow is:
+
+```text
+Step -> Sum -> Gain -> Transfer Fcn -> Output
+          ^                         |
+          |_________________________|
+                  Feedback
+```
+
+The controller output is
+
+\[
+u(t)=4e(t).
+\]
+
+### **Reference, Output, and Error**
+
+The Scope was configured to display three signals simultaneously:
+
+\[
+r(t)
+\]
+
+\[
+y(t)
+\]
+
+\[
+e(t)=r(t)-y(t).
+\]
+
+After the step input is applied, the reference immediately changes from zero to one.
+
+The plant output responds gradually because the plant is a first-order dynamic system.
+
+As the output approaches the reference,
+
+\[
+y(t)\uparrow
+\]
+
+and the error decreases,
+
+\[
+e(t)\downarrow.
+\]
+
+### **Steady-State Response**
+
+For a unit-step reference,
+
+\[
+r=1,
+\]
+
+the output approaches approximately
+
+\[
+y_{\infty}=\frac{8}{9}\approx0.889.
+\]
+
+Therefore, the system has a non-zero steady-state error:
+
+\[
+e_{\infty}\approx1-0.889=0.111.
+\]
+
+The proportional controller requires a non-zero error to maintain a non-zero control action.
+
+### **Controller Gain Experiment**
+
+The controller gain was temporarily increased from
+
+\[
+K=4
+\]
+
+to
+
+\[
+K=10.
+\]
+
+The resulting closed-loop transfer function becomes
+
+\[
+T(s)=\frac{20}{5s+21}.
+\]
+
+The simulation showed that increasing the proportional gain:
+
+- makes the output approach the reference more closely
+- reduces the steady-state error
+- makes the response faster
+
+For \(K=10\), the final value is approximately
+
+\[
+y_{\infty}=\frac{20}{21}\approx0.952.
+\]
+
+The controller gain was returned to \(K=4\) for the final model.
+
+### **Sensor Gain Experiment**
+
+A temporary gain of
+
+\[
+H=0.8
+\]
+
+was inserted into the feedback path.
+
+The measured output became
+
+\[
+y_{\text{measured}}=0.8y.
+\]
+
+Because the sensor underestimated the real output, the controller perceived a larger error than actually existed and continued applying excessive control action.
+
+The resulting closed-loop system was
+
+\[
+T(s)=\frac{8}{5s+7.4}.
+\]
+
+The actual output approached approximately
+
+\[
+y_{\infty}=\frac{8}{7.4}\approx1.081.
+\]
+
+The simulation therefore showed the output rising above the reference.
+
+This experiment demonstrated an important property of feedback systems:
+
+The controller reacts to the measured output, not directly to the true physical output.
+
+Incorrect sensor measurements can therefore produce incorrect control behavior even when the controller itself operates correctly.
+
+The sensor gain was removed after the experiment and the final model uses unity feedback.
+
+### **Main Concepts**
+
+This lesson demonstrated that Simulink is a graphical representation of the same mathematical system that can be analyzed using MATLAB transfer functions.
+
+The blocks correspond directly to mathematical relationships:
+
+```text
+Sum:
+e = r - y
+
+Gain:
+u = 4e
+
+Transfer Fcn:
+P(s) = 2 / (5s + 1)
+```
+
+Negative feedback allows the controller to compare the desired output with the measured output and react to the resulting error.
+
+Without feedback, the controller has no information about whether the actual output is correct.
+
+### **Result**
+
+The final Simulink model contains:
+
+```text
+Step
+  |
+  v
+Sum (+-)
+  |
+  v
+Gain (4)
+  |
+  v
+Transfer Fcn
+2 / (5s + 1)
+  |
+  +-------> Scope
+  |
+  +-------> Negative Feedback
+```
+
+The Scope displays:
+
+```text
+Reference r(t)
+Output y(t)
+Error e(t)
+```
+
+The simulation agrees with the analytical closed-loop model
+
+\[
+T(s)=\frac{8}{5s+9}.
+\]
+
+### **Files**
+
+```text
+feedback_control_simulink.slx
+```
+
+This is the first Simulink block-diagram model in the Polymath control-systems section.
