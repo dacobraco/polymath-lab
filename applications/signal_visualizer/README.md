@@ -7576,3 +7576,60 @@ The results demonstrate the main damping trade-off:
 For the tested systems, the measured overshoot decreased from approximately 52.6% at \(\zeta=0.2\) to 0% at critical damping.
 
 This experiment connects transfer-function coefficients directly with practical transient-response specifications used in control-system design.
+
+## **P, PI, and PID Controller Analysis**
+
+This experiment explores the individual effects of proportional, integral, and derivative control on the closed-loop response of a first-order system.
+
+The plant is:
+
+\[
+G(s) = \frac{2}{5s + 1}
+\]
+
+### **P Controller**
+
+The proportional controller is:
+
+\[
+C(s) = K_p
+\]
+
+Increasing \(K_p\) makes the response faster and reduces the steady-state error, but does not completely eliminate it.
+
+For \(K_p = 2\), the closed-loop response approaches approximately 0.8 instead of the reference value 1.
+
+### **PI Controller**
+
+The PI controller is:
+
+\[
+C(s) = K_p + \frac{K_i}{s}
+\]
+
+The integral term accumulates the control error over time and removes the steady-state error.
+
+Increasing \(K_i\) makes the controller react more strongly to accumulated error, but can increase overshoot and oscillations.
+
+### **PID Controller**
+
+The PID controller is:
+
+\[
+C(s) = K_p + \frac{K_i}{s} + K_d s
+\]
+
+The derivative term reacts to the rate of change of the error and adds damping to the system.
+
+For \(K_p = 2\) and \(K_i = 2\), increasing \(K_d\) reduced the measured overshoot:
+
+- \(K_d = 0\): 20.79%
+- \(K_d = 0.5\): 19.06%
+- \(K_d = 1\): 17.66%
+- \(K_d = 2\): 15.58%
+
+For this particular system, the settling time increased as \(K_d\) increased.
+
+The ideal derivative term also produces a strong response to sudden changes in the reference signal, illustrating the derivative kick effect.
+
+The experiment was verified independently in Python and MATLAB.
