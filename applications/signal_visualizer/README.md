@@ -7633,3 +7633,95 @@ For this particular system, the settling time increased as \(K_d\) increased.
 The ideal derivative term also produces a strong response to sudden changes in the reference signal, illustrating the derivative kick effect.
 
 The experiment was verified independently in Python and MATLAB.
+
+## **#99 — PID Controller Tuning**
+
+This lesson explored manual PID tuning and the Ziegler–Nichols tuning method in Simulink.
+
+The initial plant used for manual tuning was:
+
+\[
+G(s)=\frac{2}{5s+1}
+\]
+
+Manual tuning showed the practical roles of the PID terms:
+
+- Increasing \(K_p\) made the response faster and reduced the steady-state error.
+- Adding \(K_i\) eliminated the steady-state error but introduced additional overshoot.
+- Increasing \(K_d\) increased damping and reduced overshoot and oscillations.
+
+For the Ziegler–Nichols experiment, the plant was:
+
+\[
+G(s)=\frac{1}{s^3+6s^2+5s}
+\]
+
+With proportional control only, the critical gain was found at:
+
+\[
+K_u=30
+\]
+
+At this gain, the closed-loop characteristic equation becomes:
+
+\[
+s^3+6s^2+5s+30=0
+\]
+
+which factors as:
+
+\[
+(s+6)(s^2+5)=0
+\]
+
+The imaginary poles are:
+
+\[
+s=\pm j\sqrt{5}
+\]
+
+therefore the ultimate oscillation period is:
+
+\[
+P_u=\frac{2\pi}{\sqrt{5}}\approx2.81\text{ s}
+\]
+
+Using the classical Ziegler–Nichols PID rules:
+
+\[
+K_p=0.6K_u
+\]
+
+\[
+T_i=\frac{P_u}{2}
+\]
+
+\[
+T_d=\frac{P_u}{8}
+\]
+
+the resulting controller parameters were approximately:
+
+\[
+K_p=18
+\]
+
+\[
+K_i=12.81
+\]
+
+\[
+K_d=6.32
+\]
+
+The Ziegler–Nichols controller produced a fast but aggressive response with significant overshoot.
+
+Manual refinement by increasing the derivative gain to:
+
+\[
+K_d=10
+\]
+
+produced a more strongly damped response with reduced overshoot and fewer oscillations.
+
+The experiment demonstrated that Ziegler–Nichols tuning provides a useful initial PID estimate, while additional manual tuning can improve the response for specific design requirements.
