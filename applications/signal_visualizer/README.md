@@ -7725,3 +7725,33 @@ K_d=10
 produced a more strongly damped response with reduced overshoot and fewer oscillations.
 
 The experiment demonstrated that Ziegler–Nichols tuning provides a useful initial PID estimate, while additional manual tuning can improve the response for specific design requirements.
+
+## **#100 — Control System Stabilization Milestone**
+
+The plant
+
+G(s) = 1 / (s^3 + 6s^2 + 5s)
+
+was analyzed and stabilized using closed-loop PID control in MATLAB and Simulink.
+
+A proportional controller with Kp = 30 placed the system on the stability boundary and produced sustained oscillations with approximately constant amplitude.
+
+The system was then stabilized using a PID controller with:
+
+- Kp = 18
+- Ki = 12.81
+- Kd = 10
+
+The closed-loop step response converged to the unit reference and the oscillations decayed with time.
+
+MATLAB step-response results:
+
+- Rise time: 0.5302 s
+- Settling time: 5.1924 s
+- Overshoot: 40.3036%
+- Peak: 1.4030
+- Peak time: 1.5093 s
+- Steady-state value: approximately 1
+- `isstable(closed_loop) = 1`
+
+The milestone demonstrated the practical difference between marginal stability and a stabilized feedback system. Increasing the derivative gain from the original Ziegler-Nichols value improved damping and reduced the oscillatory behavior.
