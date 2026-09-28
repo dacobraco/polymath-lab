@@ -7755,3 +7755,27 @@ MATLAB step-response results:
 - `isstable(closed_loop) = 1`
 
 The milestone demonstrated the practical difference between marginal stability and a stabilized feedback system. Increasing the derivative gain from the original Ziegler-Nichols value improved damping and reduced the oscillatory behavior.
+
+## **#101 — Bode, Nyquist and Stability Margins**
+
+Analyzed the open-loop system
+
+\[
+G(s) = \frac{10}{s(s+2)(s+5)}
+\]
+
+using Bode and Nyquist plots.
+
+* Bode magnitude and phase response were inspected across frequency.
+* Gain margin: 7.0.
+* Gain margin frequency: 3.162 rad/s.
+* Phase margin: 55.64 deg.
+* Phase margin frequency: 0.898 rad/s.
+* The Nyquist plot was analyzed relative to the critical point −1 + 0j.
+* Closed-loop responses were compared for K = 3, K = 7 and K = 8.
+* K = 3 produced a stable response with decaying oscillations.
+* K = 7 produced sustained oscillations and represented the stability boundary.
+* K = 8 produced growing oscillations and an unstable response.
+* The experiment demonstrated the direct connection between Bode stability margins, the Nyquist criterion and closed-loop time-domain behavior.
+
+File: `stability_margin_lab.py`
