@@ -7779,3 +7779,52 @@ using Bode and Nyquist plots.
 * The experiment demonstrated the direct connection between Bode stability margins, the Nyquist criterion and closed-loop time-domain behavior.
 
 File: `stability_margin_lab.py`
+
+## Root Locus Design
+
+This lesson explores root locus analysis and gain selection for a closed-loop control system.
+
+The plant is
+
+\[
+G(s) = \frac{10}{s(s+2)(s+5)}
+\]
+
+The open-loop poles are located at
+
+\[
+s = 0,\,-2,\,-5
+\]
+
+The root locus shows how the closed-loop poles move as the controller gain \(K\) changes.
+
+MATLAB `rlocus` was used to visualize the pole trajectories, while `rlocfind` was used to interactively select a desired closed-loop pole location and determine the corresponding gain.
+
+Several gain values were tested to observe the relationship between pole location and time-domain performance.
+
+A final design was selected with approximately
+
+\[
+K = 1.0249
+\]
+
+which produced dominant closed-loop poles near
+
+\[
+s = -0.737 \pm j1.145
+\]
+
+The resulting step response had approximately:
+
+- Rise time: 1.32 s
+- Settling time: 4.46 s
+- Overshoot: 12.78%
+
+This design satisfied the target requirements:
+
+- Overshoot below 20%
+- Settling time below 5 s
+
+The experiment demonstrated the connection between root locus geometry, closed-loop pole locations, controller gain, damping, oscillation, and transient response.
+
+The number of root locus branches is equal to the number of open-loop poles. Root locus branches start at open-loop poles and terminate at open-loop zeros or approach infinity when there are fewer zeros than poles.
