@@ -8088,7 +8088,7 @@ Example results:
 - Slow design \([-2,-3]\): \(K=[4,2]\), \(u=-4\)
 - Fast design \([-10,-12]\): \(K=[118,19]\), \(u=-118\)
 
-## Lesson #106 - State Feedback Reference Tracking
+## **Bonus after #105 — State-Feedback Reference Tracking**
 
 Studied reference tracking with state feedback using
 
@@ -8170,3 +8170,147 @@ The simulated position shows a damped oscillatory transient and settles at:
 x = F / k = 0.1 m
 
 This demonstrates the connection between the physical system, differential equation, state-space representation, and direct physical modeling in Simscape.
+
+## **#108 — Control System Simulator v1**
+
+A control-system simulator was developed to compare multiple controller designs on the same physical plant.
+
+The modeled mass-spring-damper system is:
+
+\[
+m\ddot{x}+b\dot{x}+kx=F
+\]
+
+with:
+
+\[
+m=1,\qquad b=2,\qquad k=10
+\]
+
+The corresponding transfer function is:
+
+\[
+G(s)=\frac{1}{s^2+2s+10}
+\]
+
+and the state-space representation is:
+
+\[
+A=
+\begin{bmatrix}
+0&1\\
+-10&-2
+\end{bmatrix}
+\]
+
+\[
+B=
+\begin{bmatrix}
+0\\
+1
+\end{bmatrix}
+\]
+
+\[
+C=
+\begin{bmatrix}
+1&0
+\end{bmatrix}
+\]
+
+\[
+D=0
+\]
+
+The simulator compares four closed-loop controllers:
+
+- P
+- PI
+- PID
+- State feedback with reference scaling
+
+The tested controller parameters were:
+
+\[
+K_p=10
+\]
+
+\[
+K_i=5
+\]
+
+\[
+K_d=3
+\]
+
+For state feedback, the desired poles were:
+
+\[
+p=[-4,-5]
+\]
+
+The feedback gain was calculated using pole placement:
+
+\[
+K=\text{place}(A,B,p)
+\]
+
+which produced:
+
+\[
+K=[10\quad7]
+\]
+
+Reference scaling was calculated using:
+
+\[
+N_r=
+-\frac{1}
+{C(A-BK)^{-1}B}
+\]
+
+giving:
+
+\[
+N_r=20
+\]
+
+The resulting state-feedback control law is:
+
+\[
+u=-Kx+N_r r
+\]
+
+The four controllers were compared using their step responses and MATLAB `stepinfo`.
+
+Measured results:
+
+| Controller | Rise Time | Settling Time | Overshoot |
+|---|---:|---:|---:|
+| P | 0.277 s | 3.780 s | 48.5% |
+| PI | 6.122 s | 12.574 s | 0% |
+| PID | 6.310 s | 12.376 s | 0% |
+| State Feedback | 0.758 s | 1.320 s | 0% |
+
+The proportional controller appeared fast according to `RiseTime`, but its steady-state output was only approximately 0.5 instead of the reference value 1. This demonstrated that transient metrics must always be interpreted together with steady-state accuracy.
+
+The PI controller eliminated steady-state error but produced a slow response with the chosen tuning.
+
+Adding derivative action produced a more strongly damped PID response, although the selected parameters still resulted in a relatively long settling time.
+
+State feedback produced a fast, non-oscillatory response and reached the desired reference because the closed-loop poles explicitly determined the dynamics while \(N_r\) provided correct reference scaling.
+
+Key conclusions:
+
+- P control may be fast while still having significant steady-state error.
+- Integral action can eliminate steady-state error.
+- Derivative action can improve damping.
+- PID performance depends strongly on tuning.
+- State-feedback gain \(K\) determines the closed-loop dynamics through the poles of \(A-BK\).
+- Reference gain \(N_r\) determines correct steady-state reference tracking.
+- `stepinfo` rise time is measured relative to the system's own final value, not necessarily the desired reference.
+- A useful controller comparison must consider speed, settling, overshoot and steady-state accuracy together.
+
+MATLAB file:
+
+`control_system_simulator.m`
