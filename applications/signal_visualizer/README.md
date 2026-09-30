@@ -8347,3 +8347,14 @@ Example result:
 - FSPL: 91.52 dB
 - Received power: -67.52 dBm
 - Link margin: 22.48 dB
+
+### AM Modulation and Demodulation
+
+Implemented an AM simulator with a sinusoidal message and carrier signal.
+
+The simulation demonstrates:
+- amplitude modulation with adjustable modulation index
+- carrier and sideband components in the frequency spectrum
+- envelope detection using rectification and moving-average filtering
+- recovery of the original message
+- distortion caused by overmodulation when the modulation index exceeds 1
