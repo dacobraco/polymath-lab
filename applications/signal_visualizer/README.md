@@ -8128,3 +8128,45 @@ Key ideas:
 
 MATLAB file:
 - `state_observer.m`
+
+## #107 — Physical System Model
+
+A mass-spring-damper system was modeled from physical laws and implemented in MATLAB Simscape.
+
+The physical model is described by:
+
+m*x'' + b*x' + k*x = F(t)
+
+The state variables are position and velocity:
+
+x1 = x
+x2 = x'
+
+which gives the state-space model:
+
+A = [0 1; -k/m -b/m]
+
+B = [0; 1/m]
+
+C = [1 0]
+
+D = 0
+
+The Simscape model uses:
+
+- Mass: 1 kg
+- Translational Spring: 10 N/m
+- Translational Damper: 2 N*s/m
+- Ideal Force Source
+- Mechanical Translational Reference
+- Ideal Translational Motion Sensor
+- Solver Configuration
+- Simulink-PS and PS-Simulink converters
+
+A 1 N step force is applied at t = 1 s.
+
+The simulated position shows a damped oscillatory transient and settles at:
+
+x = F / k = 0.1 m
+
+This demonstrates the connection between the physical system, differential equation, state-space representation, and direct physical modeling in Simscape.
