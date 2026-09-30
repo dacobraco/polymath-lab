@@ -7992,3 +7992,61 @@ so the excitation at \(2\text{ rad/s}\) produced a larger position response than
 - Changing `C` changes what is observed, not the internal dynamics.
 - State-space and transfer-function models describe the same input-output dynamics in different forms.
 - Arbitrary input signals can be simulated directly using `forced_response()`.
+
+## **State-Space Controllability and Observability**
+
+This lesson explores two fundamental properties of state-space systems:
+
+- **Controllability** — whether the input can influence every independent direction of the state space.
+- **Observability** — whether every independent direction of the state space can be reconstructed from the measured output.
+
+For the state-space model:
+
+\[
+\dot{x} = Ax + Bu
+\]
+
+\[
+y = Cx + Du
+\]
+
+the controllability matrix is:
+
+\[
+\mathcal{C} = [B \quad AB \quad A^2B \quad \dots \quad A^{n-1}B]
+\]
+
+A system is fully controllable when:
+
+\[
+\text{rank}(\mathcal{C}) = n
+\]
+
+The observability matrix is:
+
+\[
+\mathcal{O} =
+\begin{bmatrix}
+C \\
+CA \\
+CA^2 \\
+\vdots \\
+CA^{n-1}
+\end{bmatrix}
+\]
+
+A system is fully observable when:
+
+\[
+\text{rank}(\mathcal{O}) = n
+\]
+
+The MATLAB functions `ctrb(A, B)` and `obsv(A, C)` were used to construct these matrices, while `rank()` was used to test whether all state-space directions are independently controllable or observable.
+
+A key insight is that a state does not need to be directly connected to the input or directly measured by a sensor. The system dynamics represented by matrix `A` can transfer control influence or state information indirectly.
+
+The lesson also developed an intuitive interpretation of matrix rank as the number of independent directions or independent pieces of information contained in a matrix.
+
+File:
+
+`state_space_controllability_observability.m`
