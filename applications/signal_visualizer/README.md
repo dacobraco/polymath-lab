@@ -8104,3 +8104,27 @@ Key ideas:
 
 File:
 - state_feedback_reference_tracking.m
+
+## Lesson #106 — State Observer
+
+Explored state observers for estimating states that are not directly measured.
+
+Key ideas:
+- Observability determines whether internal states can be reconstructed from available measurements.
+- An observer uses the system model and measured output to estimate the full state vector.
+- The observer dynamics are
+
+  x_hat_dot = A*x_hat + L*(y - C*x_hat)
+
+- The estimation error follows
+
+  e_dot = (A - L*C)*e
+
+- Observer poles determine how quickly the estimation error converges toward zero.
+- The observer gain L was designed using pole placement.
+- An augmented state-space model was used to simulate the real system and observer together.
+- The observer successfully estimated both states despite starting from an incorrect initial estimate.
+- The actual and estimated states converged closely during the simulation.
+
+MATLAB file:
+- `state_observer.m`
