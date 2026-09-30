@@ -8087,3 +8087,20 @@ Example results:
 - Verified closed-loop poles: \(-4,-5\)
 - Slow design \([-2,-3]\): \(K=[4,2]\), \(u=-4\)
 - Fast design \([-10,-12]\): \(K=[118,19]\), \(u=-118\)
+
+## Lesson #106 - State Feedback Reference Tracking
+
+Studied reference tracking with state feedback using
+
+u = -Kx + Nr*r
+
+Key ideas:
+- K determines the closed-loop dynamics through the poles of A - BK.
+- Nr scales the reference so the steady-state output reaches the desired value.
+- Changing Nr changes the steady-state output but does not change the closed-loop poles.
+- For the tested system, Nr = 20.
+- Without Nr, the output settled near 0.05 for a unit reference.
+- With Nr, the output settled at 1.
+
+File:
+- state_feedback_reference_tracking.m
