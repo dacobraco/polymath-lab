@@ -8050,3 +8050,40 @@ The lesson also developed an intuitive interpretation of matrix rank as the numb
 File:
 
 `state_space_controllability_observability.m`
+
+## **Lesson #105 — State Feedback and Pole Placement**
+
+- Introduced state feedback control:
+  \[
+  u=-Kx
+  \]
+- Derived the closed-loop state equation:
+  \[
+  \dot{x}=(A-BK)x
+  \]
+- Connected eigenvalues of the state matrix with system poles.
+- Explained eigenvectors as natural state-space directions and eigenvalues as the dynamics of those modes.
+- Used `place(A, B, p)` to calculate the state-feedback gain for desired poles.
+- Verified the resulting closed-loop poles using `eig(A-B*K)`.
+- Compared slower and faster pole placement and observed the trade-off between response speed and control effort.
+- Connected controllability with pole placement: all poles can be assigned only when the system is fully controllable.
+- Noted that \(u=-Kx\) regulates the state toward zero; reference tracking requires an additional reference term.
+
+Example results:
+
+- Desired poles: \([-4,-5]\)
+- Feedback gain:
+  \[
+  K=[18\quad6]
+  \]
+- Closed-loop matrix:
+  \[
+  A-BK=
+  \begin{bmatrix}
+  0&1\\
+  -20&-9
+  \end{bmatrix}
+  \]
+- Verified closed-loop poles: \(-4,-5\)
+- Slow design \([-2,-3]\): \(K=[4,2]\), \(u=-4\)
+- Fast design \([-10,-12]\): \(K=[118,19]\), \(u=-118\)
