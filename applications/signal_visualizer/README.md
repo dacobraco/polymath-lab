@@ -8314,3 +8314,36 @@ Key conclusions:
 MATLAB file:
 
 `control_system_simulator.m`
+
+## Lesson #109 — Communication System and Link Budget
+
+Built `link_budget.py` to model a basic transmitter-channel-receiver communication link.
+
+The model calculates free-space path loss using distance and carrier frequency, received signal power, and link margin relative to receiver sensitivity.
+
+Key relationships:
+
+- Higher distance increases path loss.
+- Higher frequency increases free-space path loss.
+- Higher path loss reduces received power.
+- Link margin measures how much additional loss the connection can tolerate.
+- Receiver sensitivity defines the weakest usable received signal.
+
+The script also visualizes the communication chain:
+
+Transmitter -> Channel -> Receiver
+
+Example parameters:
+
+- Transmit power: 20 dBm
+- Transmit antenna gain: 2 dB
+- Receive antenna gain: 2 dB
+- Frequency: 900 MHz
+- Distance: 1 km
+- Receiver sensitivity: -90 dBm
+
+Example result:
+
+- FSPL: 91.52 dB
+- Received power: -67.52 dBm
+- Link margin: 22.48 dB
