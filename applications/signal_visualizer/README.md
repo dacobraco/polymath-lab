@@ -7828,3 +7828,167 @@ This design satisfied the target requirements:
 The experiment demonstrated the connection between root locus geometry, closed-loop pole locations, controller gain, damping, oscillation, and transient response.
 
 The number of root locus branches is equal to the number of open-loop poles. Root locus branches start at open-loop poles and terminate at open-loop zeros or approach infinity when there are fewer zeros than poles.
+
+## **#103 State-Space Modeling**
+
+In this lesson I learned how to represent dynamic systems using the state-space form:
+
+\[
+\dot{x} = Ax + Bu
+\]
+
+\[
+y = Cx + Du
+\]
+
+The main interpretation is:
+
+- `A` describes the internal system dynamics
+- `B` describes how the input affects the states
+- `C` selects which states are observed at the output
+- `D` represents direct input-to-output influence
+
+For a mass-spring-damper system:
+
+\[
+m\ddot{x} + b\dot{x} + kx = u(t)
+\]
+
+I defined the states as:
+
+\[
+x_1 = x
+\]
+
+\[
+x_2 = \dot{x}
+\]
+
+which gives:
+
+\[
+\dot{x}_1 = x_2
+\]
+
+\[
+\dot{x}_2 =
+-\frac{k}{m}x_1
+-\frac{b}{m}x_2
++\frac{1}{m}u
+\]
+
+For the example:
+
+\[
+m=1,\quad b=2,\quad k=5
+\]
+
+the state-space matrices are:
+
+\[
+A =
+\begin{bmatrix}
+0 & 1 \\
+-5 & -2
+\end{bmatrix}
+\]
+
+\[
+B =
+\begin{bmatrix}
+0 \\
+1
+\end{bmatrix}
+\]
+
+To observe both position and velocity:
+
+\[
+C =
+\begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix}
+\]
+
+\[
+D =
+\begin{bmatrix}
+0 \\
+0
+\end{bmatrix}
+\]
+
+The poles of the system were:
+
+\[
+-1 \pm 2j
+\]
+
+which correspond to stable damped oscillations.
+
+### **Python Control Tools**
+
+I used:
+
+- `control.ss()` to create a state-space model
+- `control.initial_response()` to simulate the response from an initial state
+- `control.step_response()` to simulate a unit-step input
+- `control.forced_response()` to simulate an arbitrary input signal
+- `control.poles()` to calculate the system poles
+- `control.ss2tf()` to convert the state-space model to transfer functions
+
+The state-space model produced the transfer functions:
+
+\[
+\frac{X_1(s)}{U(s)}
+=
+\frac{1}{s^2+2s+5}
+\]
+
+for position and
+
+\[
+\frac{X_2(s)}{U(s)}
+=
+\frac{s}{s^2+2s+5}
+\]
+
+for velocity.
+
+### **Sinusoidal Excitation**
+
+I also tested sinusoidal forcing:
+
+\[
+u(t)=\sin(2t)
+\]
+
+and
+
+\[
+u(t)=\sin(5t)
+\]
+
+The system responded much more strongly near its natural frequency:
+
+\[
+\omega_n=\sqrt{\frac{k}{m}}
+\]
+
+For this system:
+
+\[
+\omega_n=\sqrt{5}\approx2.24\text{ rad/s}
+\]
+
+so the excitation at \(2\text{ rad/s}\) produced a larger position response than the excitation at \(5\text{ rad/s}\).
+
+### **Key Takeaways**
+
+- State-space exposes the internal state of a dynamic system.
+- A second-order differential equation can be converted into two first-order state equations.
+- The eigenvalues of `A` correspond to the system poles.
+- Changing `C` changes what is observed, not the internal dynamics.
+- State-space and transfer-function models describe the same input-output dynamics in different forms.
+- Arbitrary input signals can be simulated directly using `forced_response()`.
