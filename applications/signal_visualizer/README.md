@@ -8381,3 +8381,47 @@ Implemented an FM spectrum explorer in Python using NumPy and Matplotlib.
 - Implemented QPSK symbol detection.
 - Measured symbol error rate (SER) under different noise levels.
 - Observed SER of 0% at noise std 0.2 and 20.7% at noise std 0.8 with 1000 symbols.
+
+
+### Lesson #113 — GNU Radio Introduction
+
+- Installed GNU Radio Companion on Windows.
+- Built a signal-flow graph using Signal Source, Throttle, Time Sink and Frequency Sink.
+- Visualized 1 kHz and 3 kHz signals in time and frequency domains.
+- Combined two sinusoidal signals using an Add block.
+- Designed a low-pass FIR filter to preserve 1 kHz and attenuate 3 kHz.
+- Verified filtering using FFT plots.
+
+File: `applications/signal_visualizer/gnu_radio_first_flowgraph.grc`
+
+### Lesson #114 — Heterodyne Receiver
+
+Built a virtual heterodyne receiver in GNU Radio Companion.
+
+- Simulated multiple RF stations at 5, 6, and 8 kHz.
+- Implemented frequency conversion using a mixer and local oscillator.
+- Selected stations by changing the local oscillator frequency.
+- Demonstrated the image-frequency problem.
+- Added an RF band-pass preselector to suppress unwanted stations.
+- Extracted the desired 1 kHz intermediate-frequency component using a low-pass FIR filter.
+- Verified frequency conversion and filtering using FFT visualization.
+
+Project: `applications/signal_visualizer/heterodyne_receiver.grc`
+
+## Lesson #115 — Sampling and Anti-Aliasing in a Receiver
+
+Built a GNU Radio receiver simulation demonstrating aliasing and anti-aliasing filtering.
+
+- Initial sample rate: 16 kHz
+- Output sample rate: 4 kHz
+- Decimation factor: 4
+- Desired signal: 1 kHz
+- Interfering signal: 3 kHz
+- Low-pass cutoff: 1.5 kHz
+- Transition width: 300 Hz
+
+Without filtering, the 3 kHz signal aliases to 1 kHz after decimation. Applying a low-pass filter before decimation suppresses the interfering signal while preserving the desired 1 kHz component.
+
+The final receiver uses a decimating low-pass filter, combining filtering and sample-rate reduction in one block.
+
+File: `aliasing_receiver.grc`
