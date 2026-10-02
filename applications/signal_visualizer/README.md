@@ -8358,3 +8358,26 @@ The simulation demonstrates:
 - envelope detection using rectification and moving-average filtering
 - recovery of the original message
 - distortion caused by overmodulation when the modulation index exceeds 1
+
+### Lesson #111 — FM and Phase Modulation
+
+Implemented an FM spectrum explorer in Python using NumPy and Matplotlib.
+
+- Generated sinusoidal message, carrier, FM and PM signals.
+- Analyzed instantaneous frequency and phase modulation.
+- Computed FFT spectra using `rfft`.
+- Compared FM modulation indices β = 5 and β = 1.
+- Observed spectral sidebands spaced by the message frequency.
+- Explored Carson's rule for estimating FM bandwidth.
+- Compared FM and PM instantaneous frequencies.
+
+**Key insight:** FM frequency deviation follows the message amplitude, while PM instantaneous frequency deviation follows the message's rate of change.
+
+### Lesson #112 — IQ Signals and Complex Baseband
+
+- Implemented complex IQ representation using NumPy.
+- Visualized QPSK constellation diagrams.
+- Simulated complex Gaussian noise in an IQ channel.
+- Implemented QPSK symbol detection.
+- Measured symbol error rate (SER) under different noise levels.
+- Observed SER of 0% at noise std 0.2 and 20.7% at noise std 0.8 with 1000 symbols.
