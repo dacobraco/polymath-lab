@@ -8425,3 +8425,47 @@ Without filtering, the 3 kHz signal aliases to 1 kHz after decimation. Applying 
 The final receiver uses a decimating low-pass filter, combining filtering and sample-rate reduction in one block.
 
 File: `aliasing_receiver.grc`
+
+### Lesson #116 — ASK, FSK and PSK
+
+Implemented a Python digital modulation laboratory featuring:
+
+- ASK (On-Off Keying) modulation and power-based demodulation.
+- FSK modulation with continuous phase.
+- BPSK modulation with 180-degree phase shifts.
+- AWGN channel simulation.
+- Bit error rate (BER) measurement.
+- Decision threshold comparison using reproducible random data.
+
+**Experiment:** 1,000 bits, noise standard deviation 0.65.
+
+| Threshold | BER |
+|---|---|
+| 0.25 | 49.10% |
+| 0.45 | 15.50% |
+| 0.67 | 0.30% |
+| 0.85 | 13.60% |
+
+The experiment demonstrates how receiver threshold selection affects bit detection reliability in a noisy communication channel.
+
+File: `applications/signal_visualizer/digital_modulation_lab.py`
+
+### Lesson 117 — QPSK and 16-QAM Constellations
+
+**File:** `applications/signal_visualizer/constellation_visualizer.py`
+
+Implemented QPSK and 16-QAM modulation and demodulation using Python, NumPy, and Matplotlib.
+
+- Generated IQ constellations with AWGN noise.
+- Implemented QPSK decision boundaries and 16-QAM Gray mapping.
+- Calculated Bit Error Rate (BER) and Symbol Error Rate (SER).
+- Normalized both modulations to equal average symbol energy for comparison.
+
+**Results (1000 bits, sigma = 0.8, equal average symbol energy):**
+
+| Modulation | Bits per symbol | BER |
+|---|---|---|
+| QPSK | 2 | 10.30% |
+| 16-QAM | 4 | 22.70% |
+
+**Key takeaway:** Higher-order modulation transmits more bits per symbol but requires better channel conditions for reliable reception. Adaptive modulation can balance data rate and reliability.
