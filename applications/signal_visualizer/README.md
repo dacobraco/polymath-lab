@@ -8498,3 +8498,40 @@ python applications/signal_visualizer/raised_cosine_lab.py --save-dir figures --
 **Graphs:** rectangular I/Q waveform; RC impulse response; RC-shaped QPSK and Nyquist sampling instants; rectangular-vs-RC spectrum comparison; transmitted and recovered QPSK constellation.
 
 **Interpretation:** Nyquist zero-ISI is achieved at symbol-spaced sampling instants, not necessarily between them. The ideal raised-cosine pulse is strictly bandlimited, but the finite-span numerical implementation has residual spectral sidelobes. A matched filter is optimal for output SNR at the sampling instant in white noise for a known pulse; additive noise, BER curves, and channel robustness are deferred to **Lesson #119 — Channel, AWGN and BER**. The 0 / 24 result alone is not a statistical BER estimate.
+
+### Lesson #119 — AWGN Channel and BER Analysis
+
+**File:** `applications/signal_visualizer/awgn_ber_lab.py`
+
+Built a reproducible QPSK communication simulation over an Additive White Gaussian Noise (AWGN) channel using Python, NumPy, SciPy and Matplotlib.
+
+- Generated 100,000 pseudo-random bits (seed 42) and mapped them into 50,000 normalized QPSK symbols.
+- Simulated complex AWGN with independent Gaussian noise on I and Q components.
+- Recovered transmitted bits using zero-threshold I/Q detection.
+- Estimated Bit Error Rate (BER) through Monte Carlo simulation.
+- Tested five noise standard deviations from 0.2 to 0.6.
+- Converted noise variance into Eb/N0 in decibels.
+- Compared simulated BER with the theoretical QPSK BER using the complementary error function (`erfc`).
+
+**Reproducible results:**
+
+| Noise sigma | Eb/N0 (dB) | Simulated BER |
+|---|---|---|
+| 0.2 | 7.96 | 0.00016 |
+| 0.3 | 4.44 | 0.00867 |
+| 0.4 | 1.94 | 0.03823 |
+| 0.5 | 0.00 | 0.07990 |
+| 0.6 | -1.58 | 0.11878 |
+
+**Theoretical comparison:** At Eb/N0 = 0 dB, simulated BER = **0.07990** and theoretical BER = **0.07865**.
+
+**Run:**
+
+```bash
+pip install numpy scipy matplotlib
+python applications/signal_visualizer/awgn_ber_lab.py
+```
+
+**Graphs:** BER versus noise standard deviation; simulated and theoretical BER versus Eb/N0 (dB) on a logarithmic BER scale.
+
+**Interpretation:** Increasing noise power reduces Eb/N0 and increases BER nonlinearly. Simulated results closely match theoretical QPSK performance in an AWGN channel. Larger Monte Carlo sample sizes improve BER estimation accuracy, particularly at low error rates. Under overwhelming noise, QPSK BER approaches 50%. This laboratory provides the foundation for carrier and symbol synchronization in **Lesson #120**.
