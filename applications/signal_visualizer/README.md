@@ -8469,3 +8469,32 @@ Implemented QPSK and 16-QAM modulation and demodulation using Python, NumPy, and
 | 16-QAM | 4 | 22.70% |
 
 **Key takeaway:** Higher-order modulation transmits more bits per symbol but requires better channel conditions for reliable reception. Adaptive modulation can balance data rate and reliability.
+
+
+### Lesson #118 — Pulse Shaping and Matched Filtering
+
+**File:** `applications/signal_visualizer/raised_cosine_lab.py`
+
+Built and tested a reproducible QPSK baseband simulation using NumPy, SciPy Signal and Matplotlib.
+
+- Mapped 24 pseudo-random bits (seed 42) into 12 unit-energy QPSK symbols, with 16 samples per symbol.
+- Used zero-insertion upsampling and convolution to produce rectangular pulse-shaped waveforms; visualized I and Q components.
+- Designed a raised-cosine (RC) pulse with roll-off factor **0.35** and half-span **6 symbols**, including numerical handling of removable singularities.
+- Verified Nyquist zero-ISI sampling at the ideal symbol instants and compared FFT magnitude spectra of rectangular and RC-shaped QPSK waveforms in dB.
+- Implemented a unit-energy root-raised-cosine (RRC) transmit filter and a time-reversed, conjugated RRC matched filter at the receiver.
+- Accounted for both FIR filter delays before sampling and recovered the two QPSK bits by testing the I/Q signs.
+
+**Reproducible results:** 12 symbols / 24 bits; RC maximum sampling error = **0**; RRC + matched-filter maximum symbol error = **0.001863854409**; recovered bit errors = **0 / 24** in a noiseless, synchronized channel.
+
+**Run:**
+
+```bash
+pip install numpy scipy matplotlib
+python applications/signal_visualizer/raised_cosine_lab.py
+# Optionally save all five graphs without opening windows:
+python applications/signal_visualizer/raised_cosine_lab.py --save-dir figures --no-show
+```
+
+**Graphs:** rectangular I/Q waveform; RC impulse response; RC-shaped QPSK and Nyquist sampling instants; rectangular-vs-RC spectrum comparison; transmitted and recovered QPSK constellation.
+
+**Interpretation:** Nyquist zero-ISI is achieved at symbol-spaced sampling instants, not necessarily between them. The ideal raised-cosine pulse is strictly bandlimited, but the finite-span numerical implementation has residual spectral sidelobes. A matched filter is optimal for output SNR at the sampling instant in white noise for a known pulse; additive noise, BER curves, and channel robustness are deferred to **Lesson #119 — Channel, AWGN and BER**. The 0 / 24 result alone is not a statistical BER estimate.
