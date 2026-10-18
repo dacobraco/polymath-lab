@@ -8622,3 +8622,62 @@ python applications/signal_visualizer/sync_error_explorer.py
 The laboratory assumes ideal pilots, a constant frequency offset and noiseless carrier synchronization. Timing recovery is not automatic; sampling offsets are deliberately introduced and measured. The raised-cosine pulse represents an overall Nyquist response rather than separate transmit and receive filters.
 
 **Next Step:** Lesson #121 — Channel Coding Fundamentals, including repetition codes, Hamming codes and error correction.
+
+### Lesson #121 — Channel Coding Fundamentals
+
+**File:** `applications/signal_visualizer/channel_coding_lab.py`
+
+Implemented and compared error-correcting codes for digital communication over a Binary Symmetric Channel (BSC).
+
+**Implemented techniques:**
+- Repetition (3,1) encoding and majority-vote decoding.
+- Hamming (7,4) encoding with even parity.
+- Syndrome-based detection and single-bit error correction.
+- Vectorized NumPy encoding and decoding of 25,000 Hamming blocks.
+- Monte Carlo BER comparison using 100,000 information bits.
+
+**Simulation parameters:**
+- Information bits: 100,000
+- Channel bit-flip probability: 0.1
+- Random seed: 42
+- Channel model: independent bit errors (BSC)
+
+**Results:**
+
+| Method | BER | Transmitted bits | Code rate |
+|---|---:|---:|---:|
+| Uncoded | 9.911% | 100,000 | 1 |
+| Repetition (3,1) | 2.823% | 300,000 | 1/3 |
+| Hamming (7,4) | 6.534% | 175,000 | 4/7 |
+
+**Hamming single-block test:**
+
+- Original information: `1011`
+- Encoded block: `0110011`
+- Received block: `0110001`
+- Calculated syndrome: 6
+- Corrected block: `0110011`
+- Recovered information: `1011`
+
+**Additional diagnostics:**
+- Hamming blocks: 25,000
+- Nonzero syndromes: 13,037
+- Remaining information-bit errors: 6,534
+
+**Key findings:**
+
+Repetition coding achieves a lower BER at the cost of substantial transmission overhead. Hamming (7,4) provides higher coding efficiency but weaker error protection under the tested BSC conditions.
+
+A standard Hamming (7,4) code guarantees correction of one error per seven-bit block. Multiple errors can produce misleading syndromes and incorrect decoding.
+
+**Limitations:**
+
+The experiment uses independent bit flips rather than a physical modulated AWGN channel. The comparison fixes the channel bit-error probability, not the transmitted energy per information bit. Stronger coding schemes are needed for reliable image or file transmission.
+
+**Run:**
+
+```bash
+python applications/signal_visualizer/channel_coding_lab.py
+```
+
+**Next lesson:** #122 — RTL-SDR and Safe RF Signal Reception.
