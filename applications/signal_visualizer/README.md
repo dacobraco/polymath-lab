@@ -8535,3 +8535,90 @@ python applications/signal_visualizer/awgn_ber_lab.py
 **Graphs:** BER versus noise standard deviation; simulated and theoretical BER versus Eb/N0 (dB) on a logarithmic BER scale.
 
 **Interpretation:** Increasing noise power reduces Eb/N0 and increases BER nonlinearly. Simulated results closely match theoretical QPSK performance in an AWGN channel. Larger Monte Carlo sample sizes improve BER estimation accuracy, particularly at low error rates. Under overwhelming noise, QPSK BER approaches 50%. This laboratory provides the foundation for carrier and symbol synchronization in **Lesson #120**.
+
+
+### Lesson #120 — Carrier and Symbol Synchronization
+
+**File:** `applications/signal_visualizer/sync_error_explorer.py`
+
+Built a reproducible QPSK synchronization laboratory using Python, NumPy and Matplotlib.
+
+- Generated 1,000 random bits (seed 42) and mapped them into 500 normalized QPSK symbols.
+- Simulated a constant carrier phase offset of 60 degrees.
+- Measured BER before and after phase correction.
+- Implemented automatic phase estimation using a known pilot symbol.
+- Simulated a 1 Hz carrier frequency offset at 100 symbols per second.
+- Visualized the resulting rotating QPSK constellation.
+- Estimated frequency offset using two known pilot symbols.
+- Automatically corrected frequency offset and recovered the original constellation.
+- Simulated symbol timing errors using raised-cosine pulse shaping.
+- Investigated the relationship between sampling offset, ISI and BER.
+
+**Carrier Synchronization Results:**
+
+| Experiment | BER |
+|---|---|
+| Constant phase offset (60 degrees) | 50.0% |
+| After automatic phase correction | 0.0% |
+| Carrier frequency offset (1 Hz) | 50.0% |
+| After automatic frequency correction | 0.0% |
+
+**Frequency Estimation:**
+
+- Actual frequency offset: 1.0 Hz
+- Estimated frequency offset: 1.0 Hz
+- Pilot positions: 0 and 10
+- Symbol rate: 100 symbols/s
+- Phase estimation performed using complex pilot ratios.
+- Frequency estimation performed using phase difference divided by elapsed time.
+
+**Symbol Timing Synchronization Results:**
+
+| Timing Offset | Approximate BER |
+|---|---|
+| 0T | 0.0% |
+| 0.125T | 0.0% |
+| 0.250T | 0.0% |
+| 0.375T | 4.4% |
+| 0.500T | 25.0% |
+| 0.625T | 46.0% |
+| 0.750T | 50.6% |
+
+**Timing Simulation Parameters:**
+
+- 16 samples per symbol
+- Raised-cosine roll-off factor: 0.35
+- Pulse half-span: 8 symbols
+- Convolution-based pulse shaping
+- Deliberately shifted sampling instants
+- No additive channel noise
+
+**Run:**
+
+```bash
+pip install numpy matplotlib
+python applications/signal_visualizer/sync_error_explorer.py
+```
+
+**Graphs:**
+
+1. QPSK constellation with carrier frequency offset.
+2. QPSK constellation after automatic frequency correction.
+3. BER versus symbol timing offset.
+
+**Key Findings:**
+
+- Carrier phase errors rotate the QPSK constellation without changing symbol energy.
+- A constant phase error can be estimated using a known pilot symbol.
+- Carrier frequency offsets produce continuously accumulating phase errors.
+- Two pilot symbols can estimate a constant frequency offset when phase ambiguity is avoided.
+- Automatic frequency correction restored BER from 50% to 0% in the ideal noiseless simulation.
+- Incorrect symbol sampling introduces intersymbol interference (ISI).
+- Small timing errors may distort received symbols without producing bit errors.
+- Larger timing offsets can significantly increase BER even without additive noise.
+
+**Limitations:**
+
+The laboratory assumes ideal pilots, a constant frequency offset and noiseless carrier synchronization. Timing recovery is not automatic; sampling offsets are deliberately introduced and measured. The raised-cosine pulse represents an overall Nyquist response rather than separate transmit and receive filters.
+
+**Next Step:** Lesson #121 — Channel Coding Fundamentals, including repetition codes, Hamming codes and error correction.
