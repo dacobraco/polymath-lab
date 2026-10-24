@@ -8681,3 +8681,53 @@ python applications/signal_visualizer/channel_coding_lab.py
 ```
 
 **Next lesson:** #122 — RTL-SDR and Safe RF Signal Reception.
+
+
+### Lesson #122 — RTL-SDR and Safe RF Reception
+
+**File:** `applications/signal_visualizer/real_rf_analysis.py`
+
+Analyzed a real RTL-SDR recording offline using Python, NumPy and Matplotlib, without SDR hardware.
+
+**Recording source:** [cyrus-and/iq](https://github.com/cyrus-and/iq/blob/master/example/signal.bin.bz2)
+
+**Implemented techniques:**
+- Reading compressed raw I/Q samples.
+- Complex baseband reconstruction.
+- FFT spectrum analysis.
+- RF burst detection using magnitude thresholding.
+- Pulse and pause duration measurements.
+- Repeated transmission pattern comparison.
+
+**Recording parameters:**
+- Center frequency: 433.8 MHz
+- Sample rate: 1 MS/s
+- Complex samples: 500,000
+- Duration: 0.5 seconds
+
+**Results:**
+- Strongest FFT bin: 433.85076 MHz
+- Observed frequency offset: +50.76 kHz
+- Detected transmission bursts: 4
+- Long inter-burst gaps: approximately 80.4 ms
+- Pulses per burst: 21
+- Short pulse duration: approximately 0.71 ms
+- Long pulse duration: approximately 1.38 ms
+- Short pause duration: approximately 0.665 ms
+- Long pause duration: approximately 1.33 ms
+
+**Repeated pulse pattern:**
+
+`SSLSSLLLLLLLLSSSLLLLS`
+
+All four bursts produced identical short/long pulse patterns.
+
+**Key findings:**
+
+Real I/Q recordings can be analyzed with the same DSP techniques used in simulations. Magnitude thresholding reveals transmission activity, and pulse-duration analysis exposes repeated digital timing patterns.
+
+**Limitations:**
+
+The observed frequency offset includes possible receiver oscillator error. Pulse pattern recognition does not establish the original bit sequence or protocol. A real RF waterfall was not required for this experiment; waterfall visualization was demonstrated with simulated I/Q data.
+
+**Next lesson:** #123 — Decoding Real RF Signals.
