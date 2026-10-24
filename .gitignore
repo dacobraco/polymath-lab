@@ -219,3 +219,5 @@ __marimo__/
 
 # Generated audio processor demo files
 /applications/signal_visualizer/audio_processor_demo/
+/applications/signal_visualizer/iq_capture.npy
+/applications/signal_visualizer/signal.bin.bz2
