@@ -46,9 +46,9 @@ Where:
 
 The calibration formula is:
 
-\[
+$$
 T_{\text{corrected}} = \frac{M-b}{a}
-\]
+$$
 
 The coefficients are estimated using NumPy's `polyfit()` function.
 
@@ -68,9 +68,9 @@ The estimated calibration coefficients were:
 
 The resulting measurement model is:
 
-\[
+$$
 M = 1.2T + 1
-\]
+$$
 
 After calibration:
 
@@ -184,4 +184,38 @@ This lesson demonstrated the fundamental principles of sensor calibration throug
 
 The experiment established a foundation for future work involving analog front-end circuits, data acquisition, ADCs, and physical measurement systems.
 
-**PolyMath Lesson #125 — Sensors and Physical Transducers**
+
+## Lesson #126 — Analog Front-End and Dynamic Range
+
+### Objective
+
+Investigate sensor signal amplification, linearity, output saturation, and gain selection using LTspice.
+
+### Simulation Setup
+
+- Sensor voltage: 50–250 mV
+- Load resistance: 10 kOhm
+- Initial gain: 10
+- Output voltage limit: 3.3 V
+- Analysis: DC sweep
+
+### Experiments
+
+1. An ideal voltage-controlled amplifier with gain 10 produced a linear output from 0.5 V to 2.5 V.
+2. Increasing the gain to 20 and limiting the output to 3.3 V produced clipping above an input voltage of 165 mV.
+3. For an extended sensor range reaching 400 mV, a gain of 7 was selected, producing a maximum output of 2.8 V and leaving 0.5 V of headroom.
+
+### Interpretation
+
+Excessive gain causes saturation and irreversible information loss.
+
+Ideal amplification increases both signal and existing noise by the same factor, leaving their ratio unchanged. Real amplifiers can introduce additional noise.
+
+The saturation experiment used a behavioral voltage source rather than a physical operational amplifier model.
+
+The numerical dynamic range was not measured because no minimum detectable signal or noise floor was specified.
+
+### Conclusion
+
+The analog front-end must provide sufficient amplification while preserving signal integrity across the expected sensor range.
+
