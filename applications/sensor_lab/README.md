@@ -219,3 +219,75 @@ The numerical dynamic range was not measured because no minimum detectable signa
 
 The analog front-end must provide sufficient amplification while preserving signal integrity across the expected sensor range.
 
+## Lesson #127 — Operational and Instrumentation Amplifiers
+
+### Objective
+
+Investigate differential amplification, negative feedback, common-mode rejection, and the effect of resistor mismatch using LTspice.
+
+### Simulation Setup
+
+- Software: LTspice
+- Operational amplifiers: 3 × UniversalOpamp2
+- Supply voltage: ±5 V
+- Initial inputs: V1 = 1.002 V, V2 = 0.998 V
+- Differential input voltage: 4 mV
+- Analysis: DC operating point (.op)
+
+The circuit uses three operational amplifiers in a custom differential configuration. It is not the conventional three-op-amp instrumentation amplifier topology.
+
+### Experiment 1 — Differential Amplification
+
+With matched resistor ratios, the circuit produced:
+
+- Differential input: 4 mV
+- Output voltage: -0.399919 V
+- Effective differential gain: approximately -99.98
+- Current through the 200-ohm resistor: approximately 20 µA
+
+The simulation demonstrated amplification of a small differential voltage using negative feedback.
+
+### Experiment 2 — Common-Mode Rejection
+
+Both input voltages were increased by 300 mV:
+
+- V1 = 1.302 V
+- V2 = 1.298 V
+- Differential input: 4 mV
+- Output voltage: -0.399919 V
+
+The output remained unchanged at the displayed precision.
+
+This demonstrated common-mode rejection in the simulated matched circuit.
+
+### Experiment 3 — Resistor Mismatch
+
+One resistor was changed from 1 MΩ to 990 kΩ, representing a 1% decrease.
+
+Results:
+
+- Matched configuration: -0.399919 V
+- Modified configuration: -0.412897 V
+- Output difference: -12.978 mV
+- Relative output deviation: approximately 3.25%
+
+The experiment demonstrated the sensitivity of differential amplification to resistor matching.
+
+A separate common-mode sweep with fixed resistor values would be necessary to quantify the CMRR after the mismatch.
+
+### Engineering Interpretation
+
+The experiments demonstrated that:
+
+1. Negative feedback enables controlled amplification.
+2. Differential amplifiers can reject signals shared by both inputs.
+3. Accurate resistor ratios are important for common-mode rejection.
+4. Small component tolerances can produce measurable output errors.
+5. A high CMRR does not guarantee operation outside the amplifier's allowed input common-mode range.
+6. Real instrumentation amplifiers must be designed with input voltage range, supply limits, and component tolerances in mind.
+
+### Conclusion
+
+This laboratory demonstrated the practical principles of differential amplification and common-mode rejection.
+
+The LTspice experiments established a foundation for precision sensor measurements and biomedical signal acquisition.
