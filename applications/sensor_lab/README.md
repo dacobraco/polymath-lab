@@ -291,3 +291,64 @@ The experiments demonstrated that:
 This laboratory demonstrated the practical principles of differential amplification and common-mode rejection.
 
 The LTspice experiments established a foundation for precision sensor measurements and biomedical signal acquisition.
+
+## Lesson #128 — SPICE Simulation and Theoretical Comparison
+
+### Objective
+
+Compare theoretical RC and RLC circuit responses with numerical simulations in LTspice.
+
+### RC Circuit
+
+**Components:**
+- R = 10 kΩ
+- C = 100 nF, later increased to 200 nF
+- Input: 0–5 V pulse
+
+**Theoretical model:**
+
+$$
+u_C(t)=5(1-e^{-t/RC})
+$$
+
+**Results:**
+
+- Initial time constant: 1 ms
+- Time constant after doubling capacitance: 2 ms
+- At one time constant, capacitor voltage reached approximately 3.16 V.
+- Both configurations approached the same final voltage of 5 V.
+- Simulated responses agreed with theoretical predictions.
+
+File: `rc_spice_comparison.asc`
+
+### RLC Circuit
+
+**Components:**
+- R = 10 Ω, later increased to 70 Ω
+- L = 10 mH
+- C = 10 µF
+- Input: 0–5 V pulse
+
+**Theoretical parameters:**
+
+- Critical resistance: approximately 63.25 Ω
+- Damped oscillation period at R = 10 Ω: approximately 2.01 ms
+
+**Results:**
+
+- At R = 10 Ω, the circuit exhibited underdamped oscillations.
+- The first voltage peak reached approximately 8 V.
+- The oscillation period agreed with theoretical predictions.
+- At R = 70 Ω, the circuit became overdamped.
+- Oscillations and voltage overshoot disappeared.
+- Both configurations approached a steady-state voltage of 5 V.
+
+File: `rlc_spice_comparison.asc`
+
+### Conclusion
+
+LTspice transient simulations closely matched theoretical RC and RLC models.
+
+The experiments demonstrated the relationship between time constants, energy storage, damping, oscillations, and circuit component values.
+
+Increasing capacitance slows the RC response, while increasing resistance can eliminate oscillations in a series RLC circuit.
