@@ -8731,3 +8731,40 @@ Real I/Q recordings can be analyzed with the same DSP techniques used in simulat
 The observed frequency offset includes possible receiver oscillator error. Pulse pattern recognition does not establish the original bit sequence or protocol. A real RF waterfall was not required for this experiment; waterfall visualization was demonstrated with simulated I/Q data.
 
 **Next lesson:** #123 — Decoding Real RF Signals.
+
+### Lesson #130 — ADC, DAC and Anti-Aliasing
+
+**File:** `applications/signal_visualizer/adc_acquisition_lab.py`
+
+Simulated an analog signal acquisition system with RC anti-aliasing filtering, ADC sampling and 12-bit quantization.
+
+**Parameters:**
+- Useful signal: 100 Hz, 0.5 V amplitude
+- Interference: 900 Hz, 0.3 V amplitude
+- DC offset: 1.65 V
+- RC low-pass cutoff: 150 Hz
+- Sampling frequency: 500 Hz
+- ADC resolution: 12 bits
+- Reference voltage: 3.3 V
+
+**Results:**
+- ADC quantization levels: 4096
+- Voltage resolution: 0.805664 mV
+- Maximum observed quantization error: 0.17946 mV
+- Interference amplitude reduced from 0.3 V to approximately 0.0493 V
+- Compared analog signals and ADC samples before and after filtering
+
+**Key Findings:**
+- ADC resolution determines voltage precision.
+- Sampling frequency determines temporal resolution.
+- Aliasing makes different analog frequencies indistinguishable after sampling.
+- Analog anti-aliasing filtering reduces interference before digitization.
+- A first-order RC filter attenuates interference but does not eliminate aliasing.
+- Digital codes represent quantized voltage levels.
+- DAC conversion maps digital codes back to analog output levels.
+
+**Run:**
+
+python applications/signal_visualizer/adc_acquisition_lab.py
+
+**Next Lesson:** #131 — Oscilloscope, Function Generator and Logic Analyzer.
