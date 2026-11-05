@@ -352,3 +352,48 @@ LTspice transient simulations closely matched theoretical RC and RLC models.
 The experiments demonstrated the relationship between time constants, energy storage, damping, oscillations, and circuit component values.
 
 Increasing capacitance slows the RC response, while increasing resistance can eliminate oscillations in a series RLC circuit.
+
+## Lesson #129 — Analog Filter Calculation, SPICE and Validation
+
+### Objective
+
+Design and validate an analog RC low-pass filter using theoretical calculations, LTspice AC analysis, and Python.
+
+### Circuit Parameters
+
+- Resistance: R = 10 kΩ
+- Capacitance: C = 100 nF
+- AC input amplitude: 1 V
+- Theoretical cutoff frequency: 159.155 Hz
+
+### Methodology
+
+1. Calculate the theoretical cutoff frequency and transfer function.
+2. Simulate the frequency response in LTspice from 1 Hz to 100 kHz.
+3. Measure gain and phase near the cutoff frequency.
+4. Independently calculate the frequency response using Python and NumPy.
+5. Compare theoretical and simulated results.
+
+### Results
+
+At 159.34839 Hz:
+
+| Parameter | LTspice | Python |
+|---|---:|---:|
+| Gain (dB) | -3.015786 | -3.015579 |
+| Phase (degrees) | -45.034792 | -45.034799 |
+
+The measured gain and phase closely matched the theoretical predictions.
+
+### Conclusion
+
+The RC low-pass filter passes low-frequency signals while attenuating high-frequency components.
+
+Its cutoff frequency is determined by resistance and capacitance. Increasing capacitance reduces the cutoff frequency and narrows the passband.
+
+Theoretical calculations, LTspice simulation, and Python numerical validation produced consistent results.
+
+### Files
+
+- `rc_low_pass_filter.asc` — LTspice AC analysis
+- `analog_filter_validation.py` — Python frequency-response calculation
