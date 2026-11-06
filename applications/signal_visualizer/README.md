@@ -8768,3 +8768,49 @@ Simulated an analog signal acquisition system with RC anti-aliasing filtering, A
 python applications/signal_visualizer/adc_acquisition_lab.py
 
 **Next Lesson:** #131 — Oscilloscope, Function Generator and Logic Analyzer.
+
+
+## Lesson #132 — DAQ, Calibration and Measurement Uncertainty
+
+### Objective
+
+Understand data acquisition, sensor calibration, residual analysis, and measurement uncertainty.
+
+### Implementation
+
+File: `daq_uncertainty_lab.py`
+
+- Fitted a linear calibration model using NumPy.
+- Compared reference temperatures with sensor measurements.
+- Calculated and plotted calibration residuals.
+- Estimated residual standard deviation.
+- Converted a new sensor reading into calibrated temperature.
+- Combined two assumed independent uncertainty components.
+
+### Results
+
+| Parameter | Value |
+|---|---|
+| Calibration slope | 1.069 |
+| Calibration offset | 0.530 °C |
+| Residual standard deviation | 0.21525 °C |
+| New sensor reading | 38.00 °C |
+| Estimated temperature | 35.05145 °C |
+| Residual uncertainty component | 0.20136 °C |
+| Combined standard uncertainty | 0.20747 °C |
+
+### Interpretation
+
+The sensor exhibits both offset and gain errors.
+
+Linear calibration corrects the estimated systematic response, while residual analysis quantifies deviations from the fitted model.
+
+The combined uncertainty calculation assumes independent uncertainty components and is illustrative. It does not include all sources of uncertainty, such as calibration coefficient uncertainty, sensor drift, and correlation.
+
+### Key Takeaways
+
+- Data acquisition involves more than analog-to-digital conversion.
+- Calibration reduces known systematic errors.
+- Averaging reduces independent random noise but does not automatically remove systematic errors.
+- Residual analysis helps evaluate calibration model adequacy.
+- A calibrated measurement still has uncertainty.
